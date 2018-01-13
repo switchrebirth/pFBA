@@ -42,6 +42,7 @@ static struct BurnInputInfo Sg1000InputList[] = {
 
 	{"Console Pause",		BIT_DIGITAL,	&DrvNMI,	"consolepause"	},
 	{"Reset",		BIT_DIGITAL,	&DrvReset,	"reset"		},
+	{"Dip A",		BIT_DIPSWITCH,	DrvDips + 0,	"dip"},
 };
 
 STDINPUTINFO(Sg1000)
@@ -395,8 +396,10 @@ INT32 SG1KGetZipName(char** pszName, UINT32 i)
 	}
 
 	// remove the "SG1K_"
+	memset(szFilename, 0, sizeof(szFilename));
+
 	for (UINT32 j = 0; j < strlen(pszGameName); j++) {
-		szFilename[j] = pszGameName[j + 5];
+		szFilename[j] = pszGameName[j/* + 5*/];
 	}
 
 	*pszName = szFilename;

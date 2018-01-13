@@ -13,7 +13,11 @@ extern Video *video;
 
 extern INT32 MakeScreenShot(const char *dest);
 
+#ifdef STANDARD_LAYOUT
 static int max_lines = 16;
+#else
+static int max_lines = 22;
+#endif
 static int rom_index = 0;
 static int option_index = 0;
 
@@ -35,15 +39,18 @@ void Gui::DrawBg() {
         renderer->DrawRect(window, C2D_COL_GRAY);
         renderer->DrawRect(window, C2D_COL_ORANGE, false);
 
+#ifdef STANDARD_LAYOUT
         if (skin->tex_title->available) {
             skin->tex_title->Draw(GetRectTitle(), true);
         }
-
+#endif
         renderer->DrawRect(GetRectRomList(), C2D_COL_GRAY_LIGHT);
         renderer->DrawRect(GetRectRomList(), C2D_COL_ORANGE, false);
 
+#ifdef STANDARD_LAYOUT
         renderer->DrawRect(GetRectRomInfo(), C2D_COL_GRAY_LIGHT);
         renderer->DrawRect(GetRectRomInfo(), C2D_COL_GREEN, false);
+#endif
     }
 }
 
@@ -152,11 +159,32 @@ void Gui::DrawRomList() {
             renderer->DrawRect(rectText, c);
             renderer->DrawRect(rectText, color, false);
             romSelected = new RomList::Rom(rom);
+#ifdef STANDARD_LAYOUT
             DrawRomInfo(romSelected);
             if (title != NULL) {
                 Rect dst = title->Draw(GetRectRomPreview(), true);
                 renderer->DrawRect(dst, C2D_COL_RED, false);
             }
+#else
+            if (title != NULL) {
+                Rect dst = title->Draw(GetRectRomTitle(), true);
+                renderer->DrawRect(dst, C2D_COL_ORANGE, false);
+            }
+            else {
+                Rect dst = GetRectRomTitle();
+                renderer->DrawRect(dst, C2D_COL_GRAY_LIGHT);
+                renderer->DrawRect(dst, C2D_COL_ORANGE, false);
+            }
+            if (preview != NULL) {
+                Rect dst = preview->Draw(GetRectRomInfo(), true);
+                renderer->DrawRect(dst, C2D_COL_ORANGE, false);
+            }
+            else {
+                Rect dst = GetRectRomInfo();
+                renderer->DrawRect(dst, C2D_COL_GRAY_LIGHT);
+                renderer->DrawRect(dst, C2D_COL_ORANGE, false);
+            }
+#endif
         }
 
         // draw rom name text
@@ -637,6 +665,10 @@ void Gui::Run() {
     RunRom(&r);
     */
 
+#ifndef STANDARD_LAYOUT
+    char sStr[MAX_PATH];
+#endif
+
     Clear();
     DrawBg();
     DrawRomList();
@@ -676,13 +708,32 @@ void Gui::Run() {
                     && romSelected->state != RomList::RomState::MISSING) {
                     RunRom(romSelected);
                 }
+#ifndef STANDARD_LAYOUT
+            } else if (key & Input::Key::KEY_FIRE4) {
+                if (romSelected != NULL) {
+                    int hw_cfg = config->GetGuiValue(Option::Index::GUI_SHOW_HARDWARE);
+                    RomList::Hardware hw = config->hardwareList[hw_cfg];
+                    int show_clones = config->GetGuiValue(Option::Index::GUI_SHOW_CLONES);
+                    int available = (int) roms.size();
+                    if (config->GetGuiValue(Option::Index::GUI_SHOW_ALL)) {
+                    	available = show_clones ? hw.available_count : hw.available_count - hw.available_clone_count;
+                    }
+                    sprintf(sStr, "%s\n\n%s.zip\n\nROMS: %i / %i", romSelected->name, romSelected->zip, available, (int) roms.size());
+                    MessageBox(sStr, "Ok", NULL);
+                    input->Clear(0);
+                }
+#endif
             } else if (key & Input::Key::KEY_MENU1) {
                 RunOptionMenu();
                 if (title != NULL) {
                     // refresh preview/title image
                     DrawBg();
                     DrawRomList();
+#ifdef STANDARD_LAYOUT
                     title->Draw(GetRectRomPreview(), true);
+#else
+                    title->Draw(GetRectRomTitle(), true);
+#endif
                     Flip();
                 }
             } else if (key & Input::Key::KEY_MENU2) {
@@ -693,7 +744,11 @@ void Gui::Run() {
                         // refresh preview/title image
                         DrawBg();
                         DrawRomList();
+#ifdef STANDARD_LAYOUT
                         title->Draw(GetRectRomPreview(), true);
+#else
+                        title->Draw(GetRectRomTitle(), true);
+#endif
                         Flip();
                     }
                 }
@@ -771,6 +826,7 @@ const Rect Gui::GetRectRomList() {
 
     Rect rect;
 
+#ifdef STANDARD_LAYOUT
     rect.x = BORDER_SIZE;
     rect.y = renderer->height / 4;
     rect.y += BORDER_SIZE;
@@ -778,12 +834,21 @@ const Rect Gui::GetRectRomList() {
     rect.w -= BORDER_SIZE + BORDER_SIZE / 2;
     rect.h = (renderer->height / 4) * 3;
     rect.h -= BORDER_SIZE * 2;
-
+#else
+    rect.x = BORDER_SIZE;
+    rect.y = BORDER_SIZE;
+    rect.w = renderer->width / 2;
+    rect.w -= BORDER_SIZE + BORDER_SIZE / 2;
+    rect.h = renderer->height - (BORDER_SIZE * 2);
+#endif
     return rect;
 }
 
+#ifdef STANDARD_LAYOUT
 const Rect Gui::GetRectRomPreview() {
-
+#else
+const Rect Gui::GetRectRomTitle() {
+#endif
     Rect rect;
 
     rect.x = (renderer->width / 2);
@@ -817,6 +882,13 @@ void Gui::TitleFree() {
         delete (title);
         title = NULL;
     }
+
+#ifndef STANDARD_LAYOUT
+    if (preview) {
+        delete (preview);
+        preview = NULL;
+    }
+#endif
     title_loaded = 0;
 }
 
@@ -825,19 +897,55 @@ int Gui::TitleLoad(RomList::Rom *rom) {
     TitleFree();
 
     char path[MAX_PATH];
+
+#ifdef STANDARD_LAYOUT
     sprintf(path, "%s/%s.png", szAppPreviewPath, rom->zip);
     if (io->Exist(path)) {
-        title = new Texture(renderer, path);
+        title = (Texture *) new C2DTexture(renderer, path);
         return title != NULL;
     } else if (rom->parent) {
         memset(path, 0, MAX_PATH);
         sprintf(path, "%s/%s.png", szAppPreviewPath, rom->parent);
         if (io->Exist(path)) {
-            title = new Texture(renderer, path);
+            title = (Texture *) new C2DTexture(renderer, path);
             return title != NULL;
         }
     }
     return 0;
+#else
+    // Load title picture
+    sprintf(path, "%s/%s.png", szAppTitlePath, rom->zip);
+    if (io->Exist(path)) {
+        title = (Texture *) new C2DTexture(renderer, path);
+        //return title != NULL;
+    } 
+    else 
+    if (rom->parent) {
+        memset(path, 0, MAX_PATH);
+        sprintf(path, "%s/%s.png", szAppTitlePath, rom->parent);
+        if (io->Exist(path)) 
+        {
+            title = (Texture *) new C2DTexture(renderer, path);
+            //return title != NULL;
+        }
+    }
+
+    // Load preview picture
+    sprintf(path, "%s/%s.png", szAppPreviewPath, rom->zip);
+    if (io->Exist(path)) {
+        preview = (Texture *) new C2DTexture(renderer, path);
+    } 
+    else 
+    if (rom->parent) {
+        memset(path, 0, MAX_PATH);
+        sprintf(path, "%s/%s.png", szAppPreviewPath, rom->parent);
+        if (io->Exist(path)) {
+            preview = (Texture *) new C2DTexture(renderer, path);
+        }
+    }
+
+    return ((title != NULL) || (preview != NULL));
+#endif
 }
 
 void Gui::FilterRoms() {
@@ -1004,6 +1112,9 @@ int Gui::MessageBox(const char *message, const char *choice1, const char *choice
             renderer->Delay(INPUT_DELAY);
         }
     }
+
+    input->Clear(0);
+
 }
 
 int Gui::GetButton() {

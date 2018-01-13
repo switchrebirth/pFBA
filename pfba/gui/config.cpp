@@ -27,6 +27,11 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     roms_paths.push_back("");
     roms_paths.push_back("");
     roms_paths.push_back("");
+#ifdef __PSP2__
+	for (int i = roms_paths.size(); i <= DIRS_MAX; i++) {
+		roms_paths.push_back("");
+	}
+#endif
 
     // build hardware list configuration
     hardwareList.push_back({HARDWARE_PREFIX_ALL, "All"});

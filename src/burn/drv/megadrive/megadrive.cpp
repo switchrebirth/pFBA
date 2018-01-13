@@ -3909,6 +3909,8 @@ static void PrepareSprites(INT32 full)
 	INT32 u=0,link=0,sblocks=0;
 	INT32 table=0;
 	INT32 *pd = HighPreSpr;
+
+	UINT32 *sprite = NULL;
 	
 	table=RamVReg->reg[5]&0x7f;
 	if (RamVReg->reg[12]&1) table&=0x7e; // Lowest bit 0 in 40-cell mode
@@ -3918,7 +3920,7 @@ static void PrepareSprites(INT32 full)
 		INT32 pack;
 		// updates: tilecode, sx
 		for (u=0; u < 80 && (pack = *pd); u++, pd+=2) {
-			UINT32 *sprite;
+
 			INT32 code, code2, sx, sy, skip=0;
 			
 			sprite=(UINT32 *)(RamVid+((table+(link<<2))&0x7ffc)); // Find sprite
@@ -3944,9 +3946,11 @@ static void PrepareSprites(INT32 full)
 			if(!link) break; // End of sprites
 		}
 		SpriteBlocks |= sblocks;
+
+		*pd = 0; // terminate
 	} else {
 		for (; u < 80; u++) {
-			UINT32 *sprite;
+
 			INT32 code, code2, sx, sy, hv, height, width, skip=0, sx_min;
 			
 			sprite=(UINT32 *)(RamVid+((table+(link<<2))&0x7ffc)); // Find sprite
@@ -4196,48 +4200,56 @@ static INT32 PicoLine(INT32 /*scan*/)
 
 static void MegadriveDraw()
 {
-	UINT16 *pDest = (UINT16 *)pBurnDraw;
+	UINT8 *pDest = (UINT8 *)pBurnDraw;
+	UINT8 *pSrc = NULL;
 
-	if ((RamVReg->reg[12]&1) || !(MegadriveDIP[1] & 0x03)) {
-	
-		for (INT32 j=0; j < 224; j++) {
-			UINT16 *pSrc = LineBuf + (j * 320);
+	if ((RamVReg->reg[12]&1) || !(MegadriveDIP[1] & 0x03))
+	{
+		for (INT32 j=0; j < 224*2; j++) 
+		{
+			pSrc = (UINT8 *)LineBuf + (j * 320);
+
 			for (INT32 i = 0; i < 320; i++)
+			{
 				pDest[i] = pSrc[i];
+			}
+
 			pDest += 320;
 		}
-	
-	} else {
-		
-		if (( MegadriveDIP[1] & 0x03 ) == 0x01 ) {
+	}
+	else 
+	{
+		if (( MegadriveDIP[1] & 0x03 ) == 0x01 ) 
+		{
 			// Center 
-			pDest += 32;
-			for (INT32 j = 0; j < 224; j++) {
-				UINT16 *pSrc = LineBuf + (j * 320);
+			for (INT32 j = 0; j < 224; j++) 
+			{
+				pSrc = (UINT8 *)LineBuf + (j * 320 *2);
 
-				memset((UINT8 *)pDest -  32*2, 0, 64);
-				
-				for (INT32 i = 0; i < 256; i++)
-					pDest[i] = pSrc[i];
-				
-				memset((UINT8 *)pDest + 256*2, 0, 64);
-				
-				pDest += 320;
+				memset(pDest, 0, 32+32);
+				memcpy(pDest+32+32, pSrc, (320-32-32)*2);
+				memset(pDest+((320*2)-32-32), 0, 32+32);
+
+				pDest += 320*2;
 			}
-		} else {
+		}
+		else 
+		{
 			// Zoom
-			for (INT32 j = 0; j < 224; j++) {
+			for (INT32 j = 0; j < 224; j++) 
+			{
 				UINT16 *pSrc = LineBuf + (j * 320);
 				UINT32 delta = 0;
-				for (INT32 i = 0; i < 320; i++) {
-					pDest[i] = pSrc[delta >> 16];
+				for (INT32 i = 0; i < 320; i++) 
+				{
+					pDest[i] = pSrc[delta >> 16];	///255	/// www.SoftechSoftware.it TO BE TESTED !
 					delta += 0xCCCC;
 				}
 				pDest += 320;
 			}
 		}
-		
 	}
+
 	memset(LineBuf, 0, 320 * 320 * sizeof(UINT16));
 }
 

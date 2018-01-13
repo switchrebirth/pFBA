@@ -1705,8 +1705,10 @@ INT32 MSXGetZipName(char** pszName, UINT32 i)
 		return 1;
 	}
    // remove msx_
+	memset(szFilename, 0, sizeof(szFilename));
+
 	for (UINT32 j = 0; j < strlen(pszGameName); j++) {
-		szFilename[j] = pszGameName[j + 4];
+		szFilename[j] = pszGameName[j /*+ 4*/];
 	}
 
 	*pszName = szFilename;

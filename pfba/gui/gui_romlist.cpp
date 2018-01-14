@@ -1,19 +1,11 @@
 //
 // Created by cpasjuste on 22/11/16.
 //
-#include <skeleton/timer.h>
 #include <algorithm>
 #include "run.h"
-#include "video.h"
-#include "menu.h"
+#include "gui_romlist.h"
 
 using namespace c2d;
-
-extern Video *video;
-
-extern INT32 MakeScreenShot(const char *dst);
-
-static int option_index = 0;
 
 class GuiRomInfo : public Rectangle {
 
@@ -78,15 +70,7 @@ public:
     float scaling = 1;
 };
 
-Gui::Gui(Io *i, Renderer *r, Skin *s, RomList *rl, Config *cfg, Input *in)
-        : Rectangle(r->getSize()) {
-
-    io = i;
-    renderer = r;
-    skin = s;
-    romList = rl;
-    config = cfg;
-    input = in;
+GuiRomList::GuiRomList(Gui *gui) {
 
     // filter roms
     FilterRoms();
@@ -144,13 +128,14 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, RomList *rl, Config *cfg, Input *in)
     renderer->add(guiRomInfo);
 }
 
-Gui::~Gui() {
+GuiRomList::~GuiRomList() {
 
     delete (menu_gui);
     delete (menu_rom);
 }
 
-void Gui::Run() {
+#if 0
+void GuiRomList::Run() {
 
     int rom_index = 0;
     int title_loaded = 0;
@@ -252,16 +237,9 @@ void Gui::Run() {
     delete (timer_input);
     delete (timer_load);
 }
+#endif
 
-void Gui::RunOptionMenu(bool isRomConfig) {
-
-}
-
-void Gui::RunStatesMenu() {
-
-}
-
-void Gui::FilterRoms() {
+void GuiRomList::filterRoms() {
 
     roms.clear();
 
@@ -279,105 +257,4 @@ void Gui::FilterRoms() {
 
     // TODO
     //rom_index = 0;
-}
-
-void Gui::RunRom(RomList::Rom *rom) {
-
-    if (rom == NULL) {
-        return;
-    }
-
-    char path[MAX_PATH];
-    for (int i = 0; i < DIRS_MAX; i++) {
-        if (strlen(config->GetRomPath(i)) > 0) {
-            sprintf(path, "%s%s.zip", config->GetRomPath(i), rom->zip);
-            printf("%s\n", path);
-            if (io->Exist(path))
-                break;
-        }
-    }
-
-    if (!io->Exist(path)) {
-        printf("RunRom: rom not found: `%s`\n", rom->zip);
-        return;
-    }
-
-    printf("RunRom: %s\n", path);
-    for (nBurnDrvSelect[0] = 0; nBurnDrvSelect[0] < nBurnDrvCount; nBurnDrvSelect[0]++) {
-        nBurnDrvActive = nBurnDrvSelect[0];
-        if (strcasecmp(rom->zip, BurnDrvGetTextA(DRV_NAME)) == 0)
-            break;
-    }
-
-    if (nBurnDrvActive >= nBurnDrvCount) {
-        printf("RunRom: driver not found\n");
-        return;
-    }
-
-    // load rom settings
-    printf("RunRom: config->LoadRom(%s)\n", rom->zip);
-    config->Load(rom);
-
-    // set per rom input scheme
-    UpdateInputMapping(true);
-
-    printf("RunRom: RunEmulator: start\n");
-    RunEmulator(this, nBurnDrvActive);
-
-    // set default input scheme
-    UpdateInputMapping(false);
-
-    printf("RunRom: RunEmulator: return\n");
-}
-
-Input *Gui::GetInput() {
-    return input;
-}
-
-Renderer *Gui::GetRenderer() {
-    return renderer;
-}
-
-Skin *Gui::GetSkin() {
-    return skin;
-}
-
-Config *Gui::GetConfig() {
-    return config;
-}
-
-void Gui::SetTitleLoadDelay(int delay) {
-    title_delay = delay;
-}
-
-void Gui::UpdateInputMapping(bool isRomConfig) {
-
-    if (isRomConfig) {
-        input->SetKeyboardMapping(config->GetRomPlayerInputKeys(0));
-        int dz = 2000 + config->GetRomValue(Option::Index::JOY_DEADZONE) * 2000;
-        for (int i = 0; i < PLAYER_COUNT; i++) {
-            input->SetJoystickMapping(i, config->GetRomPlayerInputButtons(i), dz);
-            input->players[i].lx.id = config->GetRomValue(Option::Index::JOY_AXIS_LX);
-            input->players[i].ly.id = config->GetRomValue(Option::Index::JOY_AXIS_LY);
-            input->players[i].rx.id = config->GetRomValue(Option::Index::JOY_AXIS_RX);
-            input->players[i].ry.id = config->GetRomValue(Option::Index::JOY_AXIS_RY);
-        }
-    } else {
-        input->SetKeyboardMapping(config->GetGuiPlayerInputKeys(0));
-        int dz = 2000 + config->GetGuiValue(Option::Index::JOY_DEADZONE) * 2000;
-        for (int i = 0; i < PLAYER_COUNT; i++) {
-            input->SetJoystickMapping(i, config->GetGuiPlayerInputButtons(i), dz);
-            input->players[i].lx.id = config->GetGuiValue(Option::Index::JOY_AXIS_LX);
-            input->players[i].ly.id = config->GetGuiValue(Option::Index::JOY_AXIS_LY);
-            input->players[i].rx.id = config->GetGuiValue(Option::Index::JOY_AXIS_RX);
-            input->players[i].ry.id = config->GetGuiValue(Option::Index::JOY_AXIS_RY);
-        }
-    }
-}
-
-void Gui::Clear() {
-}
-
-void Gui::Flip() {
-    renderer->flip();
 }

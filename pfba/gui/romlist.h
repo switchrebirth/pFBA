@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "burner.h"
+
 #define HARDWARE_PREFIX_ALL 0xffffffff
 
 class RomList {
@@ -23,6 +24,7 @@ public:
         int available_clone_count = 0;
         int missing_count = 0;
         int missing_clone_count = 0;
+
         Hardware(int p, const std::string &n, int rs = 0, int ra = 0) {
             prefix = p;
             name = n;
@@ -31,8 +33,9 @@ public:
         }
     };
 
-    RomList(Io *io, std::vector<Hardware> *hwList,
+    RomList(c2d::Io *io, std::vector<Hardware> *hwList,
             const std::vector<std::string> &paths);
+
     ~RomList();
 
     enum RomState {
@@ -41,8 +44,8 @@ public:
         WORKING
     };
 
-    struct Rom {
-        char *name;
+    class Rom : public c2d::Io::File {
+    public:
         char *zip;
         char *year;
         char *manufacturer;
@@ -52,10 +55,9 @@ public:
         int hardware;
         char *system;
         int genre;
-        int size;
     };
 
-    std::vector<Rom> list;
+    std::vector<Rom *> list;
     std::vector<Hardware> *hardwareList;
 
     Hardware *GetHardware(int hardware_prefix) {

@@ -6,12 +6,12 @@
 #define _VIDEO_H_
 
 #include <cstring>
-#include <C2D.h>
+#include <c2d.h>
 
 class Video {
 
 public:
-    Video(Renderer *renderer);
+    Video(c2d::Renderer *renderer);
     virtual ~Video();
 
     virtual void Clear();
@@ -22,9 +22,9 @@ public:
     virtual void Scale();
     virtual void Filter(int filter);
 
-    Renderer *renderer = NULL;
-    Texture *screen = NULL;
-    Rect scale;
+    c2d::Renderer *renderer = NULL;
+    c2d::Texture *screen = NULL;
+    c2d::FloatRect scale;
     int VideoBufferWidth = 0;
     int VideoBufferHeight = 0;
     int rotation = 0;

@@ -6,6 +6,8 @@
 #include <gui/config.h>
 #include "video.h"
 
+using namespace c2d;
+
 extern Gui *gui;
 
 static unsigned int myHighCol16(int r, int g, int b, int /* i */) {
@@ -31,44 +33,44 @@ Video::Video(Renderer *renderer) {
     }
 
     if (screen == NULL) {
-        screen = (Texture *) new C2DTexture(renderer, VideoBufferWidth, VideoBufferHeight);
+        screen = (Texture *) new C2DTexture(Vector2f(VideoBufferWidth, VideoBufferHeight));
     }
 
     nBurnBpp = 2;
     BurnHighCol = myHighCol16;
     BurnRecalcPal();
-    screen->Lock(Rect(), (void **) &pBurnDraw, &nBurnPitch);
-    screen->Unlock();
+    screen->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
+    screen->unlock();
 
-    renderer->SetShader(gui->GetConfig()->GetRomValue(Option::Index::ROM_SHADER));
-    Filter(gui->GetConfig()->GetRomValue(Option::Index::ROM_FILTER));
+    renderer->setShader(gui->getConfig()->GetRomValue(Option::Index::ROM_SHADER));
+    Filter(gui->getConfig()->GetRomValue(Option::Index::ROM_FILTER));
     Scale();
 }
 
 void Video::Filter(int filter) {
-    screen->SetFiltering(filter);
+    screen->setFiltering(filter);
     // SDL2 needs to regenerate a texture, so update burn buffer
-    screen->Lock(Rect(), (void **) &pBurnDraw, &nBurnPitch);
-    screen->Unlock();
+    screen->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
+    screen->unlock();
 }
 
 void Video::Scale() {
 
-    Rect window = {0, 0, renderer->width, renderer->height};
+    FloatRect window = renderer->getGlobalBounds();
 
-    int scaling = gui->GetConfig()->GetRomValue(Option::Index::ROM_SCALING);
+    int scaling = gui->getConfig()->GetRomValue(Option::Index::ROM_SCALING);
     rotation = 0;
 
     // TODO: force right to left orientation on psp2,
     // should add platform specific code
 
-    if ((gui->GetConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 0
-         || gui->GetConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 3)
+    if ((gui->getConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 0
+         || gui->getConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 3)
         && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if (!(BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED)) {
             rotation = 180;
         }
-    } else if (gui->GetConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 2
+    } else if (gui->getConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 2
                && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if ((BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED)) {
             rotation = 180;
@@ -87,51 +89,51 @@ void Video::Scale() {
 
     //printf("rotation: %i\n", rotation);
 
-    scale.w = VideoBufferWidth;
-    scale.h = VideoBufferHeight;
+    scale.width = VideoBufferWidth;
+    scale.height = VideoBufferHeight;
 
     switch (scaling) {
 
         case 1: // 2x
-            scale.w = scale.w * 2;
-            scale.h = scale.h * 2;
+            scale.width = scale.width * 2;
+            scale.height = scale.height * 2;
             break;
 
         case 2: // fit
             if (rotation == 0 || rotation == 180) {
-                scale.h = window.h;
-                scale.w = (int) ((float) scale.w * ((float) scale.h / (float) VideoBufferHeight));
-                if (scale.w > window.w) {
-                    scale.w = window.w;
-                    scale.h = (int) ((float) scale.w * ((float) VideoBufferHeight / (float) VideoBufferWidth));
+                scale.height = window.height;
+                scale.width = (int) (scale.width * (scale.height / (float) VideoBufferHeight));
+                if (scale.width > window.width) {
+                    scale.width = window.width;
+                    scale.height = (int) (scale.width * ((float) VideoBufferHeight / (float) VideoBufferWidth));
                 }
             } else {
-                scale.w = window.h;
-                scale.h = (int) ((float) scale.w * ((float) VideoBufferHeight / (float) VideoBufferWidth));
+                scale.width = window.height;
+                scale.height = (int) (scale.width * ((float) VideoBufferHeight / (float) VideoBufferWidth));
             }
             break;
 
         case 3: // fit 4:3
             if (rotation == 0 || rotation == 180) {
-                scale.h = window.h;
-                scale.w = (int) (((float) scale.h * 4.0) / 3.0);
-                if (scale.w > window.w) {
-                    scale.w = window.w;
-                    scale.h = (int) (((float) scale.w * 3.0) / 4.0);
+                scale.height = window.height;
+                scale.width = (int) ((scale.height * 4.0) / 3.0);
+                if (scale.width > window.width) {
+                    scale.width = window.width;
+                    scale.height = (int) ((scale.width * 3.0) / 4.0);
                 }
             } else {
-                scale.w = window.h;
-                scale.h = (int) (((float) scale.w * 3.0) / 4.0);
+                scale.width = window.height;
+                scale.height = (int) ((scale.width * 3.0) / 4.0);
             }
             break;
 
         case 4: // fullscreen
             if (rotation == 0 || rotation == 180) {
-                scale.h = window.h;
-                scale.w = window.w;
+                scale.height = window.height;
+                scale.width = window.width;
             } else {
-                scale.h = window.w;
-                scale.w = window.h;
+                scale.height = window.width;
+                scale.width = window.height;
             }
             break;
 
@@ -139,10 +141,10 @@ void Video::Scale() {
             break;
     }
 
-    scale.x = (window.w - scale.w) / 2;
-    scale.y = (window.h - scale.h) / 2;
+    scale.left = (window.width - scale.width) / 2;
+    scale.top = (window.height - scale.height) / 2;
 
-    //printf("scale: x=%i y=%i %ix%i\n", scale.x, scale.y, scale.w, scale.h);
+    //printf("scale: x=%i y=%i %ix%i\n", scale.x, scale.y, scale.width, scale.height);
     for (int i = 0; i < 3; i++) {
         Clear();
         Flip();
@@ -150,32 +152,37 @@ void Video::Scale() {
 }
 
 void Video::Clear() {
-    renderer->Clear();
+    // TODO ?
+    //renderer->clear();
 }
 
 void Video::Lock() {
-    screen->Lock(Rect(), (void **) &pBurnDraw, &nBurnPitch);
+    screen->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
 }
 
 void Video::Unlock() {
-    screen->Unlock();
+    screen->unlock();
 }
 
+// TODO ?
 void Video::Render() {
+    /*
     if (pBurnDraw != NULL) {
-        screen->Draw(scale.x, scale.y, scale.w, scale.h, rotation);
+        screen->Draw(scale.x, scale.y, scale.width, scale.height, rotation);
     }
+    */
 }
 
 void Video::Flip() {
-    renderer->Flip();
+    //renderer->Flip();
 }
 
 Video::~Video() {
+
     if (screen != NULL) {
         delete (screen);
         screen = NULL;
     }
     pBurnDraw = NULL;
-    renderer->SetShader(0);
+    renderer->setShader(0);
 }

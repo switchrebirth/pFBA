@@ -5,7 +5,7 @@
 #ifndef _SKIN_H_
 #define _SKIN_H_
 
-#include <C2D.h>
+#include <c2d.h>
 
 class Skin {
 
@@ -14,7 +14,7 @@ public:
     struct Button {
         std::string name;
         int id = -1;
-        Texture *texture = NULL;
+        c2d::Texture *texture = NULL;
 
         Button(int i, const std::string &n) {
             id = i;
@@ -22,15 +22,16 @@ public:
         }
     };
 
-    Skin(Renderer *renderer, char *skinPath, int fontSize, std::vector<Button> btns);
+    Skin(c2d::Renderer *renderer, char *skinPath, int fontSize, std::vector<Button> btns);
 
     ~Skin();
 
     Button *GetButton(int id);
 
-    Texture *tex_bg;
-    Texture *tex_title;
-    Font *font;
+    c2d::Texture *tex_bg;
+    c2d::Texture *tex_title;
+    c2d::Font *font;
+    int fontSize = C2D_DEFAULT_CHAR_SIZE;
     std::vector<Button> buttons;
 };
 

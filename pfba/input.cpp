@@ -1,6 +1,8 @@
 #include <skeleton/input.h>
 #include "burner.h"
 
+using namespace c2d;
+
 unsigned char inputServiceSwitch;
 unsigned char inputP1P2Switch;
 

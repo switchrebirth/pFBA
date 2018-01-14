@@ -9,6 +9,9 @@
 
 #include "burner.h"
 #include "romlist.h"
+#include "gui.h"
+
+using namespace c2d;
 
 RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::string> &paths) {
 
@@ -32,29 +35,29 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
 
         nBurnDrvActive = i;
 
-        Rom rom;
-        rom.zip = BurnDrvGetTextA(DRV_NAME);
-        rom.parent = BurnDrvGetTextA(DRV_PARENT);
-        rom.name = BurnDrvGetTextA(DRV_FULLNAME);
-        rom.year = BurnDrvGetTextA(DRV_DATE);
-        rom.manufacturer = BurnDrvGetTextA(DRV_MANUFACTURER);
-        rom.system = BurnDrvGetTextA(DRV_SYSTEM);
-        rom.genre = BurnDrvGetGenreFlags();
-        rom.flags = BurnDrvGetFlags();
-        rom.state = RomState::MISSING;
-        rom.hardware = BurnDrvGetHardwareCode();
+        Rom *rom = new Rom();
+        rom->zip = BurnDrvGetTextA(DRV_NAME);
+        rom->parent = BurnDrvGetTextA(DRV_PARENT);
+        rom->name = BurnDrvGetTextA(DRV_FULLNAME);
+        rom->year = BurnDrvGetTextA(DRV_DATE);
+        rom->manufacturer = BurnDrvGetTextA(DRV_MANUFACTURER);
+        rom->system = BurnDrvGetTextA(DRV_SYSTEM);
+        rom->genre = BurnDrvGetGenreFlags();
+        rom->flags = BurnDrvGetFlags();
+        rom->state = RomState::MISSING;
+        rom->hardware = BurnDrvGetHardwareCode();
 
         // add rom to "ALL" game list
         hardwareList->at(0).supported_count++;
-        if (rom.parent) {
+        if (rom->parent) {
             hardwareList->at(0).clone_count++;
         }
 
         // add rom to specific hardware
-        Hardware *hardware = GetHardware(rom.hardware);
+        Hardware *hardware = GetHardware(rom->hardware);
         if (hardware) {
             hardware->supported_count++;
-            if (rom.parent) {
+            if (rom->parent) {
                 hardware->clone_count++;
             }
         }
@@ -63,20 +66,20 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
             if (files[j].empty()) {
                 continue;
             }
-            sprintf(path, "%s.zip", rom.zip);
-            for (int k=0; k<MAX_PATH; k++) {
+            sprintf(path, "%s.zip", rom->zip);
+            for (int k = 0; k < MAX_PATH; k++) {
                 pathUppercase[k] = toupper(path[k]);
             }
-            if (std::find(files[j].begin(), files[j].end(), path) != files[j].end() || 
+            if (std::find(files[j].begin(), files[j].end(), path) != files[j].end() ||
                 std::find(files[j].begin(), files[j].end(), pathUppercase) != files[j].end()) {
-                rom.state = BurnDrvIsWorking() ? RomState::WORKING : RomState::NOT_WORKING;
+                rom->state = BurnDrvIsWorking() ? RomState::WORKING : RomState::NOT_WORKING;
                 hardwareList->at(0).available_count++;
-                if (rom.parent) {
+                if (rom->parent) {
                     hardwareList->at(0).available_clone_count++;
                 }
                 if (hardware) {
                     hardware->available_count++;
-                    if (rom.parent) {
+                    if (rom->parent) {
                         hardware->available_clone_count++;
                     }
                 }
@@ -84,12 +87,20 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
             }
         }
 
-        if (rom.state == RomState::MISSING) {
+        // set "Io::File"" color for ui
+        rom->color = COL_RED;
+        if (rom->state == RomList::RomState::NOT_WORKING) {
+            rom->color = COL_ORANGE;
+        } else if (rom->state == RomList::RomState::WORKING) {
+            rom->color = rom->parent == NULL ? COL_GREEN : COL_YELLOW;
+        }
+
+        if (rom->state == RomState::MISSING) {
             hardwareList->at(0).missing_count++;
             if (hardware) {
                 hardware->missing_count++;
             }
-            if (rom.parent) {
+            if (rom->parent) {
                 hardwareList->at(0).missing_clone_count++;
                 if (hardware) {
                     hardware->missing_clone_count++;
@@ -119,5 +130,10 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
 }
 
 RomList::~RomList() {
+
+    for (auto &file : list) {
+        delete (file);
+    }
+
     list.clear();
 }

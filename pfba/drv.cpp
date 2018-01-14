@@ -25,7 +25,7 @@ static int DoLibInit()                    // Do Init of Burn library driver
     }
 
     NeoSystem &= ~(UINT8) 0x1f;
-    NeoSystem |= NeoSystemList[gui->GetConfig()->GetRomValue(Option::Index::ROM_NEOBIOS)];
+    NeoSystem |= NeoSystemList[gui->getConfig()->GetRomValue(Option::Index::ROM_NEOBIOS)];
 
     nRet = BurnDrvInit();
     printf("DoLibInit: BurnDrvInit = %i\n", nRet);
@@ -131,85 +131,94 @@ static int ProgressCreate() {
 }
 
 int ProgressUpdateBurner(double dProgress, const TCHAR *pszText, bool bAbs) {
+
+    // TODO
+    /*
     gui->Clear();
     gui->DrawBg();
     gui->DrawRomList();
 
     Rect window{
-            gui->GetRenderer()->width / 4,
-            gui->GetRenderer()->height / 4,
-            gui->GetRenderer()->width / 2,
-            gui->GetRenderer()->height / 2
+            gui->getRenderer()->width / 4,
+            gui->getRenderer()->height / 4,
+            gui->getRenderer()->width / 2,
+            gui->getRenderer()->height / 2
     };
 
-    gui->GetRenderer()->DrawRect(window, C2D_COL_GRAY);
-    gui->GetRenderer()->DrawRect(window, C2D_COL_GREEN, false);
+    gui->getRenderer()->DrawRect(window, C2D_COL_GRAY);
+    gui->getRenderer()->DrawRect(window, C2D_COL_GREEN, false);
 
     if (pszText) {
         nProgressPosBurn += dProgress;
 
         Rect r = {window.x + 16, window.y + 32, window.w - 32, 32};
-        gui->GetSkin()->font->Draw(r, C2D_COL_WHITE, false, true, BurnDrvGetTextA(DRV_FULLNAME));
+        gui->getSkin()->font->Draw(r, C2D_COL_WHITE, false, true, BurnDrvGetTextA(DRV_FULLNAME));
         r.y += 64;
-        gui->GetSkin()->font->Draw(r, C2D_COL_WHITE, false, true, "Please wait...");
+        gui->getSkin()->font->Draw(r, C2D_COL_WHITE, false, true, "Please wait...");
         r.y += 32;
-        gui->GetSkin()->font->Draw(r, C2D_COL_WHITE, false, true, "%s", pszText);
+        gui->getSkin()->font->Draw(r, C2D_COL_WHITE, false, true, "%s", pszText);
 
         int x = window.x + 16;
         int w = window.w - 32;
-        gui->GetRenderer()->DrawRect(x - 1, window.y + window.h - 65, w + 2, 34, 255, 255, 255, 255, false);
+        gui->getRenderer()->DrawRect(x - 1, window.y + window.h - 65, w + 2, 34, 255, 255, 255, 255, false);
 
         int progress_y = (int) (nProgressPosBurn * (double) w);
         if (progress_y > w) {
             progress_y = w;
         }
-        gui->GetRenderer()->DrawRect(x, window.y + window.h - 64, progress_y, 32, 255, 255, 0, 255);
+        gui->getRenderer()->DrawRect(x, window.y + window.h - 64, progress_y, 32, 255, 255, 0, 255);
     } else {
-        gui->GetSkin()->font->Draw(window.x + 16, window.y + 96, "Please wait...");
+        gui->getSkin()->font->Draw(window.x + 16, window.y + 96, "Please wait...");
     }
     gui->Flip();
+
+    */
 
     return 0;
 }
 
 int AppError(TCHAR *szText, int bWarning) {
 
-    gui->GetRenderer()->Delay(500);
+    // TODO
+    /*
+    gui->getRenderer()->Delay(500);
 
     Rect window{
-            gui->GetRenderer()->width / 4,
-            gui->GetRenderer()->height / 4,
-            gui->GetRenderer()->width / 2,
-            gui->GetRenderer()->height / 2
+            gui->getRenderer()->width / 4,
+            gui->getRenderer()->height / 4,
+            gui->getRenderer()->width / 2,
+            gui->getRenderer()->height / 2
     };
 
-    while (!gui->GetInput()->Update(0)[0].state) {
+    while (!gui->getInput()->Update(0)[0].state) {
 
         gui->DrawRomList();
 
-        gui->GetRenderer()->DrawRect(window, C2D_COL_GRAY);
-        gui->GetRenderer()->DrawRect(window, C2D_COL_GREEN, false);
+        gui->getRenderer()->DrawRect(window, C2D_COL_GRAY);
+        gui->getRenderer()->DrawRect(window, C2D_COL_GREEN, false);
 
         Rect dst = window;
         int height = window.h / 3;
         dst.h = height;
 
-        gui->GetSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "WARNING");
+        gui->getSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "WARNING");
         dst.y += height;
 
         if (szText) {
-            gui->GetSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "%s", szText);
+            gui->getSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "%s", szText);
             dst.y += height;
         }
 
-        gui->GetSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "PRESS A KEY TO CONTINUE", szText);
+        gui->getSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "PRESS A KEY TO CONTINUE", szText);
 
         gui->Flip();
     }
 
     GameLooping = false;
 
-    gui->GetRenderer()->Delay(500);
+    gui->getRenderer()->Delay(500);
+
+    */
 
     return 1;
 }

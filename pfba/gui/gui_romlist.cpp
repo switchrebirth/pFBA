@@ -70,191 +70,175 @@ public:
     float scaling = 1;
 };
 
-GuiRomList::GuiRomList(Gui *gui) {
+GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
+
+    gui = g;
+
+    // build/init roms list
+    rom_list = new RomList(gui->getIo(), &gui->getConfig()->hardwareList,
+                           gui->getConfig()->GetRomPaths());
 
     // filter roms
-    FilterRoms();
-
-    // build menus from options
-    menu_gui = new Menu(NULL, cfg->GetGuiOptions());
-    menu_rom = new Menu(NULL, cfg->GetRomOptions(), true);
-    menu_current = menu_gui;
-
-    // scaling factor mainly used for borders
-    // based on vita resolution..
-    scaling = std::min(renderer->getSize().x / 960, 1.0f);
+    filterRoms();
 
     // set gui main "window"
     setFillColor(Color::Gray);
     setOutlineColor(COL_ORANGE);
-    setOutlineThickness(scaling < 1 ? 1 : 2);
+    setOutlineThickness(gui->getScaling() < 1 ? 1 : 2);
     setPosition(getOutlineThickness(), getOutlineThickness());
-    setSize(Vector2f(r->getSize().x - getOutlineThickness() * 2, r->getSize().y - getOutlineThickness() * 2));
-    renderer->add(this);
+    setSize(Vector2f(getSize().x - getOutlineThickness() * 2, getSize().y - getOutlineThickness() * 2));
 
     // add title image if available
+    Skin *skin = gui->getSkin();
     if (skin->tex_title->available) {
-        skin->tex_title->setPosition(UI_MARGIN * scaling, UI_MARGIN * scaling);
+        skin->tex_title->setPosition(UI_MARGIN * gui->getScaling(), UI_MARGIN * gui->getScaling());
         float scale = (getLocalBounds().width / 3) / skin->tex_title->getSize().x;
         skin->tex_title->setScale(scale, scale);
-        renderer->add(skin->tex_title);
+        add(skin->tex_title);
     }
 
     // add rom list ui
     float top = skin->tex_title->getGlobalBounds().top
                 + skin->tex_title->getGlobalBounds().height
-                + UI_MARGIN * scaling;
+                + UI_MARGIN * gui->getScaling();
 
     FloatRect rect = {
-            UI_MARGIN * scaling, top,
-            (getLocalBounds().width / 2) - UI_MARGIN * scaling,
-            getLocalBounds().height - top - UI_MARGIN * scaling};
+            UI_MARGIN * gui->getScaling(), top,
+            (getLocalBounds().width / 2) - UI_MARGIN * gui->getScaling(),
+            getLocalBounds().height - top - UI_MARGIN * gui->getScaling()};
 
-    guiRomList = new ListBox(*skin->font, rect, (std::vector<Io::File *> &) roms);
-    guiRomList->setOutlineThickness(getOutlineThickness());
-    guiRomList->setFillColor(Color::GrayLight);
-    guiRomList->setOutlineColor(COL_ORANGE);
-    renderer->add(guiRomList);
+    list_box = new ListBox(*skin->font, rect, (std::vector<Io::File *> &) roms);
+    list_box->setOutlineThickness(getOutlineThickness());
+    list_box->setFillColor(Color::GrayLight);
+    list_box->setOutlineColor(COL_ORANGE);
+    add(list_box);
 
     // add rom info ui
-    guiRomInfo = new GuiRomInfo(
+    rom_info = new GuiRomInfo(
             FloatRect(
-                    (getLocalBounds().width / 2) + UI_MARGIN * scaling,
-                    UI_MARGIN * scaling,
-                    (getLocalBounds().width / 2) - UI_MARGIN * scaling * 2,
-                    getLocalBounds().height - UI_MARGIN * scaling * 2), scaling);
-    guiRomInfo->rectangle->setOutlineThickness(getOutlineThickness());
-    guiRomInfo->update(roms[0]);
-    renderer->add(guiRomInfo);
+                    (getLocalBounds().width / 2) + UI_MARGIN * gui->getScaling(),
+                    UI_MARGIN * gui->getScaling(),
+                    (getLocalBounds().width / 2) - UI_MARGIN * gui->getScaling() * 2,
+                    getLocalBounds().height - UI_MARGIN * gui->getScaling() * 2), gui->getScaling());
+    rom_info->rectangle->setOutlineThickness(getOutlineThickness());
+    rom_info->update(roms[0]);
+    add(rom_info);
+
+    timer_input = new Timer();
+    timer_load = new Timer();
 }
 
-GuiRomList::~GuiRomList() {
+int GuiRomList::updateState() {
 
-    delete (menu_gui);
-    delete (menu_rom);
-}
 
-#if 0
-void GuiRomList::Run() {
+    Input::Player *players = gui->getInput()->Update();
 
-    int rom_index = 0;
-    int title_loaded = 0;
+    int key = players[0].state;
+    if (key > 0) {
 
-    Timer *timer_input = new Timer();
-    Timer *timer_load = new Timer();
-
-    UpdateInputMapping(false);
-
-    while (!quit) {
-
-        Input::Player *players = input->Update();
-
-        int key = players[0].state;
-        if (key > 0) {
-
-            if (key & Input::Key::KEY_UP) {
-                rom_index--;
-                if (rom_index < 0)
-                    rom_index = (int) (roms.size() - 1);
-                guiRomList->setSelection(rom_index);
-                guiRomInfo->update(NULL);
-                title_loaded = 0;
-            } else if (key & Input::Key::KEY_DOWN) {
-                rom_index++;
-                if (rom_index >= roms.size())
-                    rom_index = 0;
-                guiRomList->setSelection(rom_index);
-                guiRomInfo->update(NULL);
-                title_loaded = 0;
-            } else if (key & Input::Key::KEY_RIGHT) {
-                rom_index += guiRomList->getMaxLines();
-                if (rom_index >= roms.size())
-                    rom_index = (int) (roms.size() - 1);
-                guiRomList->setSelection(rom_index);
-                guiRomInfo->update(NULL);
-                title_loaded = 0;
-            } else if (key & Input::Key::KEY_LEFT) {
-                rom_index -= guiRomList->getMaxLines();
-                if (rom_index < 0)
-                    rom_index = 0;
-                guiRomList->setSelection(rom_index);
-                guiRomInfo->update(NULL);
-                title_loaded = 0;
-            } else if (key & Input::Key::KEY_FIRE1) {
-                if (romSelected != NULL
-                    && romSelected->state != RomList::RomState::MISSING) {
-                    // TODO
-                    //RunRom(romSelected);
-                }
-            } else if (key & Input::Key::KEY_MENU1) {
+        if (key & Input::Key::KEY_UP) {
+            rom_index--;
+            if (rom_index < 0)
+                rom_index = (int) (roms.size() - 1);
+            list_box->setSelection(rom_index);
+            rom_info->update(NULL);
+            title_loaded = 0;
+        } else if (key & Input::Key::KEY_DOWN) {
+            rom_index++;
+            if (rom_index >= roms.size())
+                rom_index = 0;
+            list_box->setSelection(rom_index);
+            rom_info->update(NULL);
+            title_loaded = 0;
+        } else if (key & Input::Key::KEY_RIGHT) {
+            rom_index += list_box->getMaxLines();
+            if (rom_index >= roms.size())
+                rom_index = (int) (roms.size() - 1);
+            list_box->setSelection(rom_index);
+            rom_info->update(NULL);
+            title_loaded = 0;
+        } else if (key & Input::Key::KEY_LEFT) {
+            rom_index -= list_box->getMaxLines();
+            if (rom_index < 0)
+                rom_index = 0;
+            list_box->setSelection(rom_index);
+            rom_info->update(NULL);
+            title_loaded = 0;
+        } else if (key & Input::Key::KEY_FIRE1) {
+            if (rom != NULL
+                && rom->state != RomList::RomState::MISSING) {
                 // TODO
-                RunOptionMenu();
+                //RunRom(romSelected);
+            }
+        } else if (key & Input::Key::KEY_MENU1) {
+            // TODO
+            //RunOptionMenu();
+            //if (title != NULL) {
+            // refresh preview/title image
+            //}
+        } else if (key & Input::Key::KEY_MENU2) {
+            if (rom != NULL) {
+                gui->getConfig()->Load(rom);
+                // TODO
+                //RunOptionMenu(true);
                 //if (title != NULL) {
                 // refresh preview/title image
                 //}
-            } else if (key & Input::Key::KEY_MENU2) {
-                if (romSelected != NULL) {
-                    config->Load(romSelected);
-                    // TODO
-                    RunOptionMenu(true);
-                    //if (title != NULL) {
-                    // refresh preview/title image
-                    //}
-                }
-            } else if (key & EV_QUIT) {
-                quit = true;
             }
-
-            if (timer_input->GetSeconds() > 6) {
-                renderer->delay(INPUT_DELAY / 5);
-            } else if (timer_input->GetSeconds() > 2) {
-                renderer->delay(INPUT_DELAY / 2);
-            } else {
-                renderer->delay(INPUT_DELAY);
-            }
-            timer_load->Reset();
-
-
-        } else {
-
-            if (/*romSelected != NULL &&*/ !title_loaded
-                                           && timer_load->GetMillis() >= title_delay) {
-                guiRomInfo->update(roms[rom_index]);
-                /*
-                if (TitleLoad(romSelected)) {
-                    // refresh preview/title image
-                }
-                */
-                title_loaded = 1;
-                timer_load->Reset();
-            }
-            timer_input->Reset();
+        } else if (key & EV_QUIT) {
+            return key;
         }
 
-        renderer->flip();
+        if (timer_input->GetSeconds() > 6) {
+            gui->getRenderer()->delay(INPUT_DELAY / 5);
+        } else if (timer_input->GetSeconds() > 2) {
+            gui->getRenderer()->delay(INPUT_DELAY / 2);
+        } else {
+            gui->getRenderer()->delay(INPUT_DELAY);
+        }
+        timer_load->Reset();
+
+    } else {
+
+        if (/*romSelected != NULL &&*/ !title_loaded
+                                       && timer_load->GetMillis() >= title_delay) {
+            rom_info->update(roms[rom_index]);
+            /*
+            if (TitleLoad(romSelected)) {
+                // refresh preview/title image
+            }
+            */
+            title_loaded = 1;
+            timer_load->Reset();
+        }
+        timer_input->Reset();
     }
 
-    delete (timer_input);
-    delete (timer_load);
+    return 0;
 }
-#endif
 
 void GuiRomList::filterRoms() {
 
     roms.clear();
 
-    int showClone = config->GetGuiValue(Option::Index::GUI_SHOW_CLONES);
-    int showAll = config->GetGuiValue(Option::Index::GUI_SHOW_ALL);
-    int showHardwareCfg = config->GetGuiValue(Option::Index::GUI_SHOW_HARDWARE);
-    int showHardware = config->hardwareList[showHardwareCfg].prefix;
+    int showClone = gui->getConfig()->GetGuiValue(Option::Index::GUI_SHOW_CLONES);
+    int showAll = gui->getConfig()->GetGuiValue(Option::Index::GUI_SHOW_ALL);
+    int showHardwareCfg = gui->getConfig()->GetGuiValue(Option::Index::GUI_SHOW_HARDWARE);
+    int showHardware = gui->getConfig()->hardwareList[showHardwareCfg].prefix;
 
-    remove_copy_if(romList->list.begin(), romList->list.end(), back_inserter(roms),
+    remove_copy_if(rom_list->list.begin(), rom_list->list.end(), back_inserter(roms),
                    [showAll, showClone, showHardware](RomList::Rom *r) {
                        return !showAll && r->state != RomList::RomState::WORKING
                               || !showClone && r->parent != NULL
                               || showHardware != HARDWARE_PREFIX_ALL && !RomList::IsHardware(r->hardware, showHardware);
                    });
 
-    // TODO
-    //rom_index = 0;
+    rom_index = 0;
+}
+
+GuiRomList::~GuiRomList() {
+
+    delete (timer_input);
+    delete (timer_load);
+    delete (rom_list);
 }

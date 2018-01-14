@@ -19,6 +19,8 @@
 
 #include <gui/gui.h>
 
+using namespace c2d;
+
 #ifdef __PSP2__
 #include <psp2/power.h>
 #include <psp2/io/dirent.h>
@@ -35,16 +37,15 @@ int _newlib_heap_size_user = 192 * 1024 * 1024;
 #define SCR_W   1280
 #define SCR_H   720
 #else
-#define SCR_W   800
-#define SCR_H   600
+#define SCR_W   960
+#define SCR_H   544
 #endif
 
-Io *io;
 Renderer *renderer;
-Config *config;
-RomList *romList;
-Gui *gui;
 Input *inp;
+Io *io;
+Config *config;
+Gui *gui;
 Skin *skin;
 
 char szAppBurnVer[16] = VERSION;
@@ -103,9 +104,9 @@ int main(int argc, char **argv) {
 #ifdef __SFML__
     std::string shaderPath = szAppHomePath;
     shaderPath += "shaders/sfml";
-    renderer = (Renderer *) new SFMLRenderer(SCR_W, SCR_H, shaderPath);
+    renderer = (Renderer *) new SFMLRenderer(Vector2f(SCR_W, SCR_H), shaderPath);
 #else
-    renderer = (Renderer *) new C2DRenderer(SCR_W, SCR_H);
+    renderer = (Renderer *) new C2DRenderer(Vector2f(SCR_W, SCR_H));
 #endif
     inp = (Input *) new C2DInput(renderer);
     io = (Io *) new C2DIo();
@@ -115,25 +116,21 @@ int main(int argc, char **argv) {
     cfgPath += "pfba.cfg";
     config = new Config(cfgPath, renderer);
 
-    // build/init roms list
-    romList = new RomList(io, &config->hardwareList, config->GetRomPaths());
-
     // skin
     int size = config->GetGuiValue(Option::Index::SKIN_FONT_SIZE);
     Skin *skin = new Skin(renderer, szAppSkinPath, size, buttons);
 
     // run gui
-    gui = new Gui(io, renderer, skin, romList, config, inp);
+    gui = new Gui(io, renderer, skin, config, inp);
 #ifdef __PSP2__ // prevent rom list scrolling lag on psp2
     gui->SetTitleLoadDelay(500);
 #endif
 
-    gui->Run();
+    gui->run();
 
     BurnLibExit();
 
     delete (gui);
-    delete (romList);
     delete (config);
     delete (inp);
     delete (skin);

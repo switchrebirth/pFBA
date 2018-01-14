@@ -402,13 +402,12 @@ elseif (BUILD_SDL2)
     # SDL2
     ##############
     list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST)
-    set(LDFLAGS
-            cross2d
-            SDL2
-            SDL2_image
-            SDL2_ttf
-            png
-            z)
+    if (BUILD_SDL2_GL)
+        list(APPEND FLAGS -D__SDL2_GL__)
+        set(LDFLAGS cross2d GL SDL2 freetype png z)
+    else ()
+        set(LDFLAGS cross2d OSMesa pthread SDL2 freetype png z)
+    endif (BUILD_SDL2_GL)
 elseif (BUILD_SFML)
     ##############
     # SFML

@@ -11,6 +11,7 @@
 #include "romlist.h"
 #include "config.h"
 #include "menu.h"
+#include "gui_romlist.h"
 
 class Config;
 
@@ -28,47 +29,34 @@ class GuiRomInfo;
 #define COL_ORANGE  Color(255, 153, 51)
 #define COL_RED     Color(255, 51, 51)
 
-class Gui : public c2d::Rectangle {
+class Gui {
 
 public:
 
-    Gui(c2d::Io *io, c2d::Renderer *rdr, Skin *skin, RomList *rList, Config *cfg, c2d::Input *input);
+    Gui(c2d::Io *io, c2d::Renderer *rdr,
+        Skin *skin, Config *cfg, c2d::Input *input);
 
     ~Gui();
 
-    void Run();
+    void run();
 
-    void RunRom(RomList::Rom *rom);
+    void runRom(RomList::Rom *rom);
 
-    void DrawOptions(bool isRomCfg, Menu *_menu);
+    int getButton();
 
-    void DrawRomInfo(RomList::Rom *rom);
+    void updateInputMapping(bool isRomCfg);
 
-    void RunOptionMenu(bool isRomConfig = false);
+    c2d::Renderer *getRenderer();
 
-    void RunStatesMenu();
+    Skin *getSkin();
 
-    int GetButton();
+    Config *getConfig();
 
-    int TitleLoad(RomList::Rom *rom);
+    c2d::Input *getInput();
 
-    void TitleFree();
+    c2d::Io *getIo();
 
-    void SetTitleLoadDelay(int delay);
-
-    void UpdateInputMapping(bool isRomCfg);
-
-    void Clear();
-
-    void Flip();
-
-    c2d::Renderer *GetRenderer();
-
-    Skin *GetSkin();
-
-    Config *GetConfig();
-
-    c2d::Input *GetInput();
+    float getScaling();
 
 private:
 
@@ -79,22 +67,14 @@ private:
     c2d::Renderer *renderer = NULL;
     Skin *skin = NULL;
     c2d::Input *input = NULL;
+
     Menu *menu_gui = NULL;
     Menu *menu_rom = NULL;
     Menu *menu_current = NULL;
 
-    //GuiRomList *guiRomList = NULL;
-    c2d::ListBox *guiRomList = NULL;
-    GuiRomInfo *guiRomInfo = NULL;
-
-    RomList *romList = NULL;
-    std::vector<RomList::Rom *> roms;
-    RomList::Rom *romSelected = NULL;
+    GuiRomList *uiRomList;
 
     float scaling = 1;
-    int title_delay = 0;
-
-    void FilterRoms();
 
     bool quit = false;
 };

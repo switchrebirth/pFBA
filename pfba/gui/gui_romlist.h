@@ -13,30 +13,36 @@ class Option;
 
 class GuiRomInfo;
 
+class Gui;
+
 class GuiRomList : public c2d::Rectangle {
 
 public:
 
-    GuiRomList(Gui *gui);
+    GuiRomList(Gui *gui, const c2d::Vector2f &size);
 
     ~GuiRomList();
+
+    int updateState();
 
 private:
 
     void filterRoms();
 
-    Menu *menu_gui = NULL;
-    Menu *menu_rom = NULL;
-    Menu *menu_current = NULL;
-
+    Gui *gui = NULL;
     c2d::ListBox *list_box = NULL;
     GuiRomInfo *rom_info = NULL;
 
     RomList *rom_list = NULL;
     std::vector<RomList::Rom *> roms;
-    RomList::Rom *rom_selected = NULL;
+    RomList::Rom *rom = NULL;
+    int rom_index = 0;
 
-    float scaling = 1;
+    int title_loaded = 0;
+    int title_delay = 0;
+
+    Timer *timer_input = NULL;
+    Timer *timer_load = NULL;
 };
 
 #endif //GUI_ROMIST_H

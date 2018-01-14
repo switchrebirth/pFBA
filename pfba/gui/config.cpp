@@ -7,6 +7,8 @@
 #include <burner.h>
 #include "config.h"
 
+using namespace c2d;
+
 Config::Config(const std::string &cfgPath, Renderer *renderer) {
 
     configPath = cfgPath;
@@ -92,7 +94,7 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     options_gui.push_back(
             Option("FILTER", {"POINT", "LINEAR"}, 0, Option::Index::ROM_FILTER));
     options_gui.push_back(
-            Option("SHADER", renderer->shaders->GetNames(), 0, Option::Index::ROM_SHADER));
+            Option("SHADER", renderer->getShaders()->getNames(), 0, Option::Index::ROM_SHADER));
     options_gui.push_back(
             Option("ROTATION", {"OFF", "ON", "OFF+FLIP", "OFF+CAB MODE"}, 0, Option::Index::ROM_ROTATION));
     options_gui.push_back(Option("SHOW_FPS", {"OFF", "ON"}, 0, Option::Index::ROM_SHOW_FPS));

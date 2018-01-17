@@ -30,8 +30,7 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
 
     char path[MAX_PATH];
     char pathUppercase[MAX_PATH]; // sometimes on FAT32 short files appear as all uppercase
-    // TODO: fix sorting speed so we don't skip first 24 roms
-    for (UINT32 i = 24; i < nBurnDrvCount; i++) {
+    for (UINT32 i = 0; i < nBurnDrvCount; i++) {
 
         nBurnDrvActive = i;
 

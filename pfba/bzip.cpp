@@ -370,7 +370,7 @@ int BzipOpen(bool bootApp)
             free(szBzipName[z]);
             szBzipName[z] = (TCHAR*)malloc(MAX_PATH * sizeof(TCHAR));
 
-            _stprintf(szBzipName[z], _T("%s%s"), gui->getConfig()->GetRomPath(d), szName);
+            _stprintf(szBzipName[z], _T("%s%s"), gui->getConfig()->getRomPath(d), szName);
 
             if (ZipOpen(TCHARToANSI(szBzipName[z], NULL, 0)) == 0) {	// Open the rom zip file
                 nZipsFound++;

@@ -21,33 +21,31 @@ public:
 
     ~Config() {};
 
-    void Load(RomList::Rom *rom = NULL);
+    void load(RomList::Rom *rom = NULL);
 
-    void Save(RomList::Rom *rom = NULL);
+    void save(RomList::Rom *rom = NULL);
 
-    int GetGuiValue(int id);
+    //int getGuiValue(int id);
+    //int getRomValue(int id);
+    int getValue(int id, bool rom = false);
 
-    int GetRomValue(int id);
+    const char *getRomPath(int n);
 
-    const char *GetRomPath(int n);
+    std::vector<std::string> getRomPaths();
 
-    std::vector<std::string> GetRomPaths();
+    //std::vector<Option> *getGuiOptions();
+    //std::vector<Option> *getRomOptions();
+    std::vector<Option> *getOptions(bool rom = false);
 
-    std::vector<Option> *GetGuiOptions();
+    int getOptionPos(std::vector<Option> *options, int index);
 
-    std::vector<Option> *GetRomOptions();
+    int *getGuiPlayerInputKeys(int player);
 
-    int GetOptionPos(std::vector<Option> *options, int index);
+    int *getGuiPlayerInputButtons(int player);
 
-    Option *GetOption(std::vector<Option> *options, int index);
+    int *getRomPlayerInputKeys(int player);
 
-    int *GetGuiPlayerInputKeys(int player);
-
-    int *GetGuiPlayerInputButtons(int player);
-
-    int *GetRomPlayerInputKeys(int player);
-
-    int *GetRomPlayerInputButtons(int player);
+    int *getRomPlayerInputButtons(int player);
 
     std::vector<RomList::Hardware> hardwareList;
 

@@ -30,9 +30,9 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     roms_paths.push_back("");
     roms_paths.push_back("");
 #ifdef __PSP2__
-	for (int i = roms_paths.size(); i <= DIRS_MAX; i++) {
-		roms_paths.push_back("");
-	}
+    for (int i = roms_paths.size(); i <= DIRS_MAX; i++) {
+        roms_paths.push_back("");
+    }
 #endif
 
     // build hardware list configuration
@@ -193,10 +193,10 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
         options_rom.push_back(options_gui[i]);
     }
 
-    Load();
+    load();
 }
 
-void Config::Load(RomList::Rom *rom) {
+void Config::load(RomList::Rom *rom) {
 
     config_t cfg;
     config_init(&cfg);
@@ -257,7 +257,7 @@ void Config::Load(RomList::Rom *rom) {
     } else {
         // no need to save default rom config
         if (!isRomCfg) {
-            Save();
+            save();
         }
         // set default rom options
         options_rom.clear();
@@ -269,7 +269,7 @@ void Config::Load(RomList::Rom *rom) {
     config_destroy(&cfg);
 }
 
-void Config::Save(RomList::Rom *rom) {
+void Config::save(RomList::Rom *rom) {
 
     config_t cfg;
     config_init(&cfg);
@@ -325,29 +325,20 @@ void Config::Save(RomList::Rom *rom) {
     }
 }
 
-int Config::GetGuiValue(int index) {
+int Config::getValue(int index, bool rom) {
 
-    for (int i = 0; i < options_gui.size(); i++) {
-        if (index == options_gui[i].index) {
-            return options_gui[i].value;
+    std::vector<Option> *opt =
+            rom ? &options_rom : &options_gui;
+    for (int i = 0; i < opt->size(); i++) {
+        if (index == opt->at(i).index) {
+            return opt->at(i).value;
         }
     }
 
     return 0;
 }
 
-int Config::GetRomValue(int index) {
-
-    for (int i = 0; i < options_rom.size(); i++) {
-        if (index == options_rom[i].index) {
-            return options_rom[i].value;
-        }
-    }
-
-    return 0;
-}
-
-const char *Config::GetRomPath(int n) {
+const char *Config::getRomPath(int n) {
     if (n >= DIRS_MAX) {
         return roms_paths[0].c_str();
     } else {
@@ -355,19 +346,15 @@ const char *Config::GetRomPath(int n) {
     }
 }
 
-std::vector<std::string> Config::GetRomPaths() {
+std::vector<std::string> Config::getRomPaths() {
     return roms_paths;
 }
 
-std::vector<Option> *Config::GetGuiOptions() {
-    return &options_gui;
+std::vector<Option> *Config::getOptions(bool rom) {
+    return rom ? &options_rom : &options_gui;
 }
 
-std::vector<Option> *Config::GetRomOptions() {
-    return &options_rom;
-}
-
-int Config::GetOptionPos(std::vector<Option> *options, int index) {
+int Config::getOptionPos(std::vector<Option> *options, int index) {
     for (int i = 0; i < options->size(); i++) {
         if (options->at(i).index == index) {
             return i;
@@ -376,99 +363,90 @@ int Config::GetOptionPos(std::vector<Option> *options, int index) {
     return 0;
 }
 
-Option *Config::GetOption(std::vector<Option> *options, int index) {
-    for (int i = 0; i < options->size(); i++) {
-        if (options->at(i).index == index) {
-            return &options->at(i);
-        }
-    }
-    return NULL;
-}
-
-int *Config::GetGuiPlayerInputKeys(int player) {
+int *Config::getGuiPlayerInputKeys(int player) {
 
 #ifndef NO_KEYBOARD
     // TODO: player > 0 not supported yet
-    keyboard_keys[0] = GetGuiValue(Option::Index::KEY_UP);
-    keyboard_keys[1] = GetGuiValue(Option::Index::KEY_DOWN);
-    keyboard_keys[2] = GetGuiValue(Option::Index::KEY_LEFT);
-    keyboard_keys[3] = GetGuiValue(Option::Index::KEY_RIGHT);
-    keyboard_keys[4] = GetGuiValue(Option::Index::KEY_COIN1);
-    keyboard_keys[5] = GetGuiValue(Option::Index::KEY_START1);
-    keyboard_keys[6] = GetGuiValue(Option::Index::KEY_FIRE1);
-    keyboard_keys[7] = GetGuiValue(Option::Index::KEY_FIRE2);
-    keyboard_keys[8] = GetGuiValue(Option::Index::KEY_FIRE3);
-    keyboard_keys[9] = GetGuiValue(Option::Index::KEY_FIRE4);
-    keyboard_keys[10] = GetGuiValue(Option::Index::KEY_FIRE5);
-    keyboard_keys[11] = GetGuiValue(Option::Index::KEY_FIRE6);
-    keyboard_keys[12] = GetGuiValue(Option::Index::KEY_MENU1);
-    keyboard_keys[13] = GetGuiValue(Option::Index::KEY_MENU2);
+    keyboard_keys[0] = getValue(Option::Index::KEY_UP);
+    keyboard_keys[1] = getValue(Option::Index::KEY_DOWN);
+    keyboard_keys[2] = getValue(Option::Index::KEY_LEFT);
+    keyboard_keys[3] = getValue(Option::Index::KEY_RIGHT);
+    keyboard_keys[4] = getValue(Option::Index::KEY_COIN1);
+    keyboard_keys[5] = getValue(Option::Index::KEY_START1);
+    keyboard_keys[6] = getValue(Option::Index::KEY_FIRE1);
+    keyboard_keys[7] = getValue(Option::Index::KEY_FIRE2);
+    keyboard_keys[8] = getValue(Option::Index::KEY_FIRE3);
+    keyboard_keys[9] = getValue(Option::Index::KEY_FIRE4);
+    keyboard_keys[10] = getValue(Option::Index::KEY_FIRE5);
+    keyboard_keys[11] = getValue(Option::Index::KEY_FIRE6);
+    keyboard_keys[12] = getValue(Option::Index::KEY_MENU1);
+    keyboard_keys[13] = getValue(Option::Index::KEY_MENU2);
 #endif
 
     return keyboard_keys;
 }
 
-int *Config::GetGuiPlayerInputButtons(int player) {
+int *Config::getGuiPlayerInputButtons(int player) {
 
     // TODO: player > 0 not supported yet
-    joystick_keys[0] = GetGuiValue(Option::Index::JOY_UP);
-    joystick_keys[1] = GetGuiValue(Option::Index::JOY_DOWN);
-    joystick_keys[2] = GetGuiValue(Option::Index::JOY_LEFT);
-    joystick_keys[3] = GetGuiValue(Option::Index::JOY_RIGHT);
-    joystick_keys[4] = GetGuiValue(Option::Index::JOY_COIN1);
-    joystick_keys[5] = GetGuiValue(Option::Index::JOY_START1);
-    joystick_keys[6] = GetGuiValue(Option::Index::JOY_FIRE1);
-    joystick_keys[7] = GetGuiValue(Option::Index::JOY_FIRE2);
-    joystick_keys[8] = GetGuiValue(Option::Index::JOY_FIRE3);
-    joystick_keys[9] = GetGuiValue(Option::Index::JOY_FIRE4);
-    joystick_keys[10] = GetGuiValue(Option::Index::JOY_FIRE5);
-    joystick_keys[11] = GetGuiValue(Option::Index::JOY_FIRE6);
-    joystick_keys[12] = GetGuiValue(Option::Index::JOY_MENU1);
-    joystick_keys[13] = GetGuiValue(Option::Index::JOY_MENU2);
+    joystick_keys[0] = getValue(Option::Index::JOY_UP);
+    joystick_keys[1] = getValue(Option::Index::JOY_DOWN);
+    joystick_keys[2] = getValue(Option::Index::JOY_LEFT);
+    joystick_keys[3] = getValue(Option::Index::JOY_RIGHT);
+    joystick_keys[4] = getValue(Option::Index::JOY_COIN1);
+    joystick_keys[5] = getValue(Option::Index::JOY_START1);
+    joystick_keys[6] = getValue(Option::Index::JOY_FIRE1);
+    joystick_keys[7] = getValue(Option::Index::JOY_FIRE2);
+    joystick_keys[8] = getValue(Option::Index::JOY_FIRE3);
+    joystick_keys[9] = getValue(Option::Index::JOY_FIRE4);
+    joystick_keys[10] = getValue(Option::Index::JOY_FIRE5);
+    joystick_keys[11] = getValue(Option::Index::JOY_FIRE6);
+    joystick_keys[12] = getValue(Option::Index::JOY_MENU1);
+    joystick_keys[13] = getValue(Option::Index::JOY_MENU2);
 
     return joystick_keys;
 }
 
-int *Config::GetRomPlayerInputKeys(int player) {
+int *Config::getRomPlayerInputKeys(int player) {
 
 #ifndef NO_KEYBOARD
     // TODO: player > 0 not supported yet
-    keyboard_keys[0] = GetRomValue(Option::Index::KEY_UP);
-    keyboard_keys[1] = GetRomValue(Option::Index::KEY_DOWN);
-    keyboard_keys[2] = GetRomValue(Option::Index::KEY_LEFT);
-    keyboard_keys[3] = GetRomValue(Option::Index::KEY_RIGHT);
-    keyboard_keys[4] = GetRomValue(Option::Index::KEY_COIN1);
-    keyboard_keys[5] = GetRomValue(Option::Index::KEY_START1);
-    keyboard_keys[6] = GetRomValue(Option::Index::KEY_FIRE1);
-    keyboard_keys[7] = GetRomValue(Option::Index::KEY_FIRE2);
-    keyboard_keys[8] = GetRomValue(Option::Index::KEY_FIRE3);
-    keyboard_keys[9] = GetRomValue(Option::Index::KEY_FIRE4);
-    keyboard_keys[10] = GetRomValue(Option::Index::KEY_FIRE5);
-    keyboard_keys[11] = GetRomValue(Option::Index::KEY_FIRE6);
-    keyboard_keys[12] = GetRomValue(Option::Index::KEY_MENU1);
-    keyboard_keys[13] = GetRomValue(Option::Index::KEY_MENU2);
+    keyboard_keys[0] = getValue(Option::Index::KEY_UP, true);
+    keyboard_keys[1] = getValue(Option::Index::KEY_DOWN, true);
+    keyboard_keys[2] = getValue(Option::Index::KEY_LEFT, true);
+    keyboard_keys[3] = getValue(Option::Index::KEY_RIGHT, true);
+    keyboard_keys[4] = getValue(Option::Index::KEY_COIN1, true);
+    keyboard_keys[5] = getValue(Option::Index::KEY_START1, true);
+    keyboard_keys[6] = getValue(Option::Index::KEY_FIRE1, true);
+    keyboard_keys[7] = getValue(Option::Index::KEY_FIRE2, true);
+    keyboard_keys[8] = getValue(Option::Index::KEY_FIRE3, true);
+    keyboard_keys[9] = getValue(Option::Index::KEY_FIRE4, true);
+    keyboard_keys[10] = getValue(Option::Index::KEY_FIRE5, true);
+    keyboard_keys[11] = getValue(Option::Index::KEY_FIRE6, true);
+    keyboard_keys[12] = getValue(Option::Index::KEY_MENU1, true);
+    keyboard_keys[13] = getValue(Option::Index::KEY_MENU2, true);
 #endif
 
     return keyboard_keys;
 }
 
-int *Config::GetRomPlayerInputButtons(int player) {
+int *Config::getRomPlayerInputButtons(int player) {
 
     // TODO: player > 0 not supported yet
-    joystick_keys[0] = GetRomValue(Option::Index::JOY_UP);
-    joystick_keys[1] = GetRomValue(Option::Index::JOY_DOWN);
-    joystick_keys[2] = GetRomValue(Option::Index::JOY_LEFT);
-    joystick_keys[3] = GetRomValue(Option::Index::JOY_RIGHT);
-    joystick_keys[4] = GetRomValue(Option::Index::JOY_COIN1);
-    joystick_keys[5] = GetRomValue(Option::Index::JOY_START1);
-    joystick_keys[6] = GetRomValue(Option::Index::JOY_FIRE1);
-    joystick_keys[7] = GetRomValue(Option::Index::JOY_FIRE2);
-    joystick_keys[8] = GetRomValue(Option::Index::JOY_FIRE3);
-    joystick_keys[9] = GetRomValue(Option::Index::JOY_FIRE4);
-    joystick_keys[10] = GetRomValue(Option::Index::JOY_FIRE5);
-    joystick_keys[11] = GetRomValue(Option::Index::JOY_FIRE6);
-    joystick_keys[12] = GetRomValue(Option::Index::JOY_MENU1);
-    joystick_keys[13] = GetRomValue(Option::Index::JOY_MENU2);
+    joystick_keys[0] = getValue(Option::Index::JOY_UP, true);
+    joystick_keys[1] = getValue(Option::Index::JOY_DOWN, true);
+    joystick_keys[2] = getValue(Option::Index::JOY_LEFT, true);
+    joystick_keys[3] = getValue(Option::Index::JOY_RIGHT, true);
+    joystick_keys[4] = getValue(Option::Index::JOY_COIN1, true);
+    joystick_keys[5] = getValue(Option::Index::JOY_START1, true);
+    joystick_keys[6] = getValue(Option::Index::JOY_FIRE1, true);
+    joystick_keys[7] = getValue(Option::Index::JOY_FIRE2, true);
+    joystick_keys[8] = getValue(Option::Index::JOY_FIRE3, true);
+    joystick_keys[9] = getValue(Option::Index::JOY_FIRE4, true);
+    joystick_keys[10] = getValue(Option::Index::JOY_FIRE5, true);
+    joystick_keys[11] = getValue(Option::Index::JOY_FIRE6, true);
+    joystick_keys[12] = getValue(Option::Index::JOY_MENU1, true);
+    joystick_keys[13] = getValue(Option::Index::JOY_MENU2, true);
 
     return joystick_keys;
 }

@@ -22,8 +22,8 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     input = in;
 
     // build menus from options
-    menu_gui = new Menu(NULL, cfg->GetGuiOptions());
-    menu_rom = new Menu(NULL, cfg->GetRomOptions(), true);
+    menu_gui = new Menu(NULL, cfg->getOptions());
+    menu_rom = new Menu(NULL, cfg->getOptions(true), true);
     menu_current = menu_gui;
 
     // scaling factor mainly used for borders
@@ -31,6 +31,8 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     scaling = std::min(renderer->getSize().x / 960, 1.0f);
 
     uiRomList = new GuiRomList(this, renderer->getSize());
+    uiRomList->setLoadDelay(500);
+
     renderer->add(uiRomList);
 }
 
@@ -46,10 +48,30 @@ void Gui::run() {
 
     while (!quit) {
 
-        int key = uiRomList->updateState();
+        switch (uiRomList->updateKeys()) {
+
+            case Input::Key::KEY_FIRE1:
+                runRom(uiRomList->getRom());
+                break;
+
+            case Input::Key::KEY_MENU1:
+                // TODO: run option menu
+                //RunOptionMenu();
+                break;
+
+            case Input::Key::KEY_MENU2:
+                // TODO: run option menu (per rom options)
+                getConfig()->load(uiRomList->getRom());
+                //RunOptionMenu(true);
+                break;
+
+            default:
+                break;
+        }
 
         renderer->flip();
     }
+
 }
 
 float Gui::getScaling() {
@@ -64,8 +86,8 @@ void Gui::runRom(RomList::Rom *rom) {
 
     char path[MAX_PATH];
     for (int i = 0; i < DIRS_MAX; i++) {
-        if (strlen(config->GetRomPath(i)) > 0) {
-            sprintf(path, "%s%s.zip", config->GetRomPath(i), rom->zip);
+        if (strlen(config->getRomPath(i)) > 0) {
+            sprintf(path, "%s%s.zip", config->getRomPath(i), rom->zip);
             printf("%s\n", path);
             if (io->Exist(path))
                 break;
@@ -91,7 +113,7 @@ void Gui::runRom(RomList::Rom *rom) {
 
     // load rom settings
     printf("RunRom: config->LoadRom(%s)\n", rom->zip);
-    config->Load(rom);
+    config->load(rom);
 
     // set per rom input scheme
     updateInputMapping(true);
@@ -128,24 +150,24 @@ Io *Gui::getIo() {
 void Gui::updateInputMapping(bool isRomConfig) {
 
     if (isRomConfig) {
-        input->SetKeyboardMapping(config->GetRomPlayerInputKeys(0));
-        int dz = 2000 + config->GetRomValue(Option::Index::JOY_DEADZONE) * 2000;
+        input->SetKeyboardMapping(config->getRomPlayerInputKeys(0));
+        int dz = 2000 + config->getValue(Option::Index::JOY_DEADZONE, true) * 2000;
         for (int i = 0; i < PLAYER_COUNT; i++) {
-            input->SetJoystickMapping(i, config->GetRomPlayerInputButtons(i), dz);
-            input->players[i].lx.id = config->GetRomValue(Option::Index::JOY_AXIS_LX);
-            input->players[i].ly.id = config->GetRomValue(Option::Index::JOY_AXIS_LY);
-            input->players[i].rx.id = config->GetRomValue(Option::Index::JOY_AXIS_RX);
-            input->players[i].ry.id = config->GetRomValue(Option::Index::JOY_AXIS_RY);
+            input->SetJoystickMapping(i, config->getRomPlayerInputButtons(i), dz);
+            input->players[i].lx.id = config->getValue(Option::Index::JOY_AXIS_LX, true);
+            input->players[i].ly.id = config->getValue(Option::Index::JOY_AXIS_LY, true);
+            input->players[i].rx.id = config->getValue(Option::Index::JOY_AXIS_RX, true);
+            input->players[i].ry.id = config->getValue(Option::Index::JOY_AXIS_RY, true);
         }
     } else {
-        input->SetKeyboardMapping(config->GetGuiPlayerInputKeys(0));
-        int dz = 2000 + config->GetGuiValue(Option::Index::JOY_DEADZONE) * 2000;
+        input->SetKeyboardMapping(config->getGuiPlayerInputKeys(0));
+        int dz = 2000 + config->getValue(Option::Index::JOY_DEADZONE) * 2000;
         for (int i = 0; i < PLAYER_COUNT; i++) {
-            input->SetJoystickMapping(i, config->GetGuiPlayerInputButtons(i), dz);
-            input->players[i].lx.id = config->GetGuiValue(Option::Index::JOY_AXIS_LX);
-            input->players[i].ly.id = config->GetGuiValue(Option::Index::JOY_AXIS_LY);
-            input->players[i].rx.id = config->GetGuiValue(Option::Index::JOY_AXIS_RX);
-            input->players[i].ry.id = config->GetGuiValue(Option::Index::JOY_AXIS_RY);
+            input->SetJoystickMapping(i, config->getGuiPlayerInputButtons(i), dz);
+            input->players[i].lx.id = config->getValue(Option::Index::JOY_AXIS_LX);
+            input->players[i].ly.id = config->getValue(Option::Index::JOY_AXIS_LY);
+            input->players[i].rx.id = config->getValue(Option::Index::JOY_AXIS_RX);
+            input->players[i].ry.id = config->getValue(Option::Index::JOY_AXIS_RY);
         }
     }
 }

@@ -66,7 +66,7 @@ int RunOneFrame(bool bDraw, int bDrawFps, int fps) {
     inputServiceSwitch = 0;
     inputP1P2Switch = 0;
 
-    int rotation = gui->getConfig()->GetRomValue(Option::Index::ROM_ROTATION);
+    int rotation = gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
     int rotate = 0;
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if (rotation == 0) {
@@ -126,41 +126,41 @@ int RunOneFrame(bool bDraw, int bDrawFps, int fps) {
         inputP1P2Switch = 1;
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_UP)) {
-        int scaling = gui->getConfig()->GetRomValue(Option::Index::ROM_SCALING) + 1;
+        int scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true) + 1;
         if (scaling <= 5) {
-            int index = gui->getConfig()->GetOptionPos(gui->getConfig()->GetRomOptions(),
+            int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
                                                        Option::Index::ROM_SCALING);
-            gui->getConfig()->GetRomOptions()->at(index).value = scaling;
+            gui->getConfig()->getOptions(true)->at(index).value = scaling;
             video->Scale();
             gui->getRenderer()->delay(500);
         }
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_DOWN)) {
-        int scaling = gui->getConfig()->GetRomValue(Option::Index::ROM_SCALING) - 1;
+        int scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true) - 1;
         if (scaling >= 0) {
-            int index = gui->getConfig()->GetOptionPos(gui->getConfig()->GetRomOptions(),
+            int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
                                                        Option::Index::ROM_SCALING);
-            gui->getConfig()->GetRomOptions()->at(index).value = scaling;
+            gui->getConfig()->getOptions(true)->at(index).value = scaling;
             video->Scale();
             gui->getRenderer()->delay(500);
         }
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_RIGHT)) {
-        int shader = gui->getConfig()->GetRomValue(Option::Index::ROM_SHADER) + 1;
+        int shader = gui->getConfig()->getValue(Option::Index::ROM_SHADER, true) + 1;
         if (shader < gui->getRenderer()->getShaders()->getCount()) {
-            int index = gui->getConfig()->GetOptionPos(gui->getConfig()->GetRomOptions(),
+            int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
                                                        Option::Index::ROM_SHADER);
-            gui->getConfig()->GetRomOptions()->at(index).value = shader;
+            gui->getConfig()->getOptions(true)->at(index).value = shader;
             gui->getRenderer()->setShader(shader);
             gui->getRenderer()->delay(500);
         }
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_LEFT)) {
-        int shader = gui->getConfig()->GetRomValue(Option::Index::ROM_SHADER) - 1;
+        int shader = gui->getConfig()->getValue(Option::Index::ROM_SHADER, true) - 1;
         if (shader >= 0) {
-            int index = gui->getConfig()->GetOptionPos(gui->getConfig()->GetRomOptions(),
+            int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
                                                        Option::Index::ROM_SHADER);
-            gui->getConfig()->GetRomOptions()->at(index).value = shader;
+            gui->getConfig()->getOptions(true)->at(index).value = shader;
             gui->getRenderer()->setShader(shader);
             gui->getRenderer()->delay(500);
         }
@@ -306,7 +306,7 @@ void RunEmulator(Gui *g, int drvnum) {
 #endif
     bForce60Hz = true;
     nBurnSoundRate = 0;
-    if (gui->getConfig()->GetRomValue(Option::Index::ROM_AUDIO)) {
+    if (gui->getConfig()->getValue(Option::Index::ROM_AUDIO, true)) {
         nBurnSoundRate = 48000;
     }
 
@@ -361,8 +361,8 @@ void RunEmulator(Gui *g, int drvnum) {
 
     while (GameLooping) {
 
-        int showFps = gui->getConfig()->GetRomValue(Option::Index::ROM_SHOW_FPS);
-        int frameSkip = gui->getConfig()->GetRomValue(Option::Index::ROM_FRAMESKIP);
+        int showFps = gui->getConfig()->getValue(Option::Index::ROM_SHOW_FPS, true);
+        int frameSkip = gui->getConfig()->getValue(Option::Index::ROM_FRAMESKIP, true);
 
         if (frameSkip) {
             timer = GetTicks() / frametime;

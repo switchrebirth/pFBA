@@ -6,7 +6,7 @@ set(CMAKE_SYSTEM_NAME "Generic")
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
 set(BUILD_SDL2 ON CACHE BOOL "Build with SDL2 support (software, osmesa) support")
-set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
+set(BUILD_SDL2_GL ON CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
@@ -401,7 +401,7 @@ elseif (BUILD_SDL2)
     ##############
     # SDL2
     ##############
-    list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST)
+    list(APPEND FLAGS -D__SDL2__ -D__GL__ -DLSB_FIRST)
     if (BUILD_SDL2_GL)
         list(APPEND FLAGS -D__SDL2_GL__)
         set(LDFLAGS cross2d GL SDL2 freetype png z)

@@ -42,8 +42,8 @@ Video::Video(Renderer *renderer) {
     screen->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
     screen->unlock();
 
-    renderer->setShader(gui->getConfig()->GetRomValue(Option::Index::ROM_SHADER));
-    Filter(gui->getConfig()->GetRomValue(Option::Index::ROM_FILTER));
+    renderer->setShader(gui->getConfig()->getValue(Option::Index::ROM_SHADER, true));
+    Filter(gui->getConfig()->getValue(Option::Index::ROM_FILTER, true));
     Scale();
 }
 
@@ -58,19 +58,19 @@ void Video::Scale() {
 
     FloatRect window = renderer->getGlobalBounds();
 
-    int scaling = gui->getConfig()->GetRomValue(Option::Index::ROM_SCALING);
+    int scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true);
     rotation = 0;
 
     // TODO: force right to left orientation on psp2,
     // should add platform specific code
 
-    if ((gui->getConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 0
-         || gui->getConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 3)
+    if ((gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 0
+         || gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 3)
         && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if (!(BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED)) {
             rotation = 180;
         }
-    } else if (gui->getConfig()->GetRomValue(Option::Index::ROM_ROTATION) == 2
+    } else if (gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 2
                && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if ((BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED)) {
             rotation = 180;

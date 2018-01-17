@@ -23,7 +23,11 @@ public:
 
     ~GuiRomList();
 
-    int updateState();
+    int updateKeys();
+
+    RomList::Rom *getRom();
+
+    void setLoadDelay(int delay);
 
 private:
 
@@ -35,12 +39,10 @@ private:
 
     RomList *rom_list = NULL;
     std::vector<RomList::Rom *> roms;
-    RomList::Rom *rom = NULL;
     int rom_index = 0;
 
     int title_loaded = 0;
-    int title_delay = 0;
-
+    int load_delay = 0;
     Timer *timer_input = NULL;
     Timer *timer_load = NULL;
 };

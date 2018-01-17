@@ -117,19 +117,15 @@ int main(int argc, char **argv) {
     config = new Config(cfgPath, renderer);
 
     // skin
-    int size = config->GetGuiValue(Option::Index::SKIN_FONT_SIZE);
+    int size = config->getValue(Option::Index::SKIN_FONT_SIZE);
     Skin *skin = new Skin(renderer, szAppSkinPath, size, buttons);
 
     // run gui
     gui = new Gui(io, renderer, skin, config, inp);
-#ifdef __PSP2__ // prevent rom list scrolling lag on psp2
-    gui->SetTitleLoadDelay(500);
-#endif
-
     gui->run();
 
+    // quit
     BurnLibExit();
-
     delete (gui);
     delete (config);
     delete (inp);

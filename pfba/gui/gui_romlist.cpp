@@ -13,32 +13,25 @@ class GuiRomInfo : public Rectangle {
 
 public:
 
-    GuiRomInfo(const Font &font, const FloatRect &rect, float scale) : Rectangle(rect) {
+    GuiRomInfo(const Font &font, const FloatRect &rect, float scale, int fontSize = 0) : Rectangle(rect) {
 
         setFillColor(Color::Transparent);
         scaling = scale;
+        margin = UI_MARGIN * scaling;
 
-        for (int i = 0; i < 7; i++) {
-            lines.push_back(new Io::File());
-        }
-
-        infoBox = new ListBox(
-                font,
-                FloatRect(0, getSize().y / 2 + UI_MARGIN * scaling,
-                          getSize().x, getSize().y / 2 - UI_MARGIN * scaling),
-                lines);
-        infoBox->setHighLight(false);
+        infoBox = new Rectangle(FloatRect(0, getSize().y / 2 + margin,
+                                          getSize().x, getSize().y / 2 - margin));
         infoBox->setFillColor(Color::GrayLight);
         infoBox->setOutlineColor(COL_GREEN);
         infoBox->setOutlineThickness(2);
-        add(infoBox);
-    }
 
-    ~GuiRomInfo() {
-        for (int i = 0; i < 7; i++) {
-            delete (lines[i]);
-        }
-        lines.clear();
+        infoText = new Text("", font, (unsigned int) fontSize);
+        infoText->setOutlineThickness(2);
+        infoText->setSizeMax(Vector2f(infoBox->getSize().x, 0));
+        infoText->setLineSpacingModifier((int) (8 * scaling));
+        infoBox->add(infoText);
+
+        add(infoBox);
     }
 
     void update(RomList::Rom *rom) {
@@ -49,9 +42,7 @@ public:
         }
 
         if (!rom) {
-            for (int i = 0; i < 7; i++) {
-                infoBox->getLines()[i]->setString("");
-            }
+            infoText->setVisibility(C2D_VISIBILITY_HIDDEN);
         } else {
             // load preview image
             char path[MAX_PATH];
@@ -72,8 +63,8 @@ public:
                 texture->setOriginCenter();
                 texture->setPosition(Vector2f(getLocalBounds().width / 2, getLocalBounds().height / 4));
                 float tex_scaling = std::min(
-                        (getLocalBounds().width - UI_MARGIN * scaling + outline * 2) / texture->getSize().x,
-                        ((getLocalBounds().height / 2) - UI_MARGIN * scaling + outline * 2) / texture->getSize().y);
+                        (getLocalBounds().width - margin + outline * 2) / texture->getSize().x,
+                        ((getLocalBounds().height / 2) - margin + outline * 2) / texture->getSize().y);
                 texture->setScale(tex_scaling, tex_scaling);
                 add(texture);
             } else {
@@ -81,45 +72,21 @@ public:
                 texture = NULL;
             }
 
-            // rom information
-            switch (rom->state) {
-                case RomList::RomState::MISSING:
-                    infoBox->getLines()[0]->setString("STATUS: MISSING");
-                    break;
-                case RomList::RomState::NOT_WORKING:
-                    infoBox->getLines()[0]->setString("STATUS: NOT WORKING");
-                    break;
-                case RomList::RomState::WORKING:
-                    infoBox->getLines()[0]->setString("STATUS: WORKING");
-                    break;
-                default:
-                    break;
-            }
-            infoBox->getLines()[1]->setString(String("SYSTEM: ") + rom->system);
-            infoBox->getLines()[2]->setString(String("MANUFACTURER: ") + rom->manufacturer);
-            infoBox->getLines()[3]->setString(String("YEAR: ") + rom->year);
-            infoBox->getLines()[4]->setString(String("ZIP: ") + rom->zip + String(".zip"));
-            if (rom->parent) {
-                infoBox->getLines()[5]->setVisibility(C2D_VISIBILITY_VISIBLE);
-                infoBox->getLines()[5]->setString(String("PARENT: ") + rom->parent + String(".zip"));
-            } else {
-                infoBox->getLines()[5]->setVisibility(C2D_VISIBILITY_HIDDEN);
-            }
-            if (rom->flags & BDF_ORIENTATION_VERTICAL) {
-                infoBox->getLines()[6]->setVisibility(C2D_VISIBILITY_VISIBLE);
-                infoBox->getLines()[6]->setString("ORIENTATION: VERTICAL");
-                if (rom->flags & BDF_ORIENTATION_FLIPPED) {
-                    infoBox->getLines()[6]->setString("ORIENTATION: VERTICAL | FLIPPED");
-                }
-            } else {
-                infoBox->getLines()[6]->setVisibility(C2D_VISIBILITY_HIDDEN);
-            }
+            // update info text
+            snprintf(info, 512, "ZIP: %s.ZIP\nSTATUS: %s\nSYSTEM: %s\nMANUFACTURER: %s\nYEAR: %s",
+                     rom->zip, rom->state == RomList::RomState::MISSING ? "MISSING" : "AVAILABLE",
+                     rom->system, rom->manufacturer, rom->year);
+            infoText->setString(info);
+            infoText->setPosition(margin, (infoText->getGlobalBounds().height / 2) + margin);
+            infoText->setVisibility(C2D_VISIBILITY_VISIBLE);
         }
     }
 
     Texture *texture = NULL;
-    ListBox *infoBox = NULL;
-    std::vector<Io::File *> lines;
+    Rectangle *infoBox = NULL;
+    Text *infoText = NULL;
+    char info[512];
+    float margin = 0;
 
     float scaling = 1;
 };
@@ -173,7 +140,8 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
                                       (getLocalBounds().width / 2) + UI_MARGIN * gui->getScaling(),
                                       UI_MARGIN * gui->getScaling(),
                                       (getLocalBounds().width / 2) - UI_MARGIN * gui->getScaling() * 2,
-                                      getLocalBounds().height - UI_MARGIN * gui->getScaling() * 2), gui->getScaling());
+                                      getLocalBounds().height - UI_MARGIN * gui->getScaling() * 2), gui->getScaling(),
+                              list_box->getFontSize());
     rom_info->infoBox->setOutlineThickness(getOutlineThickness());
     rom_info->update(roms[0]);
     add(rom_info);

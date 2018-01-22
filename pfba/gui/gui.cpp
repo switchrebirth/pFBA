@@ -29,6 +29,9 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     // scaling factor mainly used for borders
     // based on vita resolution..
     scaling = std::min(renderer->getSize().x / 960, 1.0f);
+    if (scaling >= 1) {
+        skin->font->setFiltering(C2D_TEXTURE_FILTER_POINT);
+    }
 
     uiRomList = new GuiRomList(this, renderer->getSize());
     uiRomList->setLoadDelay(500);

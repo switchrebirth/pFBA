@@ -5,15 +5,15 @@ set(CMAKE_SYSTEM_NAME "Generic")
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
-set(BUILD_SDL1 ON CACHE BOOL "Build with SDL1 support (software, osmesa) support")
+set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) support")
 set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
-set(BUILD_SDL1_TINYGL ON CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
+set(BUILD_SDL1_TINYGL OFF CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
 set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 support (software, osmesa) support")
 set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
+set(BUILD_NX ON CACHE BOOL "Build with NX (SWITCH) support")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")
@@ -376,6 +376,9 @@ elseif (BUILD_3DS)
     ##############
     # 3DS
     ##############
+        list(APPEND INC
+                ${DEVKITPRO}/libctru/include
+                ${DEVKITPRO}/portlibs/armv6k/include)
     list(APPEND FLAGS -DARM11 -D_3DS -D__3DS__
             -DNO_KEYBOARD -D__PFBA_ARM__ -DUSE_FILE32API -DLSB_FIRST
             -ffunction-sections -fomit-frame-pointer)
@@ -395,9 +398,10 @@ elseif (BUILD_NX)
             -ffunction-sections -fomit-frame-pointer)
     set(LDFLAGS
             cross2d
+            ${DEVKITPRO}/libnx/lib/libnx.a
+            ${DEVKITPRO}/portlibs/armv8-a/lib/libfreetype.a
             ${DEVKITPRO}/portlibs/armv8-a/lib/libpng.a
             ${DEVKITPRO}/portlibs/armv8-a/lib/libz.a
-            ${DEVKITPRO}/libnx/lib/libnx.a
             m)
 elseif (BUILD_SDL2)
     ##############
@@ -429,13 +433,8 @@ elseif (BUILD_SFML)
     ##############
     list(APPEND FLAGS -D__SFML__ -DLSB_FIRST)
     set(LDFLAGS
-            cross2d
-            SDL2 sfml-graphics
-            sfml-window
-            sfml-system
-            GL
-            png
-            z)
+            cross2d SDL2 sfml-graphics sfml-window sfml-system
+            GL png z)
 endif (BUILD_PSP2)
 
 # source files
@@ -501,39 +500,18 @@ endif (BUILD_PS3)
 # CTR (3DS) target
 #####################
 if (BUILD_3DS)
-    add_executable(${PROJECT_NAME}.3ds ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
-    target_compile_options(${PROJECT_NAME}.3ds PRIVATE ${FLAGS})
-    target_include_directories(${PROJECT_NAME}.3ds PRIVATE
-            ${INC}
-            ${DEVKITPRO}/libctru/include
-            ${DEVKITPRO}/portlibs/armv6k/include
-            )
-    target_link_libraries(${PROJECT_NAME}.3ds
-            cross2d
-            ${DEVKITPRO}/portlibs/3ds/lib/libSDL2.a
-            ${LDFLAGS})
-    set_target_properties(${PROJECT_NAME}.3ds PROPERTIES LINK_FLAGS "-specs=3dsx.specs")
+    set_target_properties(${PROJECT_NAME}.elf PROPERTIES LINK_FLAGS "-specs=3dsx.specs")
     add_3dsx_target(${PROJECT_NAME}.3ds "pFBA" "FBA 3DS" "Cpasjuste" pfba/data/3ds/icon.png)
-    add_cia_target(${PROJECT_NAME}.3ds pfba/data/3ds/app.rsf pfba/data/3ds/banner.png pfba/data/3ds/audio.wav
-            "pFBA" "FBA 3DS" "Cpasjuste" pfba/data/3ds/icon.png
-            )
+    #add_cia_target(${PROJECT_NAME}.3ds pfba/data/3ds/app.rsf pfba/data/3ds/banner.png pfba/data/3ds/audio.wav "pFBA" "FBA 3DS" "Cpasjuste" pfba/data/3ds/icon.png)
 endif (BUILD_3DS)
 
 #####################
 # NX (SWITCH) target
 #####################
 if (BUILD_NX)
-    add_executable(${PROJECT_NAME}.nx ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
-    target_compile_options(${PROJECT_NAME}.nx PRIVATE ${FLAGS})
-    target_include_directories(${PROJECT_NAME}.nx PRIVATE
-            ${INC}
-            ${DEVKITPRO}/libnx/include
-            ${DEVKITPRO}/portlibs/armv8-a/include
-            )
-    target_link_libraries(${PROJECT_NAME}.nx cross2d ${LDFLAGS})
-    set_target_properties(${PROJECT_NAME}.nx PROPERTIES LINK_FLAGS "-specs=switch.specs")
+    set_target_properties(${PROJECT_NAME}.elf PROPERTIES LINK_FLAGS "-specs=switch.specs")
     add_custom_target(${PROJECT_NAME}.nro
-            DEPENDS ${PROJECT_NAME}.nx
-            COMMAND ${DEVKITPRO}/devkitA64/bin/elf2nro ${PROJECT_NAME}.nx ${PROJECT_NAME}.nro
+            DEPENDS ${PROJECT_NAME}.elf
+            COMMAND elf2nro ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro
             )
 endif (BUILD_NX)

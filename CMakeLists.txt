@@ -5,12 +5,14 @@ set(CMAKE_SYSTEM_NAME "Generic")
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
-set(BUILD_SDL2 ON CACHE BOOL "Build with SDL2 support (software, osmesa) support")
-set(BUILD_SDL2_GL ON CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
+set(BUILD_SDL1 ON CACHE BOOL "Build with SDL1 support (software, osmesa) support")
+set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
+set(BUILD_SDL1_TINYGL ON CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
+set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 support (software, osmesa) support")
+set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-#set(BUILD_RPI OFF CACHE BOOL "Build with RPI support")
 set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -401,13 +403,26 @@ elseif (BUILD_SDL2)
     ##############
     # SDL2
     ##############
-    list(APPEND FLAGS -D__SDL2__ -D__GL__ -DLSB_FIRST)
+    list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST)
+    set(LDFLAGS cross2d SDL2 freetype png z)
     if (BUILD_SDL2_GL)
-        list(APPEND FLAGS -D__SDL2_GL__)
-        set(LDFLAGS cross2d GL SDL2 freetype png z)
+        list(APPEND LDFLAGS GL)
+    elseif (BUILD_SDL2_TINYGL)
     else ()
-        set(LDFLAGS cross2d OSMesa pthread SDL2 freetype png z)
+        list(APPEND LDFLAGS OSMesa pthread)
     endif (BUILD_SDL2_GL)
+elseif (BUILD_SDL1)
+    ##############
+    # SDL1
+    ##############
+    list(APPEND FLAGS -D__SDL1__ -DLSB_FIRST)
+    set(LDFLAGS cross2d SDL freetype png z)
+    if (BUILD_SDL1_GL)
+        list(APPEND LDFLAGS GL)
+    elseif (BUILD_SDL1_TINYGL)
+    else ()
+        list(APPEND LDFLAGS OSMesa pthread)
+    endif (BUILD_SDL1_GL)
 elseif (BUILD_SFML)
     ##############
     # SFML
@@ -421,43 +436,6 @@ elseif (BUILD_SFML)
             GL
             png
             z)
-    ##############
-    # RPI
-    ##############
-elseif (BUILD_RPI)
-    # add cyclone arm asm cpu support
-    list(REMOVE_ITEM SRC_CPU ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68000_intf.cpp)
-    list(APPEND INC
-            pfba/cpu/cyclone
-            )
-    file(GLOB SRC_RPI
-            pfba/cpu/c68000_intf.cpp
-            pfba/cpu/cyclone/Cyclone.s
-            )
-    list(APPEND SRC_PFBA ${SRC_RPI})
-    # rpi3 compile flags
-    list(APPEND FLAGS
-            -D__RPI__ -D__PFBA_ARM__ -DBUILD_C68K -DUSE_FILE32API -DLSB_FIRST
-            -march=armv8-a -mcpu=cortex-a53 -mtune=cortex-a53 -mfpu=neon-fp-armv8
-            -mfloat-abi=hard -mvectorize-with-neon-quad -funsafe-math-optimizations
-            -ffast-math -mlittle-endian -munaligned-access
-            -fno-asynchronous-unwind-tables -funroll-loops
-            -mword-relocations -fno-unwind-tables -fno-optimize-sibling-calls
-            )
-    # rpi linker flags, linked to raspbian binaries compiled on
-    # the rpi device with no x11 support for sdl2 (faster, more stable)
-    set(LDFLAGS
-            -s
-            -Xlinker -rpath-link=${RPISDK}/sysroot/lib
-            -L${RPISDK}/sysroot/lib
-            cross2d
-            ${RPISDK}/sysroot/lib/libSDL2.a
-            ${RPISDK}/sysroot/lib/libSDL2_image.a
-            ${RPISDK}/sysroot/lib/libSDL2_ttf.a
-            ${RPISDK}/sysroot/lib/libfreetype.a
-            ${RPISDK}/sysroot/lib/libpng.a
-            ${RPISDK}/sysroot/lib/libz.a
-            pthread bcm_host rt dl)
 endif (BUILD_PSP2)
 
 # source files
@@ -495,25 +473,29 @@ target_link_libraries(${PROJECT_NAME}.elf ${LDFLAGS})
 #####################
 # PSP2 (vita) vpk
 #####################
-add_custom_target(${PROJECT_NAME}.vpk
-        DEPENDS ${PROJECT_NAME}.elf
-        COMMAND rm -rf vpk && mkdir -p vpk/sce_sys
-        COMMAND ${VITASDK}/bin/vita-elf-create ${PROJECT_NAME}.elf ${PROJECT_NAME}.velf
-        COMMAND ${VITASDK}/bin/vita-make-fself -s -c ${PROJECT_NAME}.velf vpk/eboot.bin
-        COMMAND ${VITASDK}/bin/vita-mksfoex -s TITLE_ID=${TITLE_ID} "${PROJECT_NAME}" vpk/sce_sys/param.sfo
-        COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/skin vpk/
-        COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/psp2/* vpk
-        COMMAND cd vpk && zip -r ../${PROJECT_NAME}-${BUILD_DATE}.vpk . && cd ..
-        )
+if (BUILD_PSP2)
+    add_custom_target(${PROJECT_NAME}.vpk
+            DEPENDS ${PROJECT_NAME}.elf
+            COMMAND rm -rf vpk && mkdir -p vpk/sce_sys
+            COMMAND ${VITASDK}/bin/vita-elf-create ${PROJECT_NAME}.elf ${PROJECT_NAME}.velf
+            COMMAND ${VITASDK}/bin/vita-make-fself -s -c ${PROJECT_NAME}.velf vpk/eboot.bin
+            COMMAND ${VITASDK}/bin/vita-mksfoex -s TITLE_ID=${TITLE_ID} "${PROJECT_NAME}" vpk/sce_sys/param.sfo
+            COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/skin vpk/
+            COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/psp2/* vpk
+            COMMAND cd vpk && zip -r ../${PROJECT_NAME}-${BUILD_DATE}.vpk . && cd ..
+            )
+endif (BUILD_PSP2)
 
 #####################
 # PS3
 #####################
-add_custom_target(${PROJECT_NAME}.ps3
-        DEPENDS ${PROJECT_NAME}.elf
-        COMMAND ${PSL1GHT}/bin/sprxlinker ${PROJECT_NAME}.elf
-        COMMAND ${PSL1GHT}/bin/make_self ${PROJECT_NAME}.elf ${PROJECT_NAME}.ps3
-        )
+if (BUILD_PS3)
+    add_custom_target(${PROJECT_NAME}.ps3
+            DEPENDS ${PROJECT_NAME}.elf
+            COMMAND ${PSL1GHT}/bin/sprxlinker ${PROJECT_NAME}.elf
+            COMMAND ${PSL1GHT}/bin/make_self ${PROJECT_NAME}.elf ${PROJECT_NAME}.ps3
+            )
+endif (BUILD_PS3)
 
 #####################
 # CTR (3DS) target
@@ -540,16 +522,18 @@ endif (BUILD_3DS)
 #####################
 # NX (SWITCH) target
 #####################
-add_executable(${PROJECT_NAME}.nx ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
-target_compile_options(${PROJECT_NAME}.nx PRIVATE ${FLAGS})
-target_include_directories(${PROJECT_NAME}.nx PRIVATE
-        ${INC}
-        ${DEVKITPRO}/libnx/include
-        ${DEVKITPRO}/portlibs/armv8-a/include
-        )
-target_link_libraries(${PROJECT_NAME}.nx cross2d ${LDFLAGS})
-set_target_properties(${PROJECT_NAME}.nx PROPERTIES LINK_FLAGS "-specs=switch.specs")
-add_custom_target(${PROJECT_NAME}.nro
-        DEPENDS ${PROJECT_NAME}.nx
-        COMMAND ${DEVKITPRO}/devkitA64/bin/elf2nro ${PROJECT_NAME}.nx ${PROJECT_NAME}.nro
-        )
+if (BUILD_NX)
+    add_executable(${PROJECT_NAME}.nx ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
+    target_compile_options(${PROJECT_NAME}.nx PRIVATE ${FLAGS})
+    target_include_directories(${PROJECT_NAME}.nx PRIVATE
+            ${INC}
+            ${DEVKITPRO}/libnx/include
+            ${DEVKITPRO}/portlibs/armv8-a/include
+            )
+    target_link_libraries(${PROJECT_NAME}.nx cross2d ${LDFLAGS})
+    set_target_properties(${PROJECT_NAME}.nx PROPERTIES LINK_FLAGS "-specs=switch.specs")
+    add_custom_target(${PROJECT_NAME}.nro
+            DEPENDS ${PROJECT_NAME}.nx
+            COMMAND ${DEVKITPRO}/devkitA64/bin/elf2nro ${PROJECT_NAME}.nx ${PROJECT_NAME}.nro
+            )
+endif (BUILD_NX)

@@ -23,7 +23,7 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
     std::vector<std::string> files[DIRS_MAX];
     for (unsigned int i = 0; i < paths.size(); i++) {
         if (!paths[i].empty()) {
-            files[i] = io->GetDirList(paths[i].c_str());
+            files[i] = io->getDirList(paths[i].c_str());
             printf("RomList: found %i files in `%s`\n", (int) files[i].size(), paths[i].c_str());
         }
     }

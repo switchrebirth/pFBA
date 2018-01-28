@@ -92,12 +92,12 @@ void Gui::runRom(RomList::Rom *rom) {
         if (strlen(config->getRomPath(i)) > 0) {
             sprintf(path, "%s%s.zip", config->getRomPath(i), rom->zip);
             printf("%s\n", path);
-            if (io->Exist(path))
+            if (io->exist(path))
                 break;
         }
     }
 
-    if (!io->Exist(path)) {
+    if (!io->exist(path)) {
         printf("RunRom: rom not found: `%s`\n", rom->zip);
         return;
     }

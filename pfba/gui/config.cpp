@@ -68,7 +68,7 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     hardwareList.push_back({HARDWARE_PREFIX_MSX, "MSX"});
 
     std::vector<std::string> hardware_names;
-    for (int i = 0; i < hardwareList.size(); i++) {
+    for (unsigned int i = 0; i < hardwareList.size(); i++) {
         hardware_names.push_back(hardwareList[i].name);
     }
 
@@ -224,7 +224,7 @@ void Config::load(RomList::Rom *rom) {
             if (!isRomCfg) {
                 settings = config_setting_lookup(settings_root, "ROMS_PATHS");
                 if (settings) {
-                    for (int i = 0; i < roms_paths.size(); i++) {
+                    for (unsigned int i = 0; i < roms_paths.size(); i++) {
                         char p[MAX_PATH];
                         snprintf(p, MAX_PATH, "ROMS_PATH%i", i);
                         const char *value;
@@ -293,7 +293,7 @@ void Config::save(RomList::Rom *rom) {
 
     if (!isRomCfg) {
         sub_setting = config_setting_add(setting_fba, "ROMS_PATHS", CONFIG_TYPE_GROUP);
-        for (int i = 0; i < roms_paths.size(); i++) {
+        for (unsigned int i = 0; i < roms_paths.size(); i++) {
             char p[MAX_PATH];
             snprintf(p, MAX_PATH, "ROMS_PATH%i", i);
             config_setting_t *setting = config_setting_add(sub_setting, p, CONFIG_TYPE_STRING);
@@ -329,7 +329,7 @@ int Config::getValue(int index, bool rom) {
 
     std::vector<Option> *opt =
             rom ? &options_rom : &options_gui;
-    for (int i = 0; i < opt->size(); i++) {
+    for (unsigned int i = 0; i < opt->size(); i++) {
         if (index == opt->at(i).index) {
             return opt->at(i).value;
         }
@@ -355,7 +355,7 @@ std::vector<Option> *Config::getOptions(bool rom) {
 }
 
 int Config::getOptionPos(std::vector<Option> *options, int index) {
-    for (int i = 0; i < options->size(); i++) {
+    for (unsigned int i = 0; i < options->size(); i++) {
         if (options->at(i).index == index) {
             return i;
         }

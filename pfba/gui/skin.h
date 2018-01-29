@@ -22,7 +22,7 @@ public:
         }
     };
 
-    Skin(c2d::Renderer *renderer, char *skinPath, int fontSize, std::vector<Button> btns);
+    Skin(char *skinPath, int fontSize, std::vector<Button> btns);
 
     ~Skin();
 

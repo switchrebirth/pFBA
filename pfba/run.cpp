@@ -211,12 +211,16 @@ static int GetSekCpuCore(Gui *g) {
 
     std::vector<std::string> zipList;
     int hardware = BurnDrvGetHardwareCode();
-    
-    if (!g->GetConfig()->GetRomValue(Option::Index::ROM_NEOBIOS)
+
+    if (!g->getConfig()->getValue(Option::Index::ROM_NEOBIOS, true)
         && RomList::IsHardware(hardware, HARDWARE_PREFIX_SNK)) {
         sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
+
+        //TODO
+        /*
         g->MessageBox("UNIBIOS DOESNT SUPPORT THE M68K ASM CORE\n"
                              "CYCLONE ASM CORE DISABLED", "OK", NULL);
+        */
     }
 
     if (RomList::IsHardware(hardware, HARDWARE_PREFIX_SEGA)) {
@@ -226,8 +230,12 @@ static int GetSekCpuCore(Gui *g) {
             || hardware & HARDWARE_SEGA_FD1094_ENC
             || hardware & HARDWARE_SEGA_FD1094_ENC_CPU2) {
             sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
-            g->MessageBox("ROM IS CRYPTED, USE DECRYPTED ROM (CLONE)\n"
-                                  "TO ENABLE CYCLONE ASM CORE (FASTER)", "OK", NULL);
+
+            //TODO
+            /*
+                g->MessageBox("ROM IS CRYPTED, USE DECRYPTED ROM (CLONE)\n"
+                                      "TO ENABLE CYCLONE ASM CORE (FASTER)", "OK", NULL);
+            */
         }
     } else if (RomList::IsHardware(hardware, HARDWARE_PREFIX_TOAPLAN)) {
         zipList.push_back("batrider");
@@ -245,10 +253,14 @@ static int GetSekCpuCore(Gui *g) {
     }
 
     std::string zip = BurnDrvGetTextA(DRV_NAME);
-    for (int i = 0; i < zipList.size(); i++) {
+    for (unsigned int i = 0; i < zipList.size(); i++) {
         if (zipList[i].compare(0, zip.length(), zip) == 0) {
-            g->MessageBox("THIS ROM DOESNT SUPPORT THE M68K ASM CORE\n"
-                                  "CYCLONE ASM CORE DISABLED", "OK", NULL);
+
+            //TODO
+            /*
+                g->MessageBox("THIS ROM DOESNT SUPPORT THE M68K ASM CORE\n"
+                                      "CYCLONE ASM CORE DISABLED", "OK", NULL);
+            */
             sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
             break;
         }

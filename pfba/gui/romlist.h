@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "burner.h"
+class Gui;
 
 #define HARDWARE_PREFIX_ALL 0xffffffff
 
@@ -33,8 +34,7 @@ public:
         }
     };
 
-    RomList(c2d::Io *io, std::vector<Hardware> *hwList,
-            const std::vector<std::string> &paths);
+    RomList(Gui *gui);
 
     ~RomList();
 
@@ -61,7 +61,7 @@ public:
     std::vector<Hardware> *hardwareList;
 
     Hardware *GetHardware(int hardware_prefix) {
-        for (int i = 0; i < hardwareList->size(); i++) {
+        for (unsigned int i = 0; i < hardwareList->size(); i++) {
             if (IsHardware(hardware_prefix, hardwareList->at(i).prefix)) {
                 return &hardwareList->at(i);
             }
@@ -70,7 +70,7 @@ public:
     };
 
     const char *GetHardwareName(int hardware_prefix) {
-        for (int i = 0; i < hardwareList->size(); i++) {
+        for (unsigned int i = 0; i < hardwareList->size(); i++) {
             if (hardwareList->at(i).prefix == hardware_prefix) {
                 return hardwareList->at(i).name.c_str();
             }
@@ -80,7 +80,7 @@ public:
 
     static bool IsHardware(int hardware, int type) {
         return (((hardware | HARDWARE_PREFIX_CARTRIDGE) ^ HARDWARE_PREFIX_CARTRIDGE)
-                & 0xff000000) == type;
+                & 0xff000000) == (unsigned int) type;
     }
 };
 

@@ -7,7 +7,7 @@
 
 using namespace c2d;
 
-Skin::Skin(Renderer *renderer, char *skinPath, int fntSize, std::vector<Button> btns) {
+Skin::Skin(char *skinPath, int fntSize, std::vector<Button> btns) {
 
     char str[MAX_PATH];
     memset(str, 0, MAX_PATH);

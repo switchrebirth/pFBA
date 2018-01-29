@@ -5,12 +5,12 @@ set(CMAKE_SYSTEM_NAME "Generic")
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
-set(BUILD_SDL1 ON CACHE BOOL "Build with SDL1 support (software, osmesa) support")
+set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) support")
 set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
-set(BUILD_SDL1_TINYGL ON CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
+set(BUILD_SDL1_TINYGL OFF CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
 set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 support (software, osmesa) support")
 set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
-set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
+set(BUILD_PSP2 ON CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
 set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
@@ -318,6 +318,7 @@ set(FLAGS
 # PSP2 (ps vita)
 #################
 if (BUILD_PSP2)
+    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -fpermissive")
     list(REMOVE_ITEM SRC_CPU ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68000_intf.cpp)
     list(APPEND INC
             pfba/cpu/cyclone
@@ -345,7 +346,7 @@ if (BUILD_PSP2)
                 )
     endif (BUILD_DEBUG)
     set(LDFLAGS
-            cross2d SDL2
+            cross2d SDL2 vita2d
             SceDisplay_stub SceGxm_stub SceSysmodule_stub
             SceCtrl_stub ScePgf_stub ScePower_stub SceCommonDialog_stub
             SceAudio_stub SceTouch_stub SceHid_stub
@@ -376,9 +377,9 @@ elseif (BUILD_3DS)
     ##############
     # 3DS
     ##############
-        list(APPEND INC
-                ${DEVKITPRO}/libctru/include
-                ${DEVKITPRO}/portlibs/armv6k/include)
+    list(APPEND INC
+            ${DEVKITPRO}/libctru/include
+            ${DEVKITPRO}/portlibs/armv6k/include)
     list(APPEND FLAGS -DARM11 -D_3DS -D__3DS__
             -DNO_KEYBOARD -D__PFBA_ARM__ -DUSE_FILE32API -DLSB_FIRST
             -ffunction-sections -fomit-frame-pointer)
@@ -479,7 +480,7 @@ if (BUILD_PSP2)
             COMMAND rm -rf vpk && mkdir -p vpk/sce_sys
             COMMAND ${VITASDK}/bin/vita-elf-create ${PROJECT_NAME}.elf ${PROJECT_NAME}.velf
             COMMAND ${VITASDK}/bin/vita-make-fself -s -c ${PROJECT_NAME}.velf vpk/eboot.bin
-            COMMAND ${VITASDK}/bin/vita-mksfoex -s TITLE_ID=${TITLE_ID} "${PROJECT_NAME}" vpk/sce_sys/param.sfo
+            COMMAND ${VITASDK}/bin/vita-mksfoex -s TITLE_ID="VITAFBA01" "${PROJECT_NAME}" vpk/sce_sys/param.sfo
             COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/skin vpk/
             COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/psp2/* vpk
             COMMAND cd vpk && zip -r ../${PROJECT_NAME}-${BUILD_DATE}.vpk . && cd ..

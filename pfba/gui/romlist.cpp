@@ -13,9 +13,38 @@
 
 using namespace c2d;
 
-RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::string> &paths) {
+RomList::RomList(Gui *gui) {
 
-    hardwareList = hwList;
+    hardwareList = &gui->getConfig()->hardwareList;
+    std::vector<std::string> paths = gui->getConfig()->getRomPaths();
+
+    // UI
+    Rectangle *rect = new C2DRectangle(
+            Vector2f(gui->getRenderer()->getSize().x - 8, gui->getRenderer()->getSize().y - 8));
+    rect->setPosition(4, 4);
+    rect->setFillColor(Color::Gray);
+    rect->setOutlineColor(Color::Orange);
+    rect->setOutlineThickness(4);
+
+    Texture *texture = new C2DTexture(gui->getSkin()->tex_title->path);
+    texture->setOriginCenter();
+    texture->setPosition(Vector2f(rect->getSize().x / 2, rect->getSize().y / 2));
+    float scaling = std::min(
+            (rect->getSize().x - 64) / texture->getSize().x,
+            (rect->getSize().y - 64) / texture->getSize().y);
+    texture->setScale(scaling, scaling);
+    rect->add(texture);
+
+    char text_str[512] = "Roms found: 0/0";
+    Text *text = new Text(text_str, *gui->getSkin()->font);
+    text->setOriginBottomLeft();
+    text->setOutlineColor(Color::Black);
+    text->setOutlineThickness(2);
+    text->setPosition(16, rect->getSize().y - 8);
+    rect->add(text);
+
+    gui->getRenderer()->add(rect);
+    // UI
 
     printf("RomList: building list...\n");
     clock_t begin = clock();
@@ -23,7 +52,7 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
     std::vector<std::string> files[DIRS_MAX];
     for (unsigned int i = 0; i < paths.size(); i++) {
         if (!paths[i].empty()) {
-            files[i] = io->getDirList(paths[i].c_str());
+            files[i] = gui->getIo()->getDirList(paths[i].c_str());
             printf("RomList: found %i files in `%s`\n", (int) files[i].size(), paths[i].c_str());
         }
     }
@@ -108,6 +137,15 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
         }
 
         list.push_back(rom);
+
+        // UI
+        if (i % 250 == 0) {
+            sprintf(text_str, "Scanning... %i%% - ROMS : %i / %i",
+                    (i * 100) / nBurnDrvCount, hardwareList->at(0).supported_count, nBurnDrvCount);
+            text->setString(text_str);
+            gui->getRenderer()->flip();
+        }
+        // UI
     }
 
     /*
@@ -126,6 +164,12 @@ RomList::RomList(Io *io, std::vector<Hardware> *hwList, const std::vector<std::s
     clock_t end = clock();
     double time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
     printf("RomList: list built in %f\n", time_spent);
+
+    // UI
+    texture->setOriginTopLeft();
+    texture->setPosition(0, 0);
+    texture->setScale(1, 1);
+    delete (rect);
 }
 
 RomList::~RomList() {

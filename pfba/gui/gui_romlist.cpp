@@ -96,8 +96,7 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
     gui = g;
 
     // build/init roms list
-    rom_list = new RomList(gui->getIo(), &gui->getConfig()->hardwareList,
-                           gui->getConfig()->getRomPaths());
+    rom_list = new RomList(gui);
 
     // filter roms
     filterRoms();

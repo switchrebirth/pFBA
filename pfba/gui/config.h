@@ -25,16 +25,12 @@ public:
 
     void save(RomList::Rom *rom = NULL);
 
-    //int getGuiValue(int id);
-    //int getRomValue(int id);
     int getValue(int id, bool rom = false);
 
     const char *getRomPath(int n);
 
     std::vector<std::string> getRomPaths();
 
-    //std::vector<Option> *getGuiOptions();
-    //std::vector<Option> *getRomOptions();
     std::vector<Option> *getOptions(bool rom = false);
 
     int getOptionPos(std::vector<Option> *options, int index);

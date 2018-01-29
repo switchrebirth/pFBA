@@ -68,13 +68,15 @@ void Gui::run() {
                 //RunOptionMenu(true);
                 break;
 
+            case EV_QUIT:
+                return;
+
             default:
                 break;
         }
 
         renderer->flip();
     }
-
 }
 
 float Gui::getScaling() {

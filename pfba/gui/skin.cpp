@@ -26,7 +26,7 @@ Skin::Skin(char *skinPath, int fntSize, std::vector<Button> btns) {
 
     // load buttons textures
     buttons = btns;
-    for (int i = 0; i < buttons.size(); i++) {
+    for (unsigned int i = 0; i < buttons.size(); i++) {
         memset(str, 0, MAX_PATH);
         snprintf(str, MAX_PATH, "%s/buttons/%i.png", skinPath, buttons[i].id);
         buttons[i].texture = (Texture *) new C2DTexture(str);
@@ -35,7 +35,7 @@ Skin::Skin(char *skinPath, int fntSize, std::vector<Button> btns) {
 
 Skin::Button *Skin::GetButton(int id) {
 
-    for (int i = 0; i < buttons.size(); i++) {
+    for (unsigned int i = 0; i < buttons.size(); i++) {
         if (buttons[i].id == id) {
             return &buttons[i];
         }

@@ -43,8 +43,8 @@ private:
 
     int title_loaded = 0;
     int load_delay = 0;
-    Timer *timer_input = NULL;
-    Timer *timer_load = NULL;
+    c2d::Timer *timer_input = NULL;
+    c2d::Timer *timer_load = NULL;
 };
 
 #endif //GUI_ROMIST_H

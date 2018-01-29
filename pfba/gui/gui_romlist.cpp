@@ -166,14 +166,14 @@ int GuiRomList::updateKeys() {
             title_loaded = 0;
         } else if (key & Input::Key::KEY_DOWN) {
             rom_index++;
-            if (rom_index >= roms.size())
+            if ((unsigned int) rom_index >= roms.size())
                 rom_index = 0;
             list_box->setSelection(rom_index);
             rom_info->update(NULL);
             title_loaded = 0;
         } else if (key & Input::Key::KEY_RIGHT) {
             rom_index += list_box->getMaxLines();
-            if (rom_index >= roms.size())
+            if ((unsigned int) rom_index >= roms.size())
                 rom_index = (int) (roms.size() - 1);
             list_box->setSelection(rom_index);
             rom_info->update(NULL);
@@ -213,7 +213,7 @@ int GuiRomList::updateKeys() {
 
     } else {
 
-        if (!title_loaded && timer_load->getMillis() > load_delay) {
+        if (!title_loaded && timer_load->getMillis() > (unsigned long) load_delay) {
             rom_info->update(roms[rom_index]);
             title_loaded = 1;
         }
@@ -239,9 +239,10 @@ void GuiRomList::filterRoms() {
 
     remove_copy_if(rom_list->list.begin(), rom_list->list.end(), back_inserter(roms),
                    [showAll, showClone, showHardware](RomList::Rom *r) {
-                       return !showAll && r->state != RomList::RomState::WORKING
-                              || !showClone && r->parent != NULL
-                              || showHardware != HARDWARE_PREFIX_ALL && !RomList::IsHardware(r->hardware, showHardware);
+                       return (!showAll && r->state != RomList::RomState::WORKING)
+                              || (!showClone && r->parent != NULL)
+                              || ((unsigned int) showHardware != HARDWARE_PREFIX_ALL
+                                  && !RomList::IsHardware(r->hardware, showHardware));
                    });
 
     rom_index = 0;
@@ -257,4 +258,3 @@ GuiRomList::~GuiRomList() {
     delete (timer_load);
     delete (rom_list);
 }
-

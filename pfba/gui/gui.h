@@ -56,6 +56,8 @@ public:
 
     c2d::Io *getIo();
 
+    GuiRomList *getUiRomList();
+
     float getScaling();
 
 private:

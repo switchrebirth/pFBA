@@ -18,12 +18,11 @@ static unsigned int myHighCol16(int r, int g, int b, int /* i */) {
     return t;
 }
 
-Video::Video(Renderer *renderer) {
+Video::Video(const c2d::Vector2f &size, Renderer *renderer) : C2DTexture(size, C2D_TEXTURE_FMT_RGB565) {
 
     this->renderer = renderer;
 
-    BurnDrvGetFullSize(&VideoBufferWidth, &VideoBufferHeight);
-    printf("game resolution: %ix%i\n", VideoBufferWidth, VideoBufferHeight);
+    printf("game resolution: %ix%i\n", (int) getSize().x, (int) getSize().y);
 
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         printf("game orientation: vertical\n");
@@ -32,29 +31,18 @@ Video::Video(Renderer *renderer) {
         printf("game orientation: flipped\n");
     }
 
-    if (screen == NULL) {
-        screen = (Texture *) new C2DTexture(Vector2f(VideoBufferWidth, VideoBufferHeight));
-    }
-
     nBurnBpp = 2;
     BurnHighCol = myHighCol16;
     BurnRecalcPal();
-    screen->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
-    screen->unlock();
+    lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
+    unlock();
 
     renderer->setShader(gui->getConfig()->getValue(Option::Index::ROM_SHADER, true));
-    Filter(gui->getConfig()->getValue(Option::Index::ROM_FILTER, true));
-    Scale();
+    setFiltering(gui->getConfig()->getValue(Option::Index::ROM_FILTER, true));
+    updateScaling();
 }
 
-void Video::Filter(int filter) {
-    screen->setFiltering(filter);
-    // SDL2 needs to regenerate a texture, so update burn buffer
-    screen->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
-    screen->unlock();
-}
-
-void Video::Scale() {
+void Video::updateScaling() {
 
     FloatRect window = renderer->getGlobalBounds();
 
@@ -84,13 +72,12 @@ void Video::Scale() {
             rotation = 0;
         }
     }
+
     // TODO: force right to left orientation on psp2,
     // should add platform specific code
 
-    //printf("rotation: %i\n", rotation);
-
-    scale.width = VideoBufferWidth;
-    scale.height = VideoBufferHeight;
+    scale.width = getSize().x;
+    scale.height = getSize().y;
 
     switch (scaling) {
 
@@ -102,14 +89,14 @@ void Video::Scale() {
         case 2: // fit
             if (rotation == 0 || rotation == 180) {
                 scale.height = window.height;
-                scale.width = (int) (scale.width * (scale.height / (float) VideoBufferHeight));
+                scale.width = (int) (scale.width * (scale.height / getSize().y));
                 if (scale.width > window.width) {
                     scale.width = window.width;
-                    scale.height = (int) (scale.width * ((float) VideoBufferHeight / (float) VideoBufferWidth));
+                    scale.height = (int) (scale.width * (getSize().y / getSize().x));
                 }
             } else {
                 scale.width = window.height;
-                scale.height = (int) (scale.width * ((float) VideoBufferHeight / (float) VideoBufferWidth));
+                scale.height = (int) (scale.width * (getSize().y / getSize().x));
             }
             break;
 
@@ -144,45 +131,13 @@ void Video::Scale() {
     scale.left = (window.width - scale.width) / 2;
     scale.top = (window.height - scale.height) / 2;
 
-    //printf("scale: x=%i y=%i %ix%i\n", scale.x, scale.y, scale.width, scale.height);
-    for (int i = 0; i < 3; i++) {
-        Clear();
-        Flip();
-    }
-}
-
-void Video::Clear() {
-    // TODO ?
-    //renderer->clear();
-}
-
-void Video::Lock() {
-    screen->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
-}
-
-void Video::Unlock() {
-    screen->unlock();
-}
-
-// TODO ?
-void Video::Render() {
-    /*
-    if (pBurnDraw != NULL) {
-        screen->Draw(scale.x, scale.y, scale.width, scale.height, rotation);
-    }
-    */
-}
-
-void Video::Flip() {
-    //renderer->Flip();
+    setPosition(scale.left, scale.top);
+    setScale(scale.width / getSize().x, scale.height / getSize().y);
+    setRotation(rotation);
 }
 
 Video::~Video() {
 
-    if (screen != NULL) {
-        delete (screen);
-        screen = NULL;
-    }
     pBurnDraw = NULL;
     renderer->setShader(0);
 }

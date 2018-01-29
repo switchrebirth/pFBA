@@ -131,7 +131,7 @@ int RunOneFrame(bool bDraw, int bDrawFps, int fps) {
             int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
                                                        Option::Index::ROM_SCALING);
             gui->getConfig()->getOptions(true)->at(index).value = scaling;
-            video->Scale();
+            video->updateScaling();
             gui->getRenderer()->delay(500);
         }
     } else if ((players[0].state & Input::Key::KEY_MENU2)
@@ -141,7 +141,7 @@ int RunOneFrame(bool bDraw, int bDrawFps, int fps) {
             int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
                                                        Option::Index::ROM_SCALING);
             gui->getConfig()->getOptions(true)->at(index).value = scaling;
-            video->Scale();
+            video->updateScaling();
             gui->getRenderer()->delay(500);
         }
     } else if ((players[0].state & Input::Key::KEY_MENU2)
@@ -165,28 +165,28 @@ int RunOneFrame(bool bDraw, int bDrawFps, int fps) {
             gui->getRenderer()->delay(500);
         }
     } else if (players[0].state & EV_RESIZE) {
-        video->Scale();
+        video->updateScaling();
     }
 
     InpMake(players);
 
     if (!bPauseOn) {
+
         nFramesEmulated++;
         nCurrentFrame++;
 
         pBurnDraw = NULL;
         if (bDraw) {
             nFramesRendered++;
-            video->Lock();
+            video->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
         }
         BurnDrvFrame();
 
         if (bDraw) {
             if (bDrawFps) {
-                video->Clear();
+                //video->Clear();
             }
-            video->Unlock();
-            video->Render();
+            video->unlock();
             if (bDrawFps) {
                 // TODO: update for latest cross2d
                 /*
@@ -195,7 +195,6 @@ int RunOneFrame(bool bDraw, int bDrawFps, int fps) {
                 gui->getSkin()->font->color = C2D_COL_WHITE;
                 */
             }
-            video->Flip();
         }
     }
 
@@ -349,7 +348,10 @@ void RunEmulator(Gui *g, int drvnum) {
     }
 
     printf("Creating video device\n");
-    video = new Video(gui->getRenderer());
+    int w, h;
+    BurnDrvGetFullSize(&w, &h);
+    video = new Video(Vector2f(w, h), gui->getRenderer());
+    gui->getRenderer()->add(video);
 
     RunReset();
 
@@ -361,15 +363,6 @@ void RunEmulator(Gui *g, int drvnum) {
     StartTicks(); // no frameskip
 
     GameLooping = true;
-
-    // prevent flickering borders by rendering a few frames and
-    // blanking the display afterwards
-    for (int i = 0; i < 9; i++)
-        RunOneFrame(true, 0, 0);
-    for (int i = 0; i < 3; i++) {
-        video->Clear();
-        video->Flip();
-    }
 
     while (GameLooping) {
 
@@ -414,6 +407,8 @@ void RunEmulator(Gui *g, int drvnum) {
                 audio->Play();
             }
         }
+
+        gui->getRenderer()->flip();
     }
 
     printf("---- PFBA EMU END ----\n\n");

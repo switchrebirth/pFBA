@@ -124,7 +124,9 @@ void Gui::runRom(RomList::Rom *rom) {
     updateInputMapping(true);
 
     printf("RunRom: RunEmulator: start\n");
+    uiRomList->setVisibility(C2D_VISIBILITY_HIDDEN);
     RunEmulator(this, nBurnDrvActive);
+    uiRomList->setVisibility(C2D_VISIBILITY_VISIBLE);
 
     // set default input scheme
     updateInputMapping(false);
@@ -150,6 +152,10 @@ Config *Gui::getConfig() {
 
 Io *Gui::getIo() {
     return io;
+}
+
+GuiRomList *Gui::getUiRomList() {
+    return uiRomList;
 }
 
 void Gui::updateInputMapping(bool isRomConfig) {

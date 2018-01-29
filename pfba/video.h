@@ -8,25 +8,20 @@
 #include <cstring>
 #include <c2d.h>
 
-class Video {
+class Video : public c2d::C2DTexture {
 
 public:
-    Video(c2d::Renderer *renderer);
+
+    Video(const c2d::Vector2f &size, c2d::Renderer *renderer);
+
     virtual ~Video();
 
-    virtual void Clear();
-    void Lock();
-    void Unlock();
-    void Render();
-    virtual void Flip();
-    virtual void Scale();
-    virtual void Filter(int filter);
+    virtual void updateScaling();
+
+private:
 
     c2d::Renderer *renderer = NULL;
-    c2d::Texture *screen = NULL;
     c2d::FloatRect scale;
-    int VideoBufferWidth = 0;
-    int VideoBufferHeight = 0;
     int rotation = 0;
 };
 

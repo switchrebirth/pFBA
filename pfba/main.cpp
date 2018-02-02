@@ -117,8 +117,7 @@ int main(int argc, char **argv) {
     config = new Config(cfgPath, renderer);
 
     // skin
-    int size = config->getValue(Option::Index::SKIN_FONT_SIZE);
-    Skin *skin = new Skin(szAppSkinPath, size, buttons);
+    Skin *skin = new Skin(szAppSkinPath, buttons);
 
     // run gui
     gui = new Gui(io, renderer, skin, config, inp);

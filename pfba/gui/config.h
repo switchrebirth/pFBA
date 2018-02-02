@@ -33,6 +33,8 @@ public:
 
     std::vector<Option> *getOptions(bool rom = false);
 
+    Option *getOption(std::vector<Option> *options, int index);
+
     int getOptionPos(std::vector<Option> *options, int index);
 
     int *getGuiPlayerInputKeys(int player);

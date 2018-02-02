@@ -25,13 +25,13 @@ public:
 
     int updateKeys();
 
+    void updateRomList();
+
     RomList::Rom *getRom();
 
     void setLoadDelay(int delay);
 
 private:
-
-    void filterRoms();
 
     Gui *gui = NULL;
     c2d::ListBox *list_box = NULL;

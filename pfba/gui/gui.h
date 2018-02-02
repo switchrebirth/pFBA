@@ -10,16 +10,22 @@
 #include "skin.h"
 #include "romlist.h"
 #include "config.h"
-#include "menu.h"
+#include "option_menu.h"
 #include "gui_romlist.h"
 
 class Config;
 
 class Option;
 
-//class GuiRomList;
+class GuiMenu;
 
 class GuiRomInfo;
+
+#define UI_KEY_FILTER_ROMS      100
+#define UI_KEY_SHOW_ROMLIST     101
+#define UI_KEY_SHOW_MEMU_UI     102
+#define UI_KEY_SHOW_MEMU_ROM    103
+#define UI_KEY_RUN_ROM          104
 
 #define UI_MARGIN   16
 #define INPUT_DELAY 150
@@ -58,11 +64,11 @@ public:
 
     GuiRomList *getUiRomList();
 
+    int getFontSize();
+
     float getScaling();
 
 private:
-
-    bool IsOptionHidden(Option *option);
 
     c2d::Io *io = NULL;
     Config *config = NULL;
@@ -70,15 +76,10 @@ private:
     Skin *skin = NULL;
     c2d::Input *input = NULL;
 
-    Menu *menu_gui = NULL;
-    Menu *menu_rom = NULL;
-    Menu *menu_current = NULL;
-
+    GuiMenu *uiMenu = NULL;
     GuiRomList *uiRomList;
 
     float scaling = 1;
-
-    bool quit = false;
 };
 
 #endif //GUI_MAIN_H

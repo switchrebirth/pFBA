@@ -7,7 +7,7 @@
 
 using namespace c2d;
 
-Skin::Skin(char *skinPath, int fntSize, std::vector<Button> btns) {
+Skin::Skin(char *skinPath, std::vector<Button> btns) {
 
     char str[MAX_PATH];
     memset(str, 0, MAX_PATH);
@@ -22,7 +22,6 @@ Skin::Skin(char *skinPath, int fntSize, std::vector<Button> btns) {
     snprintf(str, MAX_PATH, "%s/default.ttf", skinPath);
     font = new C2DFont();
     font->loadFromFile(str);
-    fontSize = fntSize;
 
     // load buttons textures
     buttons = btns;
@@ -33,7 +32,7 @@ Skin::Skin(char *skinPath, int fntSize, std::vector<Button> btns) {
     }
 }
 
-Skin::Button *Skin::GetButton(int id) {
+Skin::Button *Skin::getButton(int id) {
 
     for (unsigned int i = 0; i < buttons.size(); i++) {
         if (buttons[i].id == id) {

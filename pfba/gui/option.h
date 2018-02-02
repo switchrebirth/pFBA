@@ -82,10 +82,10 @@ public:
     int flags = INTEGER;
     int index = 0;
     int value = 0;
-    const char *GetName();
-    const char *GetValue();
-    void Next();
-    void Prev();
+    const char *getName();
+    const char *getValue();
+    void next();
+    void prev();
 
 private:
     std::string text;

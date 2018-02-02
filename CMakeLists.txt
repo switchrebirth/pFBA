@@ -309,6 +309,7 @@ set(FLAGS
         -DTOAPLAN_SOUND_SAMPLES_HACK
         -Wno-write-strings -Wno-narrowing
         -fforce-addr -finline-limit=1200
+        -Wno-sign-compare
         -DFASTCALL -U__fastcall -D_fastcall= -D__fastcall= -D__fastcall__=
         "-DINLINE=static inline" "-DSH2_INLINE=static inline"
         #-fcheck-new

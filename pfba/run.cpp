@@ -78,7 +78,7 @@ int RunOneFrame(bool bDraw, int bDrawFps, int fps) {
             rotate = 3;
         }
     }
-    Input::Player *players = gui->getInput()->Update(rotate);
+    Input::Player *players = gui->getInput()->update(rotate);
 
     // process menu
     if ((players[0].state & Input::Key::KEY_MENU1)

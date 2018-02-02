@@ -22,16 +22,15 @@ public:
         }
     };
 
-    Skin(char *skinPath, int fontSize, std::vector<Button> btns);
+    Skin(char *skinPath, std::vector<Button> btns);
 
     ~Skin();
 
-    Button *GetButton(int id);
+    Button *getButton(int id);
 
     c2d::Texture *tex_bg;
     c2d::Texture *tex_title;
     c2d::Font *font;
-    int fontSize = C2D_DEFAULT_CHAR_SIZE;
     std::vector<Button> buttons;
 };
 

@@ -26,7 +26,7 @@ RomList::RomList(Gui *gui) {
     rect->setOutlineColor(Color::Orange);
     rect->setOutlineThickness(4);
 
-    Texture *texture = new C2DTexture(gui->getSkin()->tex_title->path);
+    Texture *texture = gui->getSkin()->tex_title; //new C2DTexture(gui->getSkin()->tex_title->path);
     texture->setOriginCenter();
     texture->setPosition(Vector2f(rect->getSize().x / 2, rect->getSize().y / 2));
     float scaling = std::min(
@@ -166,9 +166,12 @@ RomList::RomList(Gui *gui) {
     printf("RomList: list built in %f\n", time_spent);
 
     // UI
+    // reset title texture for later use
     texture->setOriginTopLeft();
     texture->setPosition(0, 0);
     texture->setScale(1, 1);
+    rect->remove(texture);
+    // remove ui widgets
     delete (rect);
 }
 

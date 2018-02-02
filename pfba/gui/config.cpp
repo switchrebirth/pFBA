@@ -242,11 +242,11 @@ void Config::load(RomList::Rom *rom) {
 
             for (unsigned long i = 0; i < options->size(); i++) {
                 if (options->at(i).flags & Option::Type::MENU) {
-                    settings = config_setting_lookup(settings_root, options->at(i).GetName());
+                    settings = config_setting_lookup(settings_root, options->at(i).getName());
                 }
                 if (settings) {
                     int value = 0;
-                    if (config_setting_lookup_int(settings, options->at(i).GetName(), &value)) {
+                    if (config_setting_lookup_int(settings, options->at(i).getName(), &value)) {
                         options->at(i).value = value;
                         //printf("%s: %i\n", options->at(i).GetName(), value);
                     }
@@ -306,10 +306,10 @@ void Config::save(RomList::Rom *rom) {
             continue;
         }
         if (options->at(i).flags & Option::Type::MENU) {
-            sub_setting = config_setting_add(setting_fba, options->at(i).GetName(), CONFIG_TYPE_GROUP);
+            sub_setting = config_setting_add(setting_fba, options->at(i).getName(), CONFIG_TYPE_GROUP);
             continue;
         }
-        config_setting_t *setting = config_setting_add(sub_setting, options->at(i).GetName(), CONFIG_TYPE_INT);
+        config_setting_t *setting = config_setting_add(sub_setting, options->at(i).getName(), CONFIG_TYPE_INT);
         config_setting_set_int(setting, options->at(i).value);
     }
 
@@ -352,6 +352,15 @@ std::vector<std::string> Config::getRomPaths() {
 
 std::vector<Option> *Config::getOptions(bool rom) {
     return rom ? &options_rom : &options_gui;
+}
+
+Option *Config::getOption(std::vector<Option> *options, int index) {
+    for (unsigned int i = 0; i < options->size(); i++) {
+        if (options->at(i).index == index) {
+            return &options->at(i);
+        }
+    }
+    return NULL;
 }
 
 int Config::getOptionPos(std::vector<Option> *options, int index) {

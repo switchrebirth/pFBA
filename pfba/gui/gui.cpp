@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "run.h"
 #include "video.h"
+#include "gui_menu.h"
 #include "menu.h"
 
 using namespace c2d;
@@ -21,12 +22,7 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     config = cfg;
     input = in;
 
-    // build menus from options
-    menu_gui = new Menu(NULL, cfg->getOptions());
-    menu_rom = new Menu(NULL, cfg->getOptions(true), true);
-    menu_current = menu_gui;
-
-    // scaling factor mainly used for borders
+    // scaling factor mainly used for borders,
     // based on vita resolution..
     scaling = std::min(renderer->getSize().x / 960, 1.0f);
     if (scaling >= 1) {
@@ -35,37 +31,65 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
 
     uiRomList = new GuiRomList(this, renderer->getSize());
     uiRomList->setLoadDelay(500);
-
     renderer->add(uiRomList);
+
+    // build menus from options
+    uiMenu = new GuiMenu(this);
+    uiMenu->setVisibility(C2D_VISIBILITY_HIDDEN);
+    renderer->add(uiMenu);
 }
 
 Gui::~Gui() {
 
-    delete (menu_gui);
-    delete (menu_rom);
+    delete (uiMenu);
+    delete (uiRomList);
 }
 
 void Gui::run() {
 
+    int key = 0;
     updateInputMapping(false);
 
-    while (!quit) {
+    while (true) {
 
-        switch (uiRomList->updateKeys()) {
+        if (uiMenu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
+            key = uiMenu->updateKeys();
+        } else {
+            key = uiRomList->updateKeys();
+        }
 
-            case Input::Key::KEY_FIRE1:
+        switch (key) {
+
+            case UI_KEY_RUN_ROM:
+                getInput()->clear(0);
+                uiRomList->setVisibility(C2D_VISIBILITY_HIDDEN);
                 runRom(uiRomList->getRom());
                 break;
 
-            case Input::Key::KEY_MENU1:
-                // TODO: run option menu
-                //RunOptionMenu();
+            case UI_KEY_SHOW_MEMU_UI:
+                getInput()->clear(0);
+                uiMenu->loadMenu();
+                uiMenu->setVisibility(C2D_VISIBILITY_VISIBLE);
+                uiMenu->setLayer(1);
                 break;
 
-            case Input::Key::KEY_MENU2:
-                // TODO: run option menu (per rom options)
+            case UI_KEY_SHOW_MEMU_ROM:
+                getInput()->clear(0);
+                printf("ROM: %s\n", uiRomList->getRom()->name.c_str());
                 getConfig()->load(uiRomList->getRom());
-                //RunOptionMenu(true);
+                uiMenu->loadMenu(true);
+                uiMenu->setVisibility(C2D_VISIBILITY_VISIBLE);
+                uiMenu->setLayer(1);
+                break;
+
+            case UI_KEY_FILTER_ROMS:
+                uiRomList->updateRomList();
+                break;
+
+            case UI_KEY_SHOW_ROMLIST:
+                getInput()->clear(0);
+                uiMenu->setVisibility(C2D_VISIBILITY_HIDDEN);
+                uiRomList->setVisibility(C2D_VISIBILITY_VISIBLE);
                 break;
 
             case EV_QUIT:
@@ -158,23 +182,27 @@ GuiRomList *Gui::getUiRomList() {
     return uiRomList;
 }
 
+int Gui::getFontSize() {
+    return config->getValue(Option::Index::SKIN_FONT_SIZE);
+}
+
 void Gui::updateInputMapping(bool isRomConfig) {
 
     if (isRomConfig) {
-        input->SetKeyboardMapping(config->getRomPlayerInputKeys(0));
+        input->setKeyboardMapping(config->getRomPlayerInputKeys(0));
         int dz = 2000 + config->getValue(Option::Index::JOY_DEADZONE, true) * 2000;
         for (int i = 0; i < PLAYER_COUNT; i++) {
-            input->SetJoystickMapping(i, config->getRomPlayerInputButtons(i), dz);
+            input->setJoystickMapping(i, config->getRomPlayerInputButtons(i), dz);
             input->players[i].lx.id = config->getValue(Option::Index::JOY_AXIS_LX, true);
             input->players[i].ly.id = config->getValue(Option::Index::JOY_AXIS_LY, true);
             input->players[i].rx.id = config->getValue(Option::Index::JOY_AXIS_RX, true);
             input->players[i].ry.id = config->getValue(Option::Index::JOY_AXIS_RY, true);
         }
     } else {
-        input->SetKeyboardMapping(config->getGuiPlayerInputKeys(0));
+        input->setKeyboardMapping(config->getGuiPlayerInputKeys(0));
         int dz = 2000 + config->getValue(Option::Index::JOY_DEADZONE) * 2000;
         for (int i = 0; i < PLAYER_COUNT; i++) {
-            input->SetJoystickMapping(i, config->getGuiPlayerInputButtons(i), dz);
+            input->setJoystickMapping(i, config->getGuiPlayerInputButtons(i), dz);
             input->players[i].lx.id = config->getValue(Option::Index::JOY_AXIS_LX);
             input->players[i].ly.id = config->getValue(Option::Index::JOY_AXIS_LY);
             input->players[i].rx.id = config->getValue(Option::Index::JOY_AXIS_RX);

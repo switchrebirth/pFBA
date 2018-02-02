@@ -14,24 +14,24 @@ Option::Option(const std::string &text,
     this->index = idx;
 }
 
-const char *Option::GetName() {
+const char *Option::getName() {
     return text.c_str();
 }
 
-const char *Option::GetValue() {
+const char *Option::getValue() {
     if(value >= options.size()) {
         return "NONE";
     }
     return options[value].c_str();
 }
 
-void Option::Next() {
+void Option::next() {
     value++;
     if (value >= options.size())
         value = 0;
 }
 
-void Option::Prev() {
+void Option::prev() {
     value--;
     if (value < 0)
         value = (int) (options.size() - 1);

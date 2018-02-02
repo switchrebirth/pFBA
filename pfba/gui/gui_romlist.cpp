@@ -13,7 +13,7 @@ class GuiRomInfo : public Rectangle {
 
 public:
 
-    GuiRomInfo(const Font &font, const FloatRect &rect, float scale, int fontSize = 0) : Rectangle(rect) {
+    GuiRomInfo(const Font &font, int fontSize, const FloatRect &rect, float scale) : Rectangle(rect) {
 
         setFillColor(Color::Transparent);
         scaling = scale;
@@ -98,9 +98,6 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
     // build/init roms list
     rom_list = new RomList(gui);
 
-    // filter roms
-    filterRoms();
-
     // set gui main "window"
     setFillColor(Color::Gray);
     setOutlineColor(COL_ORANGE);
@@ -117,32 +114,18 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
         add(skin->tex_title);
     }
 
-    // add rom list ui
-    float top = skin->tex_title->getGlobalBounds().top
-                + skin->tex_title->getGlobalBounds().height
-                + UI_MARGIN * gui->getScaling();
-
-    FloatRect rect = {
-            UI_MARGIN * gui->getScaling(), top,
-            (getLocalBounds().width / 2) - UI_MARGIN * gui->getScaling(),
-            getLocalBounds().height - top - UI_MARGIN * gui->getScaling()};
-
-    list_box = new ListBox(*skin->font, rect, (std::vector<Io::File *> &) roms);
-    list_box->setOutlineThickness(getOutlineThickness());
-    list_box->setFillColor(Color::GrayLight);
-    list_box->setOutlineColor(COL_ORANGE);
-    add(list_box);
+    // filter roms
+    updateRomList();
 
     // add rom info ui
-    rom_info = new GuiRomInfo(*skin->font,
+    rom_info = new GuiRomInfo(*skin->font, gui->getFontSize(),
                               FloatRect(
                                       (getLocalBounds().width / 2) + UI_MARGIN * gui->getScaling(),
                                       UI_MARGIN * gui->getScaling(),
                                       (getLocalBounds().width / 2) - UI_MARGIN * gui->getScaling() * 2,
-                                      getLocalBounds().height - UI_MARGIN * gui->getScaling() * 2), gui->getScaling(),
-                              list_box->getFontSize());
+                                      getLocalBounds().height - UI_MARGIN * gui->getScaling() * 2), gui->getScaling());
     rom_info->infoBox->setOutlineThickness(getOutlineThickness());
-    rom_info->update(roms[0]);
+    rom_info->update(roms.size() > 0 ? roms[0] : NULL);
     add(rom_info);
 
     timer_input = new Timer();
@@ -151,8 +134,7 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
 
 int GuiRomList::updateKeys() {
 
-
-    Input::Player *players = gui->getInput()->Update();
+    Input::Player *players = gui->getInput()->update();
 
     int key = players[0].state;
     if (key > 0) {
@@ -166,14 +148,14 @@ int GuiRomList::updateKeys() {
             title_loaded = 0;
         } else if (key & Input::Key::KEY_DOWN) {
             rom_index++;
-            if ((unsigned int) rom_index >= roms.size())
+            if (rom_index >= roms.size())
                 rom_index = 0;
             list_box->setSelection(rom_index);
             rom_info->update(NULL);
             title_loaded = 0;
         } else if (key & Input::Key::KEY_RIGHT) {
             rom_index += list_box->getMaxLines();
-            if ((unsigned int) rom_index >= roms.size())
+            if (rom_index >= roms.size())
                 rom_index = (int) (roms.size() - 1);
             list_box->setSelection(rom_index);
             rom_info->update(NULL);
@@ -190,13 +172,13 @@ int GuiRomList::updateKeys() {
                 return Input::Key::KEY_FIRE1;
             }
         } else if (key & Input::Key::KEY_MENU1) {
-            return Input::Key::KEY_MENU1;
+            return UI_KEY_SHOW_MEMU_UI;
         } else if (key & Input::Key::KEY_MENU2) {
             if (getRom() != NULL) {
-                return Input::Key::KEY_MENU2;
+                return UI_KEY_SHOW_MEMU_ROM;
             }
         } else if (key & EV_QUIT) {
-            return key;
+            return EV_QUIT;
         }
 
         if (timer_input->getSeconds() > 12) {
@@ -214,7 +196,7 @@ int GuiRomList::updateKeys() {
     } else {
 
         if (!title_loaded && timer_load->getMillis() > (unsigned long) load_delay) {
-            rom_info->update(roms[rom_index]);
+            rom_info->update(roms.size() > rom_index ? roms[rom_index] : NULL);
             title_loaded = 1;
         }
 
@@ -228,8 +210,9 @@ RomList::Rom *GuiRomList::getRom() {
     return (RomList::Rom *) list_box->getSelection();
 }
 
-void GuiRomList::filterRoms() {
+void GuiRomList::updateRomList() {
 
+    rom_index = 0;
     roms.clear();
 
     int showClone = gui->getConfig()->getValue(Option::Index::GUI_SHOW_CLONES);
@@ -241,11 +224,28 @@ void GuiRomList::filterRoms() {
                    [showAll, showClone, showHardware](RomList::Rom *r) {
                        return (!showAll && r->state != RomList::RomState::WORKING)
                               || (!showClone && r->parent != NULL)
-                              || ((unsigned int) showHardware != HARDWARE_PREFIX_ALL
+                              || (showHardware != HARDWARE_PREFIX_ALL
                                   && !RomList::IsHardware(r->hardware, showHardware));
                    });
 
-    rom_index = 0;
+    if (list_box != NULL) {
+        delete (list_box);
+    }
+
+    // add rom list ui
+    float top = gui->getSkin()->tex_title->getGlobalBounds().top
+                + gui->getSkin()->tex_title->getGlobalBounds().height
+                + UI_MARGIN * gui->getScaling();
+
+    FloatRect rect = {
+            UI_MARGIN * gui->getScaling(), top,
+            (getLocalBounds().width / 2) - UI_MARGIN * gui->getScaling(),
+            getLocalBounds().height - top - UI_MARGIN * gui->getScaling()};
+    list_box = new ListBox(*gui->getSkin()->font, gui->getFontSize(), rect, (std::vector<Io::File *> &) roms);
+    list_box->setOutlineThickness(getOutlineThickness());
+    list_box->setFillColor(Color::GrayLight);
+    list_box->setOutlineColor(COL_ORANGE);
+    add(list_box);
 }
 
 void GuiRomList::setLoadDelay(int delay) {

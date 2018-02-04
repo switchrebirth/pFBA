@@ -43,10 +43,6 @@ Skin::Button *Skin::getButton(int id) {
 }
 
 Skin::~Skin() {
-    if (tex_bg)
-        delete (tex_bg);
-    if (tex_title)
-        delete (tex_title);
     if (font)
         delete (font);
 }

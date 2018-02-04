@@ -4,9 +4,8 @@
 #include <skeleton/timer.h>
 #include <algorithm>
 #include "run.h"
-#include "video.h"
 #include "gui_menu.h"
-#include "menu.h"
+#include "gui_progressbox.h"
 
 using namespace c2d;
 
@@ -37,6 +36,14 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     uiMenu = new GuiMenu(this);
     uiMenu->setVisibility(C2D_VISIBILITY_HIDDEN);
     renderer->add(uiMenu);
+
+    uiEmu = new GuiEmu(this);
+    uiEmu->setVisibility(C2D_VISIBILITY_HIDDEN);
+    renderer->add(uiEmu);
+
+    uiProgressBox = new GuiProgressBox(this);
+    uiProgressBox->setVisibility(C2D_VISIBILITY_HIDDEN);
+    renderer->add(uiProgressBox);
 }
 
 Gui::~Gui() {
@@ -54,6 +61,8 @@ void Gui::run() {
 
         if (uiMenu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
             key = uiMenu->updateKeys();
+        } else if (uiEmu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
+            key = uiEmu->updateKeys();
         } else {
             key = uiRomList->updateKeys();
         }
@@ -62,8 +71,12 @@ void Gui::run() {
 
             case UI_KEY_RUN_ROM:
                 getInput()->clear(0);
-                uiRomList->setVisibility(C2D_VISIBILITY_HIDDEN);
                 runRom(uiRomList->getRom());
+                break;
+
+            case UI_KEY_RESUME_ROM:
+                getInput()->clear(0);
+                uiEmu->resume();
                 break;
 
             case UI_KEY_SHOW_MEMU_UI:
@@ -75,7 +88,6 @@ void Gui::run() {
 
             case UI_KEY_SHOW_MEMU_ROM:
                 getInput()->clear(0);
-                printf("ROM: %s\n", uiRomList->getRom()->name.c_str());
                 getConfig()->load(uiRomList->getRom());
                 uiMenu->loadMenu(true);
                 uiMenu->setVisibility(C2D_VISIBILITY_VISIBLE);
@@ -148,14 +160,7 @@ void Gui::runRom(RomList::Rom *rom) {
     updateInputMapping(true);
 
     printf("RunRom: RunEmulator: start\n");
-    uiRomList->setVisibility(C2D_VISIBILITY_HIDDEN);
-    RunEmulator(this, nBurnDrvActive);
-    uiRomList->setVisibility(C2D_VISIBILITY_VISIBLE);
-
-    // set default input scheme
-    updateInputMapping(false);
-
-    printf("RunRom: RunEmulator: return\n");
+    uiEmu->load(nBurnDrvActive);
 }
 
 Input *Gui::getInput() {
@@ -180,6 +185,18 @@ Io *Gui::getIo() {
 
 GuiRomList *Gui::getUiRomList() {
     return uiRomList;
+}
+
+GuiEmu *Gui::getUiEmu() {
+    return uiEmu;
+}
+
+GuiProgressBox *Gui::getUiProgressBox() {
+    return uiProgressBox;
+}
+
+Font *Gui::getFont() {
+    return skin->font;
 }
 
 int Gui::getFontSize() {

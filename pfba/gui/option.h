@@ -77,14 +77,19 @@ public:
         END
     };
 
-    Option(const std::string &text, const std::vector<std::string> &options, int defaultValue, Index idx, int flags = INTEGER);
+    Option(const std::string &text, const std::vector<std::string> &options,
+           int defaultValue, Index idx, int flags = INTEGER);
 
     int flags = INTEGER;
     int index = 0;
     int value = 0;
+
     const char *getName();
+
     const char *getValue();
+
     void next();
+
     void prev();
 
 private:

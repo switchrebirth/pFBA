@@ -28,11 +28,10 @@ public:
 
     Button *getButton(int id);
 
-    c2d::Texture *tex_bg;
-    c2d::Texture *tex_title;
-    c2d::Font *font;
+    c2d::Texture *tex_bg = NULL;
+    c2d::Texture *tex_title = NULL;
+    c2d::Font *font = NULL;
     std::vector<Button> buttons;
 };
-
 
 #endif //_SKIN_H

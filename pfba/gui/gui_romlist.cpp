@@ -169,7 +169,7 @@ int GuiRomList::updateKeys() {
             title_loaded = 0;
         } else if (key & Input::Key::KEY_FIRE1) {
             if (getRom() != NULL && getRom()->state != RomList::RomState::MISSING) {
-                return Input::Key::KEY_FIRE1;
+                return UI_KEY_RUN_ROM;
             }
         } else if (key & Input::Key::KEY_MENU1) {
             return UI_KEY_SHOW_MEMU_UI;

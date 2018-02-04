@@ -12,6 +12,7 @@
 #include "config.h"
 #include "option_menu.h"
 #include "gui_romlist.h"
+#include "gui_emu.h"
 
 class Config;
 
@@ -21,11 +22,16 @@ class GuiMenu;
 
 class GuiRomInfo;
 
+class GuiEmu;
+
+class GuiProgressBox;
+
 #define UI_KEY_FILTER_ROMS      100
 #define UI_KEY_SHOW_ROMLIST     101
 #define UI_KEY_SHOW_MEMU_UI     102
 #define UI_KEY_SHOW_MEMU_ROM    103
 #define UI_KEY_RUN_ROM          104
+#define UI_KEY_RESUME_ROM       105
 
 #define UI_MARGIN   16
 #define INPUT_DELAY 150
@@ -64,6 +70,12 @@ public:
 
     GuiRomList *getUiRomList();
 
+    GuiEmu *getUiEmu();
+
+    GuiProgressBox *getUiProgressBox();
+
+    c2d::Font *getFont();
+
     int getFontSize();
 
     float getScaling();
@@ -78,6 +90,8 @@ private:
 
     GuiMenu *uiMenu = NULL;
     GuiRomList *uiRomList;
+    GuiEmu *uiEmu;
+    GuiProgressBox *uiProgressBox;
 
     float scaling = 1;
 };

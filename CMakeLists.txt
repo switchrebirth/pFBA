@@ -5,11 +5,11 @@ set(CMAKE_SYSTEM_NAME "Generic")
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
-set(BUILD_SDL1 ON CACHE BOOL "Build with SDL1 support (software, osmesa) support")
-set(BUILD_SDL1_GL ON CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
+set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) support")
+set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
 set(BUILD_SDL1_TINYGL OFF CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
-set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 support (software, osmesa) support")
-set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
+set(BUILD_SDL2 ON CACHE BOOL "Build with SDL2 support (software, osmesa) support")
+set(BUILD_SDL2_GL ON CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
@@ -467,10 +467,13 @@ add_custom_target(${PROJECT_NAME}.deps ALL
 ##########################
 # main target
 ##########################
+add_custom_target(${PROJECT_NAME}.data
+        COMMAND cp -rf ${CMAKE_SOURCE_DIR}/pfba/data/skin ${CMAKE_BINARY_DIR})
 add_executable(${PROJECT_NAME}.elf ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
 target_compile_options(${PROJECT_NAME}.elf PRIVATE ${FLAGS})
 target_include_directories(${PROJECT_NAME}.elf PRIVATE ${INC})
 target_link_libraries(${PROJECT_NAME}.elf ${LDFLAGS})
+add_dependencies(${PROJECT_NAME}.elf ${PROJECT_NAME}.data)
 
 #####################
 # PSP2 (vita) vpk

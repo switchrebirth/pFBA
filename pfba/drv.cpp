@@ -1,6 +1,6 @@
 // Driver Init module
 #include "gui.h"
-#include "run.h"
+#include "gui_progressbox.h"
 
 extern Gui *gui;
 extern UINT8 NeoSystem;
@@ -127,10 +127,24 @@ static double nProgressPosBurn = 0;
 
 static int ProgressCreate() {
     nProgressPosBurn = 0;
+    gui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_VISIBLE);
     return 0;
 }
 
 int ProgressUpdateBurner(double dProgress, const TCHAR *pszText, bool bAbs) {
+
+    gui->getUiProgressBox()->setTitle(BurnDrvGetTextA(DRV_FULLNAME));
+
+    if (pszText) {
+        nProgressPosBurn += dProgress;
+        gui->getUiProgressBox()->setMessage(pszText);
+        gui->getUiProgressBox()->setProgress((float) nProgressPosBurn);
+
+    } else {
+        gui->getUiProgressBox()->setMessage("Please wait...");
+    }
+
+    gui->getRenderer()->flip();
 
     // TODO
     /*

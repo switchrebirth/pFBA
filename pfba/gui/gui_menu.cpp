@@ -108,7 +108,7 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         optionMenu = om;
     }
 
-    isEmuRunning = false; // TODO
+    isEmuRunning = gui->getUiEmu()->getVisibility() == C2D_VISIBILITY_VISIBLE;
     optionIndex = 0;
 
     optionCount = (unsigned int)
@@ -173,7 +173,9 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
                     lines[line_index]->value->setString(button->name);
                 }
             } else {
-                lines[line_index]->value->setString("" + option->value);
+                char btn[16];
+                snprintf(btn, 16, "%i", option->value);
+                lines[line_index]->value->setString(btn);
             }
         } else {
             lines[line_index]->value->setString(option->getValue());
@@ -244,26 +246,22 @@ int GuiMenu::updateKeys() {
                         ret = UI_KEY_FILTER_ROMS;
                         break;
 
-                        /*
-                       case Option::ROM_ROTATION:
-                       case Option::Index::ROM_SCALING:
-                           if (GameLooping && video) {
-                               video->Scale();
-                           }
-                           break;
-
-                       case Option::Index::ROM_FILTER:
-                           if (GameLooping && video) {
-                               video->Filter(option->value);
-                           }
-                           break;
-
-                       case Option::Index::ROM_SHADER:
-                           if (GameLooping) {
-                               renderer->SetShader(option->value);
-                           }
-                           break;
-                       */
+                    case Option::ROM_ROTATION:
+                    case Option::Index::ROM_SCALING:
+                        if (isEmuRunning) {
+                            gui->getUiEmu()->getVideo()->updateScaling();
+                        }
+                        break;
+                    case Option::Index::ROM_FILTER:
+                        if (isEmuRunning) {
+                            gui->getUiEmu()->getVideo()->setFiltering(option->value);
+                        }
+                        break;
+                    case Option::Index::ROM_SHADER:
+                        if (isEmuRunning) {
+                            gui->getRenderer()->setShader(option->value);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -281,27 +279,22 @@ int GuiMenu::updateKeys() {
                         ret = UI_KEY_FILTER_ROMS;
                         break;
 
-                        /*
                     case Option::ROM_ROTATION:
                     case Option::Index::ROM_SCALING:
-                        if (GameLooping && video) {
-                            video->Scale();
+                        if (isEmuRunning) {
+                            gui->getUiEmu()->getVideo()->updateScaling();
                         }
                         break;
-
                     case Option::Index::ROM_FILTER:
-                        if (GameLooping && video) {
-                            video->Filter(option->value);
+                        if (isEmuRunning) {
+                            gui->getUiEmu()->getVideo()->setFiltering(option->value);
                         }
                         break;
-
                     case Option::Index::ROM_SHADER:
-                        if (GameLooping) {
-                            renderer->SetShader(option->value);
+                        if (isEmuRunning) {
+                            gui->getRenderer()->setShader(option->value);
                         }
                         break;
-                    */
-
                     default:
                         break;
                 }
@@ -338,6 +331,7 @@ int GuiMenu::updateKeys() {
             if (optionMenu->parent == NULL) {
                 if (isEmuRunning) {
                     setVisibility(C2D_VISIBILITY_HIDDEN);
+                    ret = UI_KEY_RESUME_ROM;
                 } else {
                     ret = UI_KEY_SHOW_ROMLIST;
                 }
@@ -351,16 +345,6 @@ int GuiMenu::updateKeys() {
         gui->getRenderer()->delay(INPUT_DELAY);
     }
 
-    /*
-    if (GameLooping) {
-        optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
-        for (int i = 0; i < 3; i++) {
-            Clear();
-            Flip();
-        }
-    }
-    */
-
     if (option_changed) {
         if (isRomMenu) {
             gui->getConfig()->save(gui->getUiRomList()->getRom());
@@ -370,20 +354,18 @@ int GuiMenu::updateKeys() {
         }
     }
 
-    /*
-    if (stop) {
-        GameLooping = false;
-    }
-    */
-
     return ret;
 }
 
 bool GuiMenu::isOptionHidden(Option *option) {
 
+    // TODO
+    /*
     return option->index == Option::Index::ROM_ROTATION
            && gui->getUiRomList()->getRom() != NULL
            && !(gui->getUiRomList()->getRom()->flags & BDF_ORIENTATION_VERTICAL);
+    */
+    return false;
 }
 
 GuiMenu::~GuiMenu() {

@@ -8,9 +8,9 @@ set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
 set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) support")
 set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
 set(BUILD_SDL1_TINYGL OFF CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
-set(BUILD_SDL2 ON CACHE BOOL "Build with SDL2 support (software, osmesa) support")
-set(BUILD_SDL2_GL ON CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
-set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
+set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 support (software, osmesa) support")
+set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
+set(BUILD_PSP2 ON CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
 set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
@@ -30,8 +30,6 @@ execute_process(COMMAND "date" "+%Y.%m.%d" OUTPUT_VARIABLE BUILD_DATE OUTPUT_STR
 add_subdirectory(pfba/deps/libcross2d)
 
 project(pfba)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -fpermissive")
 
 # handle m68k
 FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/deps)
@@ -325,7 +323,6 @@ set(FLAGS
 # PSP2 (ps vita)
 #################
 if (BUILD_PSP2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11")
     list(APPEND INC pfba/cpu/cyclone)
     list(APPEND SRC_PFBA pfba/cpu/cyclone/Cyclone.s)
     list(APPEND FLAGS
@@ -336,8 +333,6 @@ if (BUILD_PSP2)
                 -D__PSP2_DEBUG__ -g # TODO: cyclone arm asm core not working without O2/O3
                 )
     else ()
-        #set(CMAKE_C_FLAGS_RELEASE "-Os")
-        #set(CMAKE_CXX_FLAGS_RELEASE "-Os")
         list(APPEND FLAGS
                 -mfpu=neon -mcpu=cortex-a9 -march=armv7-a -mfloat-abi=hard -ffast-math
                 -fno-asynchronous-unwind-tables -funroll-loops
@@ -472,6 +467,7 @@ add_custom_target(${PROJECT_NAME}.data
         COMMAND cp -rf ${CMAKE_SOURCE_DIR}/pfba/data/skin ${CMAKE_BINARY_DIR})
 add_executable(${PROJECT_NAME}.elf ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
 target_compile_options(${PROJECT_NAME}.elf PRIVATE ${FLAGS})
+target_compile_options(${PROJECT_NAME}.elf PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++11 -fpermissive>)
 target_include_directories(${PROJECT_NAME}.elf PRIVATE ${INC})
 target_link_libraries(${PROJECT_NAME}.elf ${LDFLAGS})
 add_dependencies(${PROJECT_NAME}.elf ${PROJECT_NAME}.data)

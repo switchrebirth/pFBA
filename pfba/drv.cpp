@@ -59,6 +59,7 @@ static int DrvLoadRom(unsigned char *Dest, int *pnWrote, int i) {
                         "The emulation will likely suffer problems.",
                 pszFilename, BurnDrvGetTextA(0));
         printf("DrvLoadRom: %s\n", szText);
+        //gui->getUiMessageBox()->show("ERROR", szText, "OK");
     }
 
     BzipClose();
@@ -97,8 +98,6 @@ int DrvInit(int nDrvNum, bool bRestore) {
 
     nBurnLayer = 0xFF;                // show all layers
 
-    // Reset the speed throttling code, so we don't 'jump' after the load
-    RunReset();
     return 0;
 }
 
@@ -139,100 +138,17 @@ int ProgressUpdateBurner(double dProgress, const TCHAR *pszText, bool bAbs) {
         nProgressPosBurn += dProgress;
         gui->getUiProgressBox()->setMessage(pszText);
         gui->getUiProgressBox()->setProgress((float) nProgressPosBurn);
-
     } else {
         gui->getUiProgressBox()->setMessage("Please wait...");
     }
 
     gui->getRenderer()->flip();
 
-    // TODO
-    /*
-    gui->Clear();
-    gui->DrawBg();
-    gui->DrawRomList();
-
-    Rect window{
-            gui->getRenderer()->width / 4,
-            gui->getRenderer()->height / 4,
-            gui->getRenderer()->width / 2,
-            gui->getRenderer()->height / 2
-    };
-
-    gui->getRenderer()->DrawRect(window, C2D_COL_GRAY);
-    gui->getRenderer()->DrawRect(window, C2D_COL_GREEN, false);
-
-    if (pszText) {
-        nProgressPosBurn += dProgress;
-
-        Rect r = {window.x + 16, window.y + 32, window.w - 32, 32};
-        gui->getSkin()->font->Draw(r, C2D_COL_WHITE, false, true, BurnDrvGetTextA(DRV_FULLNAME));
-        r.y += 64;
-        gui->getSkin()->font->Draw(r, C2D_COL_WHITE, false, true, "Please wait...");
-        r.y += 32;
-        gui->getSkin()->font->Draw(r, C2D_COL_WHITE, false, true, "%s", pszText);
-
-        int x = window.x + 16;
-        int w = window.w - 32;
-        gui->getRenderer()->DrawRect(x - 1, window.y + window.h - 65, w + 2, 34, 255, 255, 255, 255, false);
-
-        int progress_y = (int) (nProgressPosBurn * (double) w);
-        if (progress_y > w) {
-            progress_y = w;
-        }
-        gui->getRenderer()->DrawRect(x, window.y + window.h - 64, progress_y, 32, 255, 255, 0, 255);
-    } else {
-        gui->getSkin()->font->Draw(window.x + 16, window.y + 96, "Please wait...");
-    }
-    gui->Flip();
-
-    */
-
     return 0;
 }
 
 int AppError(TCHAR *szText, int bWarning) {
 
-    // TODO
-    /*
-    gui->getRenderer()->Delay(500);
-
-    Rect window{
-            gui->getRenderer()->width / 4,
-            gui->getRenderer()->height / 4,
-            gui->getRenderer()->width / 2,
-            gui->getRenderer()->height / 2
-    };
-
-    while (!gui->getInput()->Update(0)[0].state) {
-
-        gui->DrawRomList();
-
-        gui->getRenderer()->DrawRect(window, C2D_COL_GRAY);
-        gui->getRenderer()->DrawRect(window, C2D_COL_GREEN, false);
-
-        Rect dst = window;
-        int height = window.h / 3;
-        dst.h = height;
-
-        gui->getSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "WARNING");
-        dst.y += height;
-
-        if (szText) {
-            gui->getSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "%s", szText);
-            dst.y += height;
-        }
-
-        gui->getSkin()->font->Draw(dst, C2D_COL_WHITE, true, true, "PRESS A KEY TO CONTINUE", szText);
-
-        gui->Flip();
-    }
-
-    GameLooping = false;
-
-    gui->getRenderer()->Delay(500);
-
-    */
-
+    //gui->getUiMessageBox()->show("ERROR", szText ? szText : "UNKNOW ERROR", "OK");
     return 1;
 }

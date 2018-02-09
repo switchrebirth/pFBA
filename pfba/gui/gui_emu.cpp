@@ -3,6 +3,7 @@
 //
 
 #include "gui_emu.h"
+#include "gui_romlist.h"
 #include "gui_progressbox.h"
 
 using namespace c2d;
@@ -12,6 +13,7 @@ extern int InpMake(Input::Player *players);
 extern unsigned char inputServiceSwitch;
 extern unsigned char inputP1P2Switch;
 extern int nSekCpuCore;
+bool bPauseOn = false;
 
 GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
 
@@ -28,6 +30,9 @@ int GuiEmu::load(int driver) {
 #if defined(__PSP2__) || defined(__RPI__)
     nSekCpuCore = getSekCpuCore();
 #endif
+    ///////////
+    // AUDIO
+    //////////
     nBurnSoundRate = 0;
     if (gui->getConfig()->getValue(Option::Index::ROM_AUDIO, true)) {
 #ifdef __NX__
@@ -38,25 +43,6 @@ int GuiEmu::load(int driver) {
         nBurnSoundRate = 48000;
 #endif
     }
-
-    InpInit();
-    InpDIP();
-
-    printf("Initialize rom driver\n");
-    if (DrvInit(driver, false) != 0) {
-        printf("Driver initialisation failed! Likely causes are:\n"
-                       "- Corrupt/Missing ROM(s)\n"
-                       "- I/O Error\n"
-                       "- Memory error\n\n");
-        DrvExit();
-        InpExit();
-        return -1;
-    }
-    printf("bForce60Hz = %i, nBurnFPS = %d\n", bForce60Hz, nBurnFPS);
-
-    ///////////
-    // AUDIO
-    //////////
     if (nBurnSoundRate > 0) {
         printf("Creating audio device\n");
         // disable interpolation as it produce "cracking" sound
@@ -68,16 +54,36 @@ int GuiEmu::load(int driver) {
             nBurnSoundRate = audio->frequency;
             nBurnSoundLen = audio->buffer_len;
             pBurnSoundOut = audio->buffer;
-        } else {
-            nBurnSoundRate = 0;
-            nBurnSoundLen = 0;
-            pBurnSoundOut = NULL;
         }
-    } else {
+    }
+
+    if (!audio || !audio->available) {
         printf("Audio disabled\n");
-        audio = NULL;
+        nBurnSoundRate = 0;
         nBurnSoundLen = 0;
         pBurnSoundOut = NULL;
+    }
+
+    ///////////
+    // DRIVER
+    //////////
+    InpInit();
+    InpDIP();
+
+    printf("Initialize driver\n");
+    if (DrvInit(driver, false) != 0) {
+        printf("Driver initialisation failed! Likely causes are:\n"
+                       "- Corrupt/Missing ROM(s)\n"
+                       "- I/O Error\n"
+                       "- Memory error\n\n");
+        DrvExit();
+        InpExit();
+        if (audio) {
+            delete (audio);
+        }
+        gui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
+        gui->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
+        return -1;
     }
 
     ///////////
@@ -86,16 +92,16 @@ int GuiEmu::load(int driver) {
     printf("Creating video device\n");
     int w, h;
     BurnDrvGetFullSize(&w, &h);
-    video = new Video(Vector2f(w, h), gui->getRenderer());
+    video = new Video(gui, Vector2f(w, h));
     add(video);
     // set fps text on top
     fpsText->setLayer(1);
 
     // reset
+    bPauseOn = false;
     nFramesEmulated = 0;
     nCurrentFrame = 0;
     nFramesRendered = 0;
-
     startTicks();
 
     setVisibility(C2D_VISIBILITY_VISIBLE);
@@ -103,6 +109,22 @@ int GuiEmu::load(int driver) {
     gui->getUiRomList()->setVisibility(C2D_VISIBILITY_HIDDEN);
 
     return 0;
+}
+
+void GuiEmu::stop() {
+
+    DrvExit();
+    InpExit();
+    if (video) {
+        delete (video);
+        video = NULL;
+    }
+    if (audio) {
+        delete (audio);
+        audio = NULL;
+    }
+
+    setVisibility(C2D_VISIBILITY_HIDDEN);
 }
 
 void GuiEmu::drawFrame(bool bDraw, int bDrawFps, int fps) {
@@ -270,11 +292,11 @@ int GuiEmu::updateKeys() {
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_RIGHT)) {
         int shader = gui->getConfig()->getValue(Option::Index::ROM_SHADER, true) + 1;
-        if (shader < gui->getRenderer()->getShaders()->getCount()) {
+        if (shader < gui->getRenderer()->getShaderList()->getCount()) {
             int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
                                                        Option::Index::ROM_SHADER);
             gui->getConfig()->getOptions(true)->at(index).value = shader;
-            gui->getRenderer()->setShader(shader);
+            video->setShader(shader);
             gui->getRenderer()->delay(500);
         }
     } else if ((players[0].state & Input::Key::KEY_MENU2)
@@ -284,7 +306,7 @@ int GuiEmu::updateKeys() {
             int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
                                                        Option::Index::ROM_SHADER);
             gui->getConfig()->getOptions(true)->at(index).value = shader;
-            gui->getRenderer()->setShader(shader);
+            video->setShader(shader);
             gui->getRenderer()->delay(500);
         }
     } else if (players[0].state & EV_RESIZE) {
@@ -327,15 +349,11 @@ int GuiEmu::getSekCpuCore() {
     std::vector<std::string> zipList;
     int hardware = BurnDrvGetHardwareCode();
 
-    if (!g->getConfig()->getValue(Option::Index::ROM_NEOBIOS, true)
+    if (!gui->getConfig()->getValue(Option::Index::ROM_NEOBIOS, true)
         && RomList::IsHardware(hardware, HARDWARE_PREFIX_SNK)) {
         sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
-
-        //TODO
-        /*
-        g->MessageBox("UNIBIOS DOESNT SUPPORT THE M68K ASM CORE\n"
-                             "CYCLONE ASM CORE DISABLED", "OK", NULL);
-        */
+        gui->getUiMessageBox()->show("WARNING", "UNIBIOS DOESNT SUPPORT THE M68K ASM CORE\n"
+                "CYCLONE ASM CORE DISABLED", "OK");
     }
 
     if (RomList::IsHardware(hardware, HARDWARE_PREFIX_SEGA)) {
@@ -345,12 +363,8 @@ int GuiEmu::getSekCpuCore() {
             || hardware & HARDWARE_SEGA_FD1094_ENC
             || hardware & HARDWARE_SEGA_FD1094_ENC_CPU2) {
             sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
-
-            //TODO
-            /*
-                g->MessageBox("ROM IS CRYPTED, USE DECRYPTED ROM (CLONE)\n"
-                                      "TO ENABLE CYCLONE ASM CORE (FASTER)", "OK", NULL);
-            */
+            gui->getUiMessageBox()->show("WARNING", "ROM IS CRYPTED, USE DECRYPTED ROM (CLONE)\n"
+                    "TO ENABLE CYCLONE ASM CORE (FASTER)", "OK");
         }
     } else if (RomList::IsHardware(hardware, HARDWARE_PREFIX_TOAPLAN)) {
         zipList.push_back("batrider");
@@ -370,16 +384,14 @@ int GuiEmu::getSekCpuCore() {
     std::string zip = BurnDrvGetTextA(DRV_NAME);
     for (unsigned int i = 0; i < zipList.size(); i++) {
         if (zipList[i].compare(0, zip.length(), zip) == 0) {
-
-            //TODO
-            /*
-                g->MessageBox("THIS ROM DOESNT SUPPORT THE M68K ASM CORE\n"
-                                      "CYCLONE ASM CORE DISABLED", "OK", NULL);
-            */
+            gui->getUiMessageBox()->show("WARNING", "THIS ROM DOESNT SUPPORT THE M68K ASM CORE\n"
+                    "CYCLONE ASM CORE DISABLED", "OK");
             sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
             break;
         }
     }
+
+    zipList.clear();
 
     return sekCpuCore;
 }

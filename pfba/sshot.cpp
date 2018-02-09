@@ -2,6 +2,9 @@
 #include <png.h>
 #include <malloc.h>
 
+#include "gui/gui.h"
+#include "gui/gui_emu.h"
+
 #define SSHOT_NOERROR 0
 #define SSHOT_ERROR_BPP_NOTSUPPORTED 1
 #define SSHOT_LIBPNG_ERROR 2
@@ -13,6 +16,8 @@ static UINT8* pSShot = NULL;
 static UINT8* pConvertedImage = NULL;
 static png_bytep* pSShotImageRows = NULL;
 static FILE* ff;
+
+extern Gui *gui;
 
 INT32 MakeScreenShot(const char *dest)
 {
@@ -63,7 +68,8 @@ INT32 MakeScreenShot(const char *dest)
 	if (pBurnDraw == NULL) {
 		printf("MakeScreenshot: RunOneFrame\n");
 		// force a frame to be drawn to fba buffer
-		RunOneFrame(true, 0, 0);
+		//RunOneFrame(true, 0, 0);
+		gui->getUiEmu()->drawFrame(true, 0, 0);
 		if (pBurnDraw == NULL) {
 			printf("MakeScreenshot: pBurnDraw == NULL\n");
 			return SSHOT_OTHER_ERROR;

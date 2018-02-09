@@ -21,9 +21,13 @@ public:
 
     void resume();
 
+    void stop();
+
     Video *getVideo();
 
     void draw(c2d::Transform &transform);
+
+    void drawFrame(bool bDraw, int bDrawFps, int fps);
 
     int updateKeys();
 
@@ -33,7 +37,7 @@ private:
     Video *video = NULL;
     c2d::Audio *audio = NULL;
     c2d::Text *fpsText = NULL;
-    char fpsString[16];
+    char fpsString[32];
 
     int frame_limit, frametime;
     int now, done, timer, tick, ticks, fps;
@@ -43,8 +47,6 @@ private:
     void startTicks();
 
     unsigned int getTicks();
-
-    void drawFrame(bool bDraw, int bDrawFps, int fps);
 
 #if defined(__PSP2__) || defined(__RPI__)
     int getSekCpuCore();

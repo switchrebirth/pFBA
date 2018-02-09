@@ -29,11 +29,6 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     roms_paths.push_back("");
     roms_paths.push_back("");
     roms_paths.push_back("");
-#ifdef __PSP2__
-    for (int i = roms_paths.size(); i <= DIRS_MAX; i++) {
-        roms_paths.push_back("");
-    }
-#endif
 
     // build hardware list configuration
     hardwareList.push_back({HARDWARE_PREFIX_ALL, "All"});
@@ -93,8 +88,10 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     options_gui.push_back(Option("SCALING", {"NONE", "2X", "FIT", "FIT 4:3", "FULL"}, 2, Option::Index::ROM_SCALING));
     options_gui.push_back(
             Option("FILTER", {"POINT", "LINEAR"}, 0, Option::Index::ROM_FILTER));
-    options_gui.push_back(
-            Option("SHADER", renderer->getShaders()->getNames(), 0, Option::Index::ROM_SHADER));
+    if (renderer->getShaderList() != NULL) {
+        options_gui.push_back(
+                Option("SHADER", renderer->getShaderList()->getNames(), 0, Option::Index::ROM_SHADER));
+    }
     options_gui.push_back(
             Option("ROTATION", {"OFF", "ON", "OFF+FLIP", "OFF+CAB MODE"}, 0, Option::Index::ROM_ROTATION));
     options_gui.push_back(Option("SHOW_FPS", {"OFF", "ON"}, 0, Option::Index::ROM_SHOW_FPS));

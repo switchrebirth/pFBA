@@ -8,7 +8,7 @@
 #define printf sceClibPrintf
 #endif
 
-#define EMU_C68K
+//#define EMU_C68K
 #define SEK_CORE_C68K (0)
 #define SEK_CORE_M68K (1)
 
@@ -956,9 +956,13 @@ void SekSetIRQLine(const INT32 line, const INT32 nstatus)
 // Adjust the active CPU's timeslice
 void SekRunAdjust(const INT32 nCycles)
 {
+#ifndef EMU_C68K
+	INT32 count = m68k_ICount;
+#else
 	INT32 count = nSekCpuCore ==
                   SEK_CORE_C68K && nSekCPUType[nSekActive] == 0x68000 ?
                   c68k[nSekActive].cycles : m68k_ICount;
+#endif
 	if (nCycles < 0 && count < -nCycles) {
 		SekRunEnd();
 		return;

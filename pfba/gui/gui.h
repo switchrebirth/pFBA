@@ -11,14 +11,14 @@
 #include "romlist.h"
 #include "config.h"
 #include "option_menu.h"
-#include "gui_romlist.h"
-#include "gui_emu.h"
 
 class Config;
 
 class Option;
 
 class GuiMenu;
+
+class GuiRomList;
 
 class GuiRomInfo;
 
@@ -32,6 +32,7 @@ class GuiProgressBox;
 #define UI_KEY_SHOW_MEMU_ROM    103
 #define UI_KEY_RUN_ROM          104
 #define UI_KEY_RESUME_ROM       105
+#define UI_KEY_STOP_ROM         106
 
 #define UI_MARGIN   16
 #define INPUT_DELAY 150
@@ -74,6 +75,8 @@ public:
 
     GuiProgressBox *getUiProgressBox();
 
+    c2d::MessageBox *getUiMessageBox();
+
     c2d::Font *getFont();
 
     int getFontSize();
@@ -89,9 +92,10 @@ private:
     c2d::Input *input = NULL;
 
     GuiMenu *uiMenu = NULL;
-    GuiRomList *uiRomList;
-    GuiEmu *uiEmu;
-    GuiProgressBox *uiProgressBox;
+    GuiRomList *uiRomList = NULL;
+    GuiEmu *uiEmu = NULL;
+    GuiProgressBox *uiProgressBox = NULL;
+    c2d::MessageBox *uiMessageBox = NULL;
 
     float scaling = 1;
 };

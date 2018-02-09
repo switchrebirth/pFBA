@@ -2,7 +2,6 @@
 // Created by cpasjuste on 22/11/16.
 //
 #include <algorithm>
-#include "run.h"
 #include "gui_romlist.h"
 
 using namespace c2d;
@@ -26,6 +25,7 @@ public:
         infoBox->setOutlineThickness(2);
 
         infoText = new Text("", font, (unsigned int) fontSize);
+        infoText->setPosition(margin, margin);
         infoText->setOutlineThickness(2);
         infoText->setSizeMax(Vector2f(infoBox->getSize().x, 0));
         infoText->setLineSpacingModifier((int) (8 * scaling));
@@ -77,7 +77,6 @@ public:
                      rom->zip, rom->state == RomList::RomState::MISSING ? "MISSING" : "AVAILABLE",
                      rom->system, rom->manufacturer, rom->year);
             infoText->setString(info);
-            infoText->setPosition(margin, (infoText->getGlobalBounds().height / 2) + margin);
             infoText->setVisibility(C2D_VISIBILITY_VISIBLE);
         }
     }

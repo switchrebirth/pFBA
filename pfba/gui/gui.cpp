@@ -3,8 +3,9 @@
 //
 #include <skeleton/timer.h>
 #include <algorithm>
-#include "run.h"
 #include "gui_menu.h"
+#include "gui_emu.h"
+#include "gui_romlist.h"
 #include "gui_progressbox.h"
 
 using namespace c2d;
@@ -24,9 +25,6 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     // scaling factor mainly used for borders,
     // based on vita resolution..
     scaling = std::min(renderer->getSize().x / 960, 1.0f);
-    if (scaling >= 1) {
-        skin->font->setFiltering(C2D_TEXTURE_FILTER_POINT);
-    }
 
     uiRomList = new GuiRomList(this, renderer->getSize());
     uiRomList->setLoadDelay(500);
@@ -44,6 +42,19 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     uiProgressBox = new GuiProgressBox(this);
     uiProgressBox->setVisibility(C2D_VISIBILITY_HIDDEN);
     renderer->add(uiProgressBox);
+
+    uiMessageBox = new MessageBox(
+            FloatRect(
+                    renderer->getSize().x / 2,
+                    renderer->getSize().y / 2,
+                    renderer->getSize().x / 2,
+                    renderer->getSize().y / 2),
+            input, *skin->font, getFontSize());
+    uiMessageBox->setOriginCenter();
+    uiMessageBox->setFillColor(Color::GrayLight);
+    uiMessageBox->setOutlineColor(Color::Orange);
+    uiMessageBox->setOutlineThickness(2);
+    renderer->add(uiMessageBox);
 }
 
 Gui::~Gui() {
@@ -77,6 +88,12 @@ void Gui::run() {
             case UI_KEY_RESUME_ROM:
                 getInput()->clear(0);
                 uiEmu->resume();
+                break;
+
+            case UI_KEY_STOP_ROM:
+                getInput()->clear(0);
+                uiEmu->stop();
+                uiRomList->setVisibility(C2D_VISIBILITY_VISIBLE);
                 break;
 
             case UI_KEY_SHOW_MEMU_UI:
@@ -152,14 +169,14 @@ void Gui::runRom(RomList::Rom *rom) {
         return;
     }
 
+    // set per rom input scheme
+    updateInputMapping(true);
+
     // load rom settings
     printf("RunRom: config->LoadRom(%s)\n", rom->zip);
     config->load(rom);
 
-    // set per rom input scheme
-    updateInputMapping(true);
-
-    printf("RunRom: RunEmulator: start\n");
+    printf("RunRom: uiEmu->load(%i)\n", nBurnDrvActive);
     uiEmu->load(nBurnDrvActive);
 }
 
@@ -193,6 +210,10 @@ GuiEmu *Gui::getUiEmu() {
 
 GuiProgressBox *Gui::getUiProgressBox() {
     return uiProgressBox;
+}
+
+MessageBox *Gui::getUiMessageBox() {
+    return uiMessageBox;
 }
 
 Font *Gui::getFont() {

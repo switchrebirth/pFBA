@@ -334,9 +334,11 @@ if (BUILD_PSP2)
             -DNO_KEYBOARD -DBUILD_C68K -DUSE_FILE32API -DLSB_FIRST)
     if (BUILD_DEBUG)
         list(APPEND FLAGS
-                -D__PSP2_DEBUG__ # TODO: cyclone arm asm core not working without O2/O3
+                -D__PSP2_DEBUG__ -g # TODO: cyclone arm asm core not working without O2/O3
                 )
     else ()
+        #set(CMAKE_C_FLAGS_RELEASE "-Os")
+        #set(CMAKE_CXX_FLAGS_RELEASE "-Os")
         list(APPEND FLAGS
                 -mfpu=neon -mcpu=cortex-a9 -march=armv7-a -mfloat-abi=hard -ffast-math
                 -fno-asynchronous-unwind-tables -funroll-loops
@@ -409,7 +411,14 @@ elseif (BUILD_SDL2)
     ##############
     # SDL2
     ##############
-    list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST)
+    list(REMOVE_ITEM SRC_CPU ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68000_intf.cpp)
+    list(APPEND INC
+            pfba/cpu/cyclone
+            )
+    list(APPEND SRC_CPU
+            pfba/cpu/c68000_intf.cpp
+            )
+    list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST -fpermissive)
     set(LDFLAGS cross2d SDL2 freetype png z)
     if (BUILD_SDL2_GL)
         list(APPEND LDFLAGS GL)

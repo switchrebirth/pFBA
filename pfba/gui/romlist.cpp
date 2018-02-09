@@ -26,7 +26,7 @@ RomList::RomList(Gui *gui) {
     rect->setOutlineColor(Color::Orange);
     rect->setOutlineThickness(4);
 
-    Texture *texture = gui->getSkin()->tex_title; //new C2DTexture(gui->getSkin()->tex_title->path);
+    Texture *texture = gui->getSkin()->tex_title;
     texture->setOriginCenter();
     texture->setPosition(Vector2f(rect->getSize().x / 2, rect->getSize().y / 2));
     float scaling = std::min(

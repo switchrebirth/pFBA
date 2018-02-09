@@ -60,8 +60,9 @@ void GuiProgressBox::setTitle(std::string title) {
 
 void GuiProgressBox::setProgress(float progress) {
 
+    float width = progress * (progress_bg->getSize().x - 2);
     progress_fg->setSize(
-            progress * (progress_bg->getSize().x - 2),
+            std::min(width, progress_bg->getSize().x - 2),
             progress_fg->getSize().y);
 }
 

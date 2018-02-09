@@ -26,14 +26,14 @@ private:
 
     bool isOptionHidden(Option *option);
 
-    Gui *gui;
-    c2d::Text *title;
-    c2d::Rectangle *highlight;
+    Gui *gui = NULL;
+    c2d::Text *title = NULL;
+    c2d::Rectangle *highlight = NULL;
     std::vector<MenuLine *> lines;
 
-    OptionMenu *optionMenuGui;
-    OptionMenu *optionMenuRom;
-    OptionMenu *optionMenu;
+    OptionMenu *optionMenuGui = NULL;
+    OptionMenu *optionMenuRom = NULL;
+    OptionMenu *optionMenu = NULL;
     std::vector<Option> *options;
     int optionIndex = 0;
     int optionCount = 0;

@@ -12,7 +12,7 @@ class Video : public c2d::C2DTexture {
 
 public:
 
-    Video(const c2d::Vector2f &size, c2d::Renderer *renderer);
+    Video(Gui *gui, const c2d::Vector2f &size);
 
     virtual ~Video();
 
@@ -20,9 +20,7 @@ public:
 
 private:
 
-    c2d::Renderer *renderer = NULL;
-    c2d::FloatRect scale;
-    int rotation = 0;
+    Gui *gui = NULL;
 };
 
 #endif //_VIDEO_H_

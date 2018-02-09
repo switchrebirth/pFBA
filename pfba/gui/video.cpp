@@ -8,8 +8,6 @@
 
 using namespace c2d;
 
-extern Gui *gui;
-
 static unsigned int myHighCol16(int r, int g, int b, int /* i */) {
     unsigned int t;
     t = (unsigned int) ((r << 8) & 0xf800); // rrrr r000 0000 0000
@@ -18,9 +16,9 @@ static unsigned int myHighCol16(int r, int g, int b, int /* i */) {
     return t;
 }
 
-Video::Video(const c2d::Vector2f &size, Renderer *renderer) : C2DTexture(size, C2D_TEXTURE_FMT_RGB565) {
+Video::Video(Gui *gui, const c2d::Vector2f &size) : C2DTexture(size, C2D_TEXTURE_FMT_RGB565) {
 
-    this->renderer = renderer;
+    this->gui = gui;
 
     printf("game resolution: %ix%i\n", (int) getSize().x, (int) getSize().y);
 
@@ -37,21 +35,18 @@ Video::Video(const c2d::Vector2f &size, Renderer *renderer) : C2DTexture(size, C
     lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
     unlock();
 
-    renderer->setShader(gui->getConfig()->getValue(Option::Index::ROM_SHADER, true));
+    setShader(gui->getConfig()->getValue(Option::Index::ROM_SHADER, true));
     setFiltering(gui->getConfig()->getValue(Option::Index::ROM_FILTER, true));
     updateScaling();
 }
 
 void Video::updateScaling() {
 
-    FloatRect window = renderer->getGlobalBounds();
-
+    int rotation = 0;
     int scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true);
-    rotation = 0;
 
     // TODO: force right to left orientation on psp2,
     // should add platform specific code
-
     if ((gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 0
          || gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 3)
         && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
@@ -75,52 +70,50 @@ void Video::updateScaling() {
 
     // TODO: force right to left orientation on psp2,
     // should add platform specific code
-
-    scale.width = getSize().x;
-    scale.height = getSize().y;
+    c2d::Vector2f scale = getSize();
 
     switch (scaling) {
 
         case 1: // 2x
-            scale.width = scale.width * 2;
-            scale.height = scale.height * 2;
+            scale.x = scale.x * 2;
+            scale.y = scale.y * 2;
             break;
 
         case 2: // fit
             if (rotation == 0 || rotation == 180) {
-                scale.height = window.height;
-                scale.width = (int) (scale.width * (scale.height / getSize().y));
-                if (scale.width > window.width) {
-                    scale.width = window.width;
-                    scale.height = (int) (scale.width * (getSize().y / getSize().x));
+                scale.y = gui->getRenderer()->getSize().y;
+                scale.x = (int) (scale.x * (scale.y / getSize().y));
+                if (scale.x > gui->getRenderer()->getSize().x) {
+                    scale.x = gui->getRenderer()->getSize().x;
+                    scale.y = (int) (scale.x * (getSize().y / getSize().x));
                 }
             } else {
-                scale.width = window.height;
-                scale.height = (int) (scale.width * (getSize().y / getSize().x));
+                scale.x = gui->getRenderer()->getSize().y;
+                scale.y = (int) (scale.x * (getSize().y / getSize().x));
             }
             break;
 
         case 3: // fit 4:3
             if (rotation == 0 || rotation == 180) {
-                scale.height = window.height;
-                scale.width = (int) ((scale.height * 4.0) / 3.0);
-                if (scale.width > window.width) {
-                    scale.width = window.width;
-                    scale.height = (int) ((scale.width * 3.0) / 4.0);
+                scale.y = gui->getRenderer()->getSize().y;
+                scale.x = (int) ((scale.y * 4.0) / 3.0);
+                if (scale.x > gui->getRenderer()->getSize().x) {
+                    scale.x = gui->getRenderer()->getSize().x;
+                    scale.y = (int) ((scale.x * 3.0) / 4.0);
                 }
             } else {
-                scale.width = window.height;
-                scale.height = (int) ((scale.width * 3.0) / 4.0);
+                scale.x = gui->getRenderer()->getSize().y;
+                scale.y = (int) ((scale.x * 3.0) / 4.0);
             }
             break;
 
         case 4: // fullscreen
             if (rotation == 0 || rotation == 180) {
-                scale.height = window.height;
-                scale.width = window.width;
+                scale.y = gui->getRenderer()->getSize().y;
+                scale.x = gui->getRenderer()->getSize().x;
             } else {
-                scale.height = window.width;
-                scale.width = window.height;
+                scale.y = gui->getRenderer()->getSize().x;
+                scale.x = gui->getRenderer()->getSize().y;
             }
             break;
 
@@ -128,16 +121,14 @@ void Video::updateScaling() {
             break;
     }
 
-    scale.left = (window.width - scale.width) / 2;
-    scale.top = (window.height - scale.height) / 2;
-
-    setPosition(scale.left, scale.top);
-    setScale(scale.width / getSize().x, scale.height / getSize().y);
+    setOriginCenter();
+    setPosition(gui->getRenderer()->getSize().x / 2, gui->getRenderer()->getSize().y / 2);
+    setScale(scale.x / getSize().x, scale.y / getSize().y);
     setRotation(rotation);
 }
 
 Video::~Video() {
 
-    pBurnDraw = NULL;
-    renderer->setShader(0);
+    // TODO: free or not to free ?
+    //pBurnDraw = NULL;
 }

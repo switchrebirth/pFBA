@@ -22,8 +22,10 @@
 using namespace c2d;
 
 #ifdef __PSP2__
+
 #include <psp2/power.h>
 #include <psp2/io/dirent.h>
+
 int _newlib_heap_size_user = 192 * 1024 * 1024;
 #define SCR_W   960
 #define SCR_H   544
@@ -108,8 +110,8 @@ int main(int argc, char **argv) {
 #else
     renderer = (Renderer *) new C2DRenderer(Vector2f(SCR_W, SCR_H));
 #endif
-    inp = (Input *) new C2DInput(renderer);
-    io = (Io *) new C2DIo();
+    inp = new C2DInput(renderer);
+    io = new C2DIo();
 
     // load configuration
     std::string cfgPath = szAppHomePath;

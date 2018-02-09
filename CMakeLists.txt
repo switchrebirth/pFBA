@@ -31,235 +31,240 @@ add_subdirectory(pfba/deps/libcross2d)
 
 project(pfba)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -fpermissive")
+
 # handle m68k
 FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/deps)
 ADD_CUSTOM_COMMAND(OUTPUT
         ${CMAKE_BINARY_DIR}/deps/m68kops.h ${CMAKE_BINARY_DIR}/deps/m68kops.c
-        COMMAND gcc ${CMAKE_SOURCE_DIR}/src/cpu/m68k/m68kmake.c -o ${CMAKE_BINARY_DIR}/deps/m68kmake
-        COMMAND ${CMAKE_BINARY_DIR}/deps/m68kmake ${CMAKE_BINARY_DIR}/deps/ ${CMAKE_SOURCE_DIR}/src/cpu/m68k/m68k_in.c)
+        COMMAND gcc ${CMAKE_SOURCE_DIR}/fba/src/cpu/m68k/m68kmake.c -o ${CMAKE_BINARY_DIR}/deps/m68kmake
+        COMMAND ${CMAKE_BINARY_DIR}/deps/m68kmake ${CMAKE_BINARY_DIR}/deps/ ${CMAKE_SOURCE_DIR}/fba/src/cpu/m68k/m68k_in.c)
 
 ##############
 # burn
 ##############
 set(BURN_DIRS
-        src/burn
-        src/burn/devices
-        src/burn/snd
+        fba/src/burn
+        fba/src/burn/devices
+        fba/src/burn/snd
         )
 file(GLOB SRC_BURN
-        src/burn/*.c*
-        src/burn/devices/*.c*
-        src/burn/snd/*.c*
+        fba/src/burn/*.c*
+        fba/src/burn/devices/*.c*
+        fba/src/burn/snd/*.c*
         )
 
 ##############
 # burner
 ##############
 set(BURNER_DIRS
-        src/burner
+        fba/src/burner
         )
 file(GLOB SRC_BURNER
-        src/burner/*.c*
+        fba/src/burner/*.c*
         )
 list(REMOVE_ITEM SRC_BURNER
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/conc.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/cong.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/dat.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/gamc.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/gami.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/image.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/misc.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/sshot.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/state.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burner/statec.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/conc.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/cong.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/dat.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/gamc.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/gami.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/image.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/misc.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/sshot.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/state.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/statec.cpp
         )
 ##############
 # drivers
 ##############
 set(DRV_DIRS
-        src/burn/drv
-        src/burn/drv/capcom
-        src/burn/drv/cave
-        src/burn/drv/coleco
-        src/burn/drv/cps3
-        src/burn/drv/dataeast
-        src/burn/drv/galaxian
-        src/burn/drv/irem
-        src/burn/drv/konami
-        src/burn/drv/megadrive
-        src/burn/drv/midway
-        src/burn/drv/msx
-        src/burn/drv/neogeo
-        src/burn/drv/pce
-        src/burn/drv/pgm
-        src/burn/drv/pre90s
-        src/burn/drv/psikyo
-        src/burn/drv/pst90s
-        src/burn/drv/sega
-        src/burn/drv/sg1000
-        src/burn/drv/sms
-        src/burn/drv/snes
-        src/burn/drv/taito
-        src/burn/drv/toaplan
+        fba/src/burn/drv
+        fba/src/burn/drv/capcom
+        fba/src/burn/drv/cave
+        fba/src/burn/drv/coleco
+        fba/src/burn/drv/cps3
+        fba/src/burn/drv/dataeast
+        fba/src/burn/drv/galaxian
+        fba/src/burn/drv/irem
+        fba/src/burn/drv/konami
+        fba/src/burn/drv/megadrive
+        fba/src/burn/drv/midway
+        fba/src/burn/drv/msx
+        fba/src/burn/drv/neogeo
+        fba/src/burn/drv/pce
+        fba/src/burn/drv/pgm
+        fba/src/burn/drv/pre90s
+        fba/src/burn/drv/psikyo
+        fba/src/burn/drv/pst90s
+        fba/src/burn/drv/sega
+        fba/src/burn/drv/sg1000
+        fba/src/burn/drv/sms
+        fba/src/burn/drv/snes
+        fba/src/burn/drv/taito
+        fba/src/burn/drv/toaplan
         )
 file(GLOB_RECURSE SRC_DRV
-        src/burn/drv/*.cpp
+        fba/src/burn/drv/*.cpp
         )
 list(REMOVE_ITEM SRC_DRV
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burn/drv/capcom/ctv_make.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/burn/drv/pgm/pgm_sprite_create.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burn/drv/capcom/ctv_make.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burn/drv/pgm/pgm_sprite_create.cpp
         )
 
 ##############
 # interfaces
 ##############
 set(INTF_DIRS
-        src/intf
-        src/intf/input
-        src/intf/cd
-        src/intf/audio
+        fba/src/intf
+        fba/src/intf/input
+        fba/src/intf/cd
+        fba/src/intf/audio
         )
 file(GLOB SRC_INTF
-        src/intf/*.cpp
-        src/intf/input/*.cpp
-        src/intf/cd/*.cpp
-        src/intf/audio/*.cpp
+        fba/src/intf/*.cpp
+        fba/src/intf/input/*.cpp
+        fba/src/intf/cd/*.cpp
+        fba/src/intf/audio/*.cpp
         )
 list(REMOVE_ITEM SRC_INTF
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/intf/input/inp_interface.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/intf/audio/aud_dsp.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/intf/audio/aud_interface.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/intf/input/inp_interface.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/intf/audio/aud_dsp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/intf/audio/aud_interface.cpp
         )
 
 ##############
 # cpu
 ##############
 set(CPU_DIRS
-        src/cpu
-        #src/cpu/a68k
-        src/cpu/adsp2100
-        src/cpu/tms34010
-        src/cpu/arm
-        src/cpu/arm7
-        src/cpu/h6280
-        src/cpu/hd6309
-        src/cpu/i8039
-        src/cpu/i8051
-        src/cpu/konami
-        src/cpu/m68k
-        src/cpu/m6502
-        src/cpu/m6800
-        src/cpu/m6805
-        src/cpu/m6809
-        src/cpu/mips3
-        src/cpu/nec
-        src/cpu/pic16c5x
-        src/cpu/s2650
-        src/cpu/tlcs90
-        src/cpu/sh2
-        src/cpu/tms32010
-        src/cpu/upd7725
-        src/cpu/upd7810
-        src/cpu/v60
-        src/cpu/z80
+        fba/src/cpu
+        #fba/src/cpu/a68k
+        fba/src/cpu/adsp2100
+        fba/src/cpu/tms34010
+        fba/src/cpu/arm
+        fba/src/cpu/arm7
+        fba/src/cpu/h6280
+        fba/src/cpu/hd6309
+        fba/src/cpu/i8039
+        fba/src/cpu/i8051
+        fba/src/cpu/konami
+        fba/src/cpu/m68k
+        fba/src/cpu/m6502
+        fba/src/cpu/m6800
+        fba/src/cpu/m6805
+        fba/src/cpu/m6809
+        fba/src/cpu/mips3
+        fba/src/cpu/nec
+        fba/src/cpu/pic16c5x
+        fba/src/cpu/s2650
+        fba/src/cpu/tlcs90
+        fba/src/cpu/sh2
+        fba/src/cpu/tms32010
+        fba/src/cpu/upd7725
+        fba/src/cpu/upd7810
+        fba/src/cpu/v60
+        fba/src/cpu/z80
         )
 file(GLOB SRC_CPU
-        src/cpu/*.c*
-        #src/cpu/a68k/*.c*
-        src/cpu/adsp2100/*.c*
-        src/cpu/tms34010/*.c*
-        src/cpu/arm/*.c*
-        src/cpu/arm7/*.c*
-        src/cpu/h6280/*.c*
-        src/cpu/hd6309/*.c*
-        src/cpu/i8039/*.c*
-        src/cpu/i8051/*.c*
-        src/cpu/konami/*.c*
-        src/cpu/m68k/*.c*
-        src/cpu/m6502/*.c*
-        src/cpu/m6800/*.c*
-        src/cpu/m6805/*.c*
-        src/cpu/m6809/*.c*
-        src/cpu/mips3/*.c*
-        src/cpu/nec/*.c*
-        src/cpu/pic16c5x/*.c*
-        src/cpu/s2650/*.c*
-        src/cpu/tlcs90/*.c*
-        src/cpu/sh2/*.c*
-        src/cpu/tms32010/*.c*
-        src/cpu/upd7725/*.c*
-        src/cpu/upd7810/*.c*
-        src/cpu/v60/*.c*
-        src/cpu/z80/*.c*
+        fba/src/cpu/*.c*
+        #fba/src/cpu/a68k/*.c*
+        fba/src/cpu/adsp2100/*.c*
+        fba/src/cpu/tms34010/*.c*
+        fba/src/cpu/arm/*.c*
+        fba/src/cpu/arm7/*.c*
+        fba/src/cpu/h6280/*.c*
+        fba/src/cpu/hd6309/*.c*
+        fba/src/cpu/i8039/*.c*
+        fba/src/cpu/i8051/*.c*
+        fba/src/cpu/konami/*.c*
+        fba/src/cpu/m68k/*.c*
+        fba/src/cpu/m6502/*.c*
+        fba/src/cpu/m6800/*.c*
+        fba/src/cpu/m6805/*.c*
+        fba/src/cpu/m6809/*.c*
+        fba/src/cpu/mips3/*.c*
+        fba/src/cpu/nec/*.c*
+        fba/src/cpu/pic16c5x/*.c*
+        fba/src/cpu/s2650/*.c*
+        fba/src/cpu/tlcs90/*.c*
+        fba/src/cpu/sh2/*.c*
+        fba/src/cpu/tms32010/*.c*
+        fba/src/cpu/upd7725/*.c*
+        fba/src/cpu/upd7810/*.c*
+        fba/src/cpu/v60/*.c*
+        fba/src/cpu/z80/*.c*
+        # PFBA
+        pfba/cpu/c68000_intf.cpp
         )
 list(REMOVE_ITEM SRC_CPU
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/adsp2100/2100ops.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/tms34010/tms34010_dasm.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/tms34010/tms34010_newdasm.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68k/m68kmake.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68k/m68k_in.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68k/m68kfpu.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68k/m68kdasm.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/arm7/arm7core.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/arm7/arm7exec.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/hd6309/6309tbl.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/h6280/tblh6280.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/hd6309/6309ops.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/konami/konamops.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6502/t6502.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6502/t65c02.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6502/t65sc02.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6502/tdeco16.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6502/tn2a03.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/konami/konamtbl.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6800/6800ops.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6800/6800tbl.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6805/6805ops.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6809/6809ops.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m6809/6809tbl.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/nec/necinstr.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/nec/v25sfr.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/nec/v25instr.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/i8051/mcs51ops.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/upd7810/7810ops.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/upd7810/7810tbl.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/op12.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/am.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/am1.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/am2.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/op7a.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/am3.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/op2.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/op4.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/op6.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/op3.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/op5.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/optable.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/v60mem.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/v60/v60d.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m68000_intf.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/adsp2100/2100ops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/tms34010/tms34010_dasm.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/tms34010/tms34010_newdasm.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m68k/m68kmake.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m68k/m68k_in.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m68k/m68kfpu.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m68k/m68kdasm.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/arm7/arm7core.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/arm7/arm7exec.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/hd6309/6309tbl.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/h6280/tblh6280.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/hd6309/6309ops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/konami/konamops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6502/t6502.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6502/t65c02.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6502/t65sc02.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6502/tdeco16.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6502/tn2a03.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/konami/konamtbl.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6800/6800ops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6800/6800tbl.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6805/6805ops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6809/6809ops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6809/6809tbl.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/nec/necinstr.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/nec/v25sfr.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/nec/v25instr.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/i8051/mcs51ops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/upd7810/7810ops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/upd7810/7810tbl.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/op12.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/am.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/am1.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/am2.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/op7a.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/am3.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/op2.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/op4.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/op6.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/op3.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/op5.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/optable.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/v60mem.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/v60d.c
         )
 
 ##############
 # 7z
 ##############
 set(7Z_DIRS
-        src/dep/libs/lib7z
+        fba/src/dep/libs/lib7z
         )
 file(GLOB SRC_7Z
-        src/dep/libs/lib7z/7zDec.c
-        src/dep/libs/lib7z/7zArcIn.c
-        src/dep/libs/lib7z/7zStream.c
-        src/dep/libs/lib7z/LzmaDec.c
-        src/dep/libs/lib7z/Lzma2Dec.c
-        src/dep/libs/lib7z/Bra.c
-        src/dep/libs/lib7z/Bcj2.c
-        src/dep/libs/lib7z/7zBuf.c
-        src/dep/libs/lib7z/Delta.c
-        src/dep/libs/lib7z/Bra86.c
-        src/dep/libs/lib7z/BraIA64.c
-        src/dep/libs/lib7z/7zCrc.c
-        src/dep/libs/lib7z/7zCrcOpt.c
-        src/dep/libs/lib7z/CpuArch.c
+        fba/src/dep/libs/lib7z/7zDec.c
+        fba/src/dep/libs/lib7z/7zArcIn.c
+        fba/src/dep/libs/lib7z/7zStream.c
+        fba/src/dep/libs/lib7z/LzmaDec.c
+        fba/src/dep/libs/lib7z/Lzma2Dec.c
+        fba/src/dep/libs/lib7z/Bra.c
+        fba/src/dep/libs/lib7z/Bcj2.c
+        fba/src/dep/libs/lib7z/7zBuf.c
+        fba/src/dep/libs/lib7z/Delta.c
+        fba/src/dep/libs/lib7z/Bra86.c
+        fba/src/dep/libs/lib7z/BraIA64.c
+        fba/src/dep/libs/lib7z/7zCrc.c
+        fba/src/dep/libs/lib7z/7zCrcOpt.c
+        fba/src/dep/libs/lib7z/CpuArch.c
         )
 
 ##############
@@ -303,6 +308,7 @@ set(INC ${PFBA_DIRS}
 # flags
 set(FLAGS
         #-DUNICODE
+        -D__PFBA__
         -DINCLUDE_7Z_SUPPORT
         -DUSE_SPEEDHACKS
         -DBUILD_SDL -DBUILD_M68K
@@ -319,16 +325,9 @@ set(FLAGS
 # PSP2 (ps vita)
 #################
 if (BUILD_PSP2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -fpermissive")
-    list(REMOVE_ITEM SRC_CPU ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68000_intf.cpp)
-    list(APPEND INC
-            pfba/cpu/cyclone
-            )
-    file(GLOB SRC_PSP2
-            pfba/cpu/c68000_intf.cpp
-            pfba/cpu/cyclone/Cyclone.s
-            )
-    list(APPEND SRC_PFBA ${SRC_PSP2})
+    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11")
+    list(APPEND INC pfba/cpu/cyclone)
+    list(APPEND SRC_PFBA pfba/cpu/cyclone/Cyclone.s)
     list(APPEND FLAGS
             -Wl,-q -D__PSP2__ -D__PFBA_ARM__
             -DNO_KEYBOARD -DBUILD_C68K -DUSE_FILE32API -DLSB_FIRST)
@@ -411,14 +410,7 @@ elseif (BUILD_SDL2)
     ##############
     # SDL2
     ##############
-    list(REMOVE_ITEM SRC_CPU ${CMAKE_CURRENT_SOURCE_DIR}/src/cpu/m68000_intf.cpp)
-    list(APPEND INC
-            pfba/cpu/cyclone
-            )
-    list(APPEND SRC_CPU
-            pfba/cpu/c68000_intf.cpp
-            )
-    list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST -fpermissive)
+    list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST)
     set(LDFLAGS cross2d SDL2 freetype png z)
     if (BUILD_SDL2_GL)
         list(APPEND LDFLAGS GL)
@@ -458,19 +450,19 @@ set(SRC ${SRC_PFBA} ${SRC_CPU} ${SRC_DRV} ${SRC_BURN} ${SRC_BURNER} ${SRC_INTF} 
 add_custom_target(${PROJECT_NAME}.deps ALL
         COMMAND rm -rf ${PROJECT_BINARY_DIR}/deps && mkdir ${PROJECT_BINARY_DIR}/deps
         # driverlist.h
-        COMMAND perl ${CMAKE_SOURCE_DIR}/src/dep/scripts/gamelist.pl -o deps/driverlist.h -l deps/gamelist.txt ${SRC_DRV}
+        COMMAND perl ${CMAKE_SOURCE_DIR}/fba/src/dep/scripts/gamelist.pl -o deps/driverlist.h -l deps/gamelist.txt ${SRC_DRV}
         # ctv.h
-        COMMAND g++ ${CMAKE_SOURCE_DIR}/src/burn/drv/capcom/ctv_make.cpp -o deps/ctv_make
+        COMMAND g++ ${CMAKE_SOURCE_DIR}/fba/src/burn/drv/capcom/ctv_make.cpp -o deps/ctv_make
         COMMAND ${PROJECT_BINARY_DIR}/deps/ctv_make > deps/ctv.h
         # pgm sprite
-        COMMAND g++ ${CMAKE_SOURCE_DIR}/src/burn/drv/pgm/pgm_sprite_create.cpp -o deps/pgm_sprite_create
+        COMMAND g++ ${CMAKE_SOURCE_DIR}/fba/src/burn/drv/pgm/pgm_sprite_create.cpp -o deps/pgm_sprite_create
         COMMAND ${PROJECT_BINARY_DIR}/deps/pgm_sprite_create > deps/pgm_sprite.h
         # func headers
-        COMMAND perl ${CMAKE_SOURCE_DIR}/src/dep/scripts/toa_gp9001_func.pl -o deps/toa_gp9001_func.h
-        COMMAND perl ${CMAKE_SOURCE_DIR}/src/dep/scripts/neo_sprite_func.pl -o deps/neo_sprite_func.h
-        COMMAND perl ${CMAKE_SOURCE_DIR}/src/dep/scripts/cave_tile_func.pl -o deps/cave_tile_func.h
-        COMMAND perl ${CMAKE_SOURCE_DIR}/src/dep/scripts/cave_sprite_func.pl -o deps/cave_sprite_func.h
-        COMMAND perl ${CMAKE_SOURCE_DIR}/src/dep/scripts/psikyo_tile_func.pl -o deps/psikyo_tile_func.h
+        COMMAND perl ${CMAKE_SOURCE_DIR}/fba/src/dep/scripts/toa_gp9001_func.pl -o deps/toa_gp9001_func.h
+        COMMAND perl ${CMAKE_SOURCE_DIR}/fba/src/dep/scripts/neo_sprite_func.pl -o deps/neo_sprite_func.h
+        COMMAND perl ${CMAKE_SOURCE_DIR}/fba/src/dep/scripts/cave_tile_func.pl -o deps/cave_tile_func.h
+        COMMAND perl ${CMAKE_SOURCE_DIR}/fba/src/dep/scripts/cave_sprite_func.pl -o deps/cave_sprite_func.h
+        COMMAND perl ${CMAKE_SOURCE_DIR}/fba/src/dep/scripts/psikyo_tile_func.pl -o deps/psikyo_tile_func.h
         )
 
 ##########################

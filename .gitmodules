@@ -1,3 +1,6 @@
 [submodule "pfba/deps/libcross2d"]
 	path = pfba/deps/libcross2d
 	url = git@github.com:Cpasjuste/libcross2d.git
+[submodule "fba"]
+	path = fba
+	url = git@github.com:Cpasjuste/fba.git

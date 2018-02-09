@@ -8,7 +8,9 @@
 #define printf sceClibPrintf
 #endif
 
-//#define EMU_C68K
+#ifdef __PFBA_ARM__
+#define EMU_C68K
+#endif
 #define SEK_CORE_C68K (0)
 #define SEK_CORE_M68K (1)
 
@@ -444,6 +446,7 @@ extern "C" void C68KResetCallback()
 extern "C" int C68KUnrecognizedCallback()
 {
     printf("UnrecognizedCallback();\n");
+    return 0;
 }
 
 extern "C" void C68KRTECallback()

@@ -30,6 +30,9 @@ private:
     c2d::Text *title = NULL;
     c2d::Rectangle *highlight = NULL;
     std::vector<MenuLine *> lines;
+    c2d::Color fillColor[2] = {
+            {55, 55, 55, 230},
+            {55, 55, 55, 180}};
 
     OptionMenu *optionMenuGui = NULL;
     OptionMenu *optionMenuRom = NULL;

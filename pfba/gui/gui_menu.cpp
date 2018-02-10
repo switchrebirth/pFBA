@@ -43,9 +43,7 @@ GuiMenu::GuiMenu(Gui *gui) : Rectangle(Vector2f(0, 0)) {
 
     this->gui = gui;
 
-    Color color = Color::Gray;
-    color.a = 220;
-    setFillColor(color);
+    setFillColor(fillColor[0]);
     setOutlineColor(COL_ORANGE);
     setOutlineThickness(4);
     setPosition(UI_MARGIN * gui->getScaling(), UI_MARGIN * gui->getScaling());
@@ -106,8 +104,10 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
     }
 
     isEmuRunning = gui->getUiEmu()->getVisibility() == C2D_VISIBILITY_VISIBLE;
+    setFillColor(fillColor[isEmuRunning]);
+
     optionIndex = 0;
-    optionCount = optionMenu->childs.size() + optionMenu->option_ids.size();
+    optionCount = (int) (optionMenu->childs.size() + optionMenu->option_ids.size());
 
     if (isEmuRunning) {
         // if frameskip is enabled, we may get a black buffer,

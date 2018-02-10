@@ -1,6 +1,7 @@
 
 // Paths module
 #include <unistd.h>
+#include <sys/stat.h>
 #include "burner.h"
 
 #ifdef __PSP2__

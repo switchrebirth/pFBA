@@ -77,18 +77,6 @@ int main(int argc, char **argv) {
     scePowerSetGpuClockFrequency(222);
     scePowerSetGpuXbarClockFrequency(166);
 
-    // create needed directories
-    sceIoMkdir("ux0:/data/pfba", 0777);
-    sceIoMkdir("ux0:/data/pfba/saves", 0777);
-    sceIoMkdir("ux0:/data/pfba/configs", 0777);
-    sceIoMkdir("ux0:/data/pfba/hiscore", 0777);
-    sceIoMkdir("ux0:/data/pfba/samples", 0777);
-    sceIoMkdir("ux0:/data/pfba/previews", 0777);
-    sceIoMkdir("ux0:/data/pfba/blend", 0777);
-    sceIoMkdir("ux0:/data/pfba/roms", 0777);
-    sceIoMkdir("ux0:/data/pfba/config", 0777);
-    sceIoMkdir("ux0:/data/pfba/config/games", 0777);
-
     buttons.push_back({8, "UP"});
     buttons.push_back({6, "DOWN"});
     buttons.push_back({7, "LEFT"});

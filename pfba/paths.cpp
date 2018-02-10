@@ -1,23 +1,13 @@
 
 // Paths module
 #include <unistd.h>
-#include <sys/stat.h>
 #include "burner.h"
 
 #ifdef __PSP2__
-char szAppHomePath[MAX_PATH] = "ux0:/data/pfba/";
-char szAppSavePath[MAX_PATH] = "ux0:/data/pfba/saves";
-char szAppConfigPath[MAX_PATH] = "ux0:/data/pfba/configs";
-char szAppHiscorePath[MAX_PATH] = "ux0:/data/pfba/hiscore";
-char szAppSamplesPath[MAX_PATH] = "ux0:/data/pfba/samples";
-char szAppPreviewPath[MAX_PATH] = "ux0:/data/pfba/previews";
+#include <psp2/io/stat.h>
+#define mkdir sceIoMkdir
+#endif
 
-char szAppTitlePath[MAX_PATH] = "ux0:/data/pfba/titles";
-
-char szAppBlendPath[MAX_PATH] = "ux0:/data/pfba/blend/";
-char szAppEEPROMPath[MAX_PATH] = "ux0:/data/pfba/config/games/";
-char szAppSkinPath[MAX_PATH] = "app0:/skin";
-#else
 char szAppHomePath[MAX_PATH];
 char szAppSavePath[MAX_PATH];
 char szAppConfigPath[MAX_PATH];
@@ -30,11 +20,12 @@ char szAppTitlePath[MAX_PATH];
 char szAppBlendPath[MAX_PATH];
 char szAppEEPROMPath[MAX_PATH];
 char szAppSkinPath[MAX_PATH];
-#endif
 
 void BurnPathsInit() {
-#ifndef __PSP2__ // TODO : crash on psp2 ?!
-#ifdef __3DS__
+#ifdef __PSP2__
+    strncpy(szAppHomePath, "ux0:/data/pfba", MAX_PATH);
+    strncpy(szAppSkinPath, "app0:/skin", MAX_PATH);
+#elif __3DS__
     strncpy(szAppHomePath, "/pfba", MAX_PATH);
 #elif __PS3__
     strncpy(szAppHomePath, "/dev_hdd0/pfba", MAX_PATH);
@@ -73,13 +64,14 @@ void BurnPathsInit() {
     mkdir(szAppBlendPath, 0777);
     //printf("szAppBlendPath: %s\n", szAppBlendPath);
 
+#ifndef __PSP2__
     snprintf(szAppSkinPath, MAX_PATH, "%s%s", szAppHomePath, "skin");
     mkdir(szAppSkinPath, 0777);
     //printf("szAppSkinPath: %s\n", szAppSkinPath);
+#endif
 
     snprintf(szAppEEPROMPath, MAX_PATH, "%sconfig", szAppHomePath);
     mkdir(szAppEEPROMPath, 0777);
     strncat(szAppEEPROMPath, "/games/", MAX_PATH);
     mkdir(szAppEEPROMPath, 0777);
-#endif
 }

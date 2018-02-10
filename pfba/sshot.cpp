@@ -69,7 +69,7 @@ INT32 MakeScreenShot(const char *dest)
 		printf("MakeScreenshot: RunOneFrame\n");
 		// force a frame to be drawn to fba buffer
 		//RunOneFrame(true, 0, 0);
-		gui->getUiEmu()->drawFrame(true, 0, 0);
+		gui->getUiEmu()->renderFrame(true, 0, 0);
 		if (pBurnDraw == NULL) {
 			printf("MakeScreenshot: pBurnDraw == NULL\n");
 			return SSHOT_OTHER_ERROR;

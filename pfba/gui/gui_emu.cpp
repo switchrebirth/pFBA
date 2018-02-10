@@ -19,7 +19,8 @@ GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
 
     gui = g;
     setFillColor(Color::Transparent);
-    fpsText = new Text("60", *gui->getSkin()->font, (unsigned int) gui->getFontSize());
+
+    fpsText = new Text("0123456789", *gui->getSkin()->font, (unsigned int) gui->getFontSize());
     fpsText->setPosition(16, 16);
     add(fpsText);
 }
@@ -111,7 +112,7 @@ int GuiEmu::load(int driver) {
     return 0;
 }
 
-void GuiEmu::stop() {
+void GuiEmu::unload() {
 
     DrvExit();
     InpExit();
@@ -127,7 +128,25 @@ void GuiEmu::stop() {
     setVisibility(C2D_VISIBILITY_HIDDEN);
 }
 
-void GuiEmu::drawFrame(bool bDraw, int bDrawFps, int fps) {
+void GuiEmu::pause() {
+
+    bPauseOn = true;
+    if (audio) {
+        audio->Pause(1);
+    }
+    gui->updateInputMapping(false);
+}
+
+void GuiEmu::resume() {
+
+    gui->updateInputMapping(true);
+    if (audio) {
+        audio->Pause(0);
+    }
+    bPauseOn = false;
+}
+
+void GuiEmu::renderFrame(bool bDraw, int bDrawFps, int fps) {
 
     fpsText->setVisibility(
             bDrawFps ? C2D_VISIBILITY_VISIBLE : C2D_VISIBILITY_HIDDEN);
@@ -155,7 +174,7 @@ void GuiEmu::drawFrame(bool bDraw, int bDrawFps, int fps) {
     }
 }
 
-void GuiEmu::draw(c2d::Transform &transform) {
+void GuiEmu::updateFrame() {
 
     int showFps = gui->getConfig()->getValue(Option::Index::ROM_SHOW_FPS, true);
     int frameSkip = gui->getConfig()->getValue(Option::Index::ROM_FRAMESKIP, true);
@@ -172,13 +191,13 @@ void GuiEmu::draw(c2d::Transform &transform) {
         if (ticks > 0) {
             if (ticks > 10) ticks = 10;
             for (int i = 0; i < ticks - 1; i++) {
-                drawFrame(false, showFps, fps);
+                renderFrame(false, showFps, fps);
                 if (audio) {
                     audio->Play();
                 }
             }
             if (ticks >= 1) {
-                drawFrame(true, showFps, fps);
+                renderFrame(true, showFps, fps);
                 if (audio) {
                     audio->Play();
                 }
@@ -194,35 +213,16 @@ void GuiEmu::draw(c2d::Transform &transform) {
                 tick = timer;
             }
         }
-        drawFrame(true, showFps, fps);
+        renderFrame(true, showFps, fps);
         if (audio) {
             audio->Play();
         }
     }
-
-    // draw childs (texture and fps text)
-    Widget::draw(transform);
 }
 
-void GuiEmu::pause() {
+int GuiEmu::update() {
 
-    bPauseOn = true;
-    if (audio) {
-        audio->Pause(1);
-    }
-    gui->updateInputMapping(false);
-}
-
-void GuiEmu::resume() {
-
-    gui->updateInputMapping(true);
-    if (audio) {
-        audio->Pause(0);
-    }
-    bPauseOn = false;
-}
-
-int GuiEmu::updateKeys() {
+    updateFrame();
 
     inputServiceSwitch = 0;
     inputP1P2Switch = 0;
@@ -329,9 +329,9 @@ void GuiEmu::startTicks() {
 
 unsigned int GuiEmu::getTicks() {
     unsigned int ticks;
-    struct timeval now = {};
-    gettimeofday(&now, NULL);
-    ticks = (unsigned int) ((now.tv_sec - start.tv_sec) * 1000000 + now.tv_usec - start.tv_usec);
+    struct timeval n = {};
+    gettimeofday(&n, NULL);
+    ticks = (unsigned int) ((n.tv_sec - start.tv_sec) * 1000000 + n.tv_usec - start.tv_usec);
     return ticks;
 }
 

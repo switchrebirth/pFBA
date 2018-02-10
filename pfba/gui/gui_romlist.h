@@ -23,7 +23,7 @@ public:
 
     ~GuiRomList();
 
-    int updateKeys();
+    int update();
 
     void updateRomList();
 

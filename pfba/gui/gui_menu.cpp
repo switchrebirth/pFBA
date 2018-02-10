@@ -114,7 +114,7 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         // force a frame to be drawn
         if (pBurnDraw == NULL) {
             bPauseOn = false;
-            gui->getUiEmu()->drawFrame(true, 0, 0);
+            gui->getUiEmu()->renderFrame(true, 0, 0);
             bPauseOn = true;
         }
         if (optionMenu == optionMenuRom) {
@@ -204,7 +204,7 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
                            lines[0]->getGlobalBounds().top - 5);
 }
 
-int GuiMenu::updateKeys() {
+int GuiMenu::update() {
 
     bool option_changed = false;
     int ret = 0;
@@ -347,10 +347,19 @@ int GuiMenu::updateKeys() {
 
 bool GuiMenu::isOptionHidden(Option *option) {
 
-    // TODO
-    return option->index == Option::Index::ROM_ROTATION
-           && gui->getUiRomList()->getRom() != NULL
-           && !(gui->getUiRomList()->getRom()->flags & BDF_ORIENTATION_VERTICAL);
+    RomList::Rom *rom = gui->getUiRomList()->getRom();
+
+    if (option->index == Option::Index::ROM_ROTATION
+        && rom != NULL && !(rom->flags & BDF_ORIENTATION_VERTICAL)) {
+        return true;
+    }
+
+    if (option->index == Option::Index::ROM_NEOBIOS
+        && rom != NULL && !(RomList::IsHardware(rom->hardware, HARDWARE_PREFIX_SNK))) {
+        return true;
+    }
+
+    return false;
 }
 
 GuiMenu::~GuiMenu() {

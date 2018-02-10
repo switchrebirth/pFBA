@@ -71,11 +71,11 @@ void Gui::run() {
     while (true) {
 
         if (uiMenu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
-            key = uiMenu->updateKeys();
+            key = uiMenu->update();
         } else if (uiEmu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
-            key = uiEmu->updateKeys();
+            key = uiEmu->update();
         } else {
-            key = uiRomList->updateKeys();
+            key = uiRomList->update();
         }
 
         switch (key) {
@@ -92,7 +92,7 @@ void Gui::run() {
 
             case UI_KEY_STOP_ROM:
                 getInput()->clear(0);
-                uiEmu->stop();
+                uiEmu->unload();
                 uiRomList->setVisibility(C2D_VISIBILITY_VISIBLE);
                 break;
 

@@ -131,7 +131,7 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
     timer_load = new Timer();
 }
 
-int GuiRomList::updateKeys() {
+int GuiRomList::update() {
 
     Input::Player *players = gui->getInput()->update();
 

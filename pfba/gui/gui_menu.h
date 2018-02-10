@@ -18,7 +18,7 @@ public:
 
     ~GuiMenu();
 
-    int updateKeys();
+    int update();
 
     void loadMenu(bool isRomMenu = false, OptionMenu *om = NULL);
 

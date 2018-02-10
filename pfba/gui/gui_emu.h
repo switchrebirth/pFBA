@@ -17,19 +17,19 @@ public:
 
     int load(int driver);
 
+    void unload();
+
     void pause();
 
     void resume();
 
-    void stop();
+    int update();
+
+    void updateFrame();
+
+    void renderFrame(bool draw, int drawFps, int fps);
 
     Video *getVideo();
-
-    void draw(c2d::Transform &transform);
-
-    void drawFrame(bool bDraw, int bDrawFps, int fps);
-
-    int updateKeys();
 
 private:
 
@@ -49,7 +49,9 @@ private:
     unsigned int getTicks();
 
 #if defined(__PSP2__) || defined(__RPI__)
+
     int getSekCpuCore();
+
 #endif
 
 };

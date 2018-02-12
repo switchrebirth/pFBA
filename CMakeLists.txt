@@ -316,6 +316,7 @@ set(FLAGS
         -Wno-sign-compare
         -DFASTCALL -U__fastcall -D_fastcall= -D__fastcall= -D__fastcall__=
         "-DINLINE=static inline" "-DSH2_INLINE=static inline"
+        -Wno-unused-variable -Wno-unused-but-set-variable -Wno-sequence-point
         #-fcheck-new
         )
 

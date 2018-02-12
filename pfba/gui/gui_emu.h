@@ -5,6 +5,7 @@
 #ifndef PFBA_GUI_EMU_H
 #define PFBA_GUI_EMU_H
 
+#include <sys/time.h>
 #include "gui.h"
 #include "video.h"
 #include "skeleton/audio.h"

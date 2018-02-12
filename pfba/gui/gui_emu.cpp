@@ -2,7 +2,6 @@
 // Created by cpasjuste on 03/02/18.
 //
 
-#include <sys/time.h>
 #include "gui_emu.h"
 #include "gui_romlist.h"
 #include "gui_progressbox.h"

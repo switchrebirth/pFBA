@@ -126,9 +126,6 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
     rom_info->infoBox->setOutlineThickness(getOutlineThickness());
     rom_info->update(roms.size() > 0 ? roms[0] : NULL);
     add(rom_info);
-
-    timer_input = new Timer();
-    timer_load = new Timer();
 }
 
 int GuiRomList::update() {
@@ -180,26 +177,26 @@ int GuiRomList::update() {
             return EV_QUIT;
         }
 
-        if (timer_input->getSeconds() > 12) {
+        if (timer_input.getElapsedTime().asSeconds() > 12) {
             gui->getRenderer()->delay(INPUT_DELAY / 8);
-        } else if (timer_input->getSeconds() > 6) {
+        } else if (timer_input.getElapsedTime().asSeconds() > 6) {
             gui->getRenderer()->delay(INPUT_DELAY / 5);
-        } else if (timer_input->getSeconds() > 2) {
+        } else if (timer_input.getElapsedTime().asSeconds() > 2) {
             gui->getRenderer()->delay(INPUT_DELAY / 2);
         } else {
             gui->getRenderer()->delay(INPUT_DELAY);
         }
 
-        timer_load->reset();
+        timer_load.restart();
 
     } else {
 
-        if (!title_loaded && timer_load->getMillis() > (unsigned long) load_delay) {
+        if (!title_loaded && timer_load.getElapsedTime().asMilliseconds() > (unsigned long) load_delay) {
             rom_info->update(roms.size() > rom_index ? roms[rom_index] : NULL);
             title_loaded = 1;
         }
 
-        timer_input->reset();
+        timer_input.restart();
     }
 
     return 0;
@@ -253,7 +250,5 @@ void GuiRomList::setLoadDelay(int delay) {
 
 GuiRomList::~GuiRomList() {
 
-    delete (timer_input);
-    delete (timer_load);
     delete (rom_list);
 }

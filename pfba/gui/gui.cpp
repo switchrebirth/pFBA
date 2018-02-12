@@ -10,10 +10,6 @@
 
 using namespace c2d;
 
-extern Video *video;
-
-extern INT32 MakeScreenShot(const char *dst);
-
 Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
 
     io = i;

@@ -50,20 +50,9 @@ PFBA: Portable Final Burn Alpha
 
 >- mkdir cmake-build
 >- cd cmake-build
->- cmake -DBUILD_SFML=ON -DCMAKE_BUILD_TYPE=Release ..
+>- cmake -DBUILD_SDL2=ON -DBUILD_SDL2_GL=ON -DCMAKE_BUILD_TYPE=Release ..
 >- make pfba.deps
->- make pfba
-
-**Linux (SFML) compilation**
-
->- Dependencies (deb) : libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsfml-dev libpng-dev
-
->- mkdir cmake-build
->- cd cmake-build
->- cmake -DBUILD_SFML=ON -DCMAKE_BUILD_TYPE=Release ..
->- make pfba.deps
->- make pfba
-
+>- make pfba.elf
 
 **Ps Vita compilation**
 
@@ -72,14 +61,6 @@ PFBA: Portable Final Burn Alpha
 >- cmake -DBUILD_PSP2=ON -DCMAKE_BUILD_TYPE=Release ..
 >- make pfba.deps
 >- make pfba.vpk
-
-**RPI3 compilation**
-
->- mkdir cmake-build
->- cd cmake-build
->- cmake -DBUILD_RPI=ON -DBUILD_SDL2=ON -DCMAKE_BUILD_TYPE=Release ..
->- make pfba.deps
->- make pfba
 
 -----
 

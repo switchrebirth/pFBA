@@ -39,6 +39,11 @@ PFBA: Portable Final Burn Alpha
 
 -----
 
+**Clone repository**
+
+>- git clone --recursive git@github.com:Cpasjuste/pfba.git
+>- cd pfba && git submodule update --init --recursive
+
 **Linux (SDL2) compilation**
 
 >- Dependencies (deb) : libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev

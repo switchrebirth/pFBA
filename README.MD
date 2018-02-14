@@ -16,8 +16,7 @@ PFBA: Portable Final Burn Alpha
 
 **Currently supported devices**
 
->- Linux (sfml, sdl2)
->- RPI 3 (sfml, sdl2, wip)
+>- Linux (sdl1, sdl2)
 >- Ps Vita (vita2d)
 
 -----
@@ -46,7 +45,7 @@ PFBA: Portable Final Burn Alpha
 
 **Linux (SDL2) compilation**
 
->- Dependencies (deb) : libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
+>- Dependencies (deb) : sudo apt-get install libsdl2-dev libfreetype6-dev libpng-dev zlib1g-dev
 
 >- mkdir cmake-build
 >- cd cmake-build

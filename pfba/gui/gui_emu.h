@@ -16,6 +16,8 @@ public:
 
     GuiEmu(Gui *gui);
 
+    ~GuiEmu();
+
     int load(int driver);
 
     void unload();
@@ -28,7 +30,7 @@ public:
 
     void updateFrame();
 
-    void renderFrame(bool draw, int drawFps, int fps);
+    void renderFrame(bool draw, int drawFps, float fps);
 
     Video *getVideo();
 
@@ -37,11 +39,14 @@ private:
     Gui *gui = NULL;
     Video *video = NULL;
     c2d::Audio *audio = NULL;
+    c2d::Clock *clock = NULL;
     c2d::Text *fpsText = NULL;
     char fpsString[32];
 
     int frame_limit, frametime;
-    int now, done, timer, tick, ticks, fps;
+    float now, done, timer, tick, ticks, fps;
+
+    float time_now = 0, time_last = 0;
 
     struct timeval start;
 

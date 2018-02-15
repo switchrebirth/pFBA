@@ -20,6 +20,8 @@ GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
     gui = g;
     setFillColor(Color::Transparent);
 
+    clock = new C2DClock();
+
     fpsText = new Text("0123456789", *gui->getSkin()->font, (unsigned int) gui->getFontSize());
     fpsText->setPosition(16, 16);
     add(fpsText);
@@ -98,19 +100,24 @@ int GuiEmu::load(int driver) {
     // set fps text on top
     fpsText->setLayer(1);
 
-    // reset
-    bPauseOn = false;
-    nFramesEmulated = 0;
-    nCurrentFrame = 0;
-    nFramesRendered = 0;
-    startTicks();
-
     setVisibility(C2D_VISIBILITY_VISIBLE);
     gui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
     gui->getUiRomList()->setVisibility(C2D_VISIBILITY_HIDDEN);
 
     // set per rom input configuration
     gui->updateInputMapping(true);
+
+    // reset
+    bPauseOn = false;
+    nFramesEmulated = 0;
+    nCurrentFrame = 0;
+    nFramesRendered = 0;
+
+    frame_limit = nBurnFPS / 100;
+    frametime = 100000000 / nBurnFPS;
+    now = done = timer = tick = ticks = fps = 0;
+    clock->restart();
+    //startTicks();
 
     return 0;
 }
@@ -149,7 +156,7 @@ void GuiEmu::resume() {
     bPauseOn = false;
 }
 
-void GuiEmu::renderFrame(bool bDraw, int bDrawFps, int fps) {
+void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
 
     fpsText->setVisibility(
             bDrawFps ? C2D_VISIBILITY_VISIBLE : C2D_VISIBILITY_HIDDEN);
@@ -170,7 +177,7 @@ void GuiEmu::renderFrame(bool bDraw, int bDrawFps, int fps) {
         if (bDraw) {
             video->unlock();
             if (bDrawFps) {
-                sprintf(fpsString, "FPS: %2d/%2d", fps, (nBurnFPS / 100));
+                sprintf(fpsString, "FPS: %i/%2d", (int) fps, (nBurnFPS / 100));
                 fpsText->setString(fpsString);
             }
         }
@@ -209,11 +216,10 @@ void GuiEmu::updateFrame() {
         }
     } else {
         if (showFps) {
-            timer = getTicks();
-            if (timer - tick > 1000000) {
-                fps = nFramesRendered;
-                nFramesRendered = 0;
-                tick = timer;
+            time_now = gui->getRenderer()->getElapsedTime().asSeconds();
+            if (time_now - time_last > 0.1f) {
+                fps = 1.f / gui->getRenderer()->getDeltaTime().asSeconds();
+                time_last = time_now;
             }
         }
         renderFrame(true, showFps, fps);
@@ -335,6 +341,11 @@ unsigned int GuiEmu::getTicks() {
 
 Video *GuiEmu::getVideo() {
     return video;
+}
+
+GuiEmu::~GuiEmu() {
+
+    delete (clock);
 }
 
 #if defined(__PSP2__) || defined(__RPI__)

@@ -47,7 +47,7 @@ RomList::RomList(Gui *gui) {
     // UI
 
     printf("RomList: building list...\n");
-    clock_t begin = clock();
+    float time_start = gui->getRenderer()->getElapsedTime().asSeconds();
 
     std::vector<std::string> files[DIRS_MAX];
     for (unsigned int i = 0; i < paths.size(); i++) {
@@ -161,8 +161,7 @@ RomList::RomList(Gui *gui) {
         files[i].clear();
     }
 
-    clock_t end = clock();
-    double time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
+    float time_spent = gui->getRenderer()->getElapsedTime().asSeconds() - time_start;
     printf("RomList: list built in %f\n", time_spent);
 
     // UI

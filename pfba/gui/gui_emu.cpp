@@ -109,6 +109,9 @@ int GuiEmu::load(int driver) {
     gui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
     gui->getUiRomList()->setVisibility(C2D_VISIBILITY_HIDDEN);
 
+    // set per rom input configuration
+    gui->updateInputMapping(true);
+
     return 0;
 }
 
@@ -258,11 +261,6 @@ int GuiEmu::update() {
         // TODO: update for latest cross2d
         //gui->RunStatesMenu();
         // restore rom control scheme
-        gui->updateInputMapping(true);
-        if (audio) {
-            audio->Pause(0);
-        }
-        bPauseOn = false;
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_FIRE3)) {
         inputServiceSwitch = 1;

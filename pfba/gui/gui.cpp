@@ -51,6 +51,8 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     uiMessageBox->setOutlineColor(Color::Orange);
     uiMessageBox->setOutlineThickness(2);
     renderer->add(uiMessageBox);
+
+    updateInputMapping(false);
 }
 
 Gui::~Gui() {
@@ -62,7 +64,6 @@ Gui::~Gui() {
 void Gui::run() {
 
     int key = 0;
-    updateInputMapping(false);
 
     while (true) {
 
@@ -164,9 +165,6 @@ void Gui::runRom(RomList::Rom *rom) {
         printf("RunRom: driver not found\n");
         return;
     }
-
-    // set per rom input scheme
-    updateInputMapping(true);
 
     // load rom settings
     printf("RunRom: config->LoadRom(%s)\n", rom->zip);

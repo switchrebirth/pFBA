@@ -20,8 +20,6 @@ GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
     gui = g;
     setFillColor(Color::Transparent);
 
-    clock = new C2DClock();
-
     fpsText = new Text("0123456789", *gui->getSkin()->font, (unsigned int) gui->getFontSize());
     fpsText->setPosition(16, 16);
     add(fpsText);
@@ -110,14 +108,11 @@ int GuiEmu::load(int driver) {
     // reset
     bPauseOn = false;
     nFramesEmulated = 0;
-    nCurrentFrame = 0;
     nFramesRendered = 0;
+    nCurrentFrame = 0;
 
-    frame_limit = nBurnFPS / 100;
-    frametime = 100000000 / nBurnFPS;
-    now = done = timer = tick = ticks = fps = 0;
-    clock->restart();
-    //startTicks();
+    frame_time = 1.0f / ((float) nBurnFPS / 100.0f);
+    time_now = time_last = fps = 0;
 
     return 0;
 }
@@ -181,6 +176,10 @@ void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
                 fpsText->setString(fpsString);
             }
         }
+
+        if (audio) {
+            audio->Play();
+        }
     }
 }
 
@@ -189,43 +188,23 @@ void GuiEmu::updateFrame() {
     int showFps = gui->getConfig()->getValue(Option::Index::ROM_SHOW_FPS, true);
     int frameSkip = gui->getConfig()->getValue(Option::Index::ROM_FRAMESKIP, true);
 
+    if (showFps) {
+        time_now = gui->getRenderer()->getElapsedTime().asSeconds();
+        if (time_now - time_last > 0.1f) {
+            fps = 1.f / gui->getRenderer()->getDeltaTime().asSeconds();
+            time_last = time_now;
+        }
+    }
+
     if (frameSkip) {
-        timer = getTicks() / frametime;
-        if (timer - tick > frame_limit && showFps) {
-            fps = nFramesRendered;
-            nFramesRendered = 0;
-            tick = timer;
-        }
-        now = timer;
-        ticks = now - done;
-        if (ticks > 0) {
-            if (ticks > 10) ticks = 10;
-            for (int i = 0; i < ticks - 1; i++) {
-                renderFrame(false, showFps, fps);
-                if (audio) {
-                    audio->Play();
-                }
-            }
-            if (ticks >= 1) {
-                renderFrame(true, showFps, fps);
-                if (audio) {
-                    audio->Play();
-                }
-            }
-            done = now;
-        }
-    } else {
-        if (showFps) {
-            time_now = gui->getRenderer()->getElapsedTime().asSeconds();
-            if (time_now - time_last > 0.1f) {
-                fps = 1.f / gui->getRenderer()->getDeltaTime().asSeconds();
-                time_last = time_now;
-            }
+        float delta = gui->getRenderer()->getDeltaTime().asSeconds() - frame_time;
+        while (delta > frame_time) {
+            renderFrame(false, showFps, fps);
+            delta -= frame_time;
         }
         renderFrame(true, showFps, fps);
-        if (audio) {
-            audio->Play();
-        }
+    } else {
+        renderFrame(true, showFps, fps);
     }
 }
 
@@ -322,30 +301,8 @@ int GuiEmu::update() {
     return 0;
 }
 
-void GuiEmu::startTicks() {
-
-    frame_limit = nBurnFPS / 100;
-    frametime = 100000000 / nBurnFPS;
-    now = done = timer = tick = ticks = fps = 0;
-
-    gettimeofday(&start, NULL);
-}
-
-unsigned int GuiEmu::getTicks() {
-    unsigned int ticks;
-    struct timeval n = {};
-    gettimeofday(&n, NULL);
-    ticks = (unsigned int) ((n.tv_sec - start.tv_sec) * 1000000 + n.tv_usec - start.tv_usec);
-    return ticks;
-}
-
 Video *GuiEmu::getVideo() {
     return video;
-}
-
-GuiEmu::~GuiEmu() {
-
-    delete (clock);
 }
 
 #if defined(__PSP2__) || defined(__RPI__)

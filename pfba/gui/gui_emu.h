@@ -16,8 +16,6 @@ public:
 
     GuiEmu(Gui *gui);
 
-    ~GuiEmu();
-
     int load(int driver);
 
     void unload();
@@ -39,20 +37,10 @@ private:
     Gui *gui = NULL;
     Video *video = NULL;
     c2d::Audio *audio = NULL;
-    c2d::Clock *clock = NULL;
     c2d::Text *fpsText = NULL;
     char fpsString[32];
 
-    int frame_limit, frametime;
-    float now, done, timer, tick, ticks, fps;
-
-    float time_now = 0, time_last = 0;
-
-    struct timeval start;
-
-    void startTicks();
-
-    unsigned int getTicks();
+    float frame_time, time_now, time_last, fps;
 
 #if defined(__PSP2__) || defined(__RPI__)
 

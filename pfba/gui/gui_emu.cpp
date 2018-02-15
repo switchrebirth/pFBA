@@ -50,7 +50,7 @@ int GuiEmu::load(int driver) {
         // on some games (cps1 (SF2), cave ...)
         nInterpolation = 1;
         nFMInterpolation = 0;
-        audio = (Audio *) new C2DAudio(nBurnSoundRate, nBurnFPS);
+        audio = new C2DAudio(nBurnSoundRate, nBurnFPS);
         if (audio->available) {
             nBurnSoundRate = audio->frequency;
             nBurnSoundLen = audio->buffer_len;

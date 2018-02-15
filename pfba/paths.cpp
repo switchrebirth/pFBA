@@ -30,6 +30,8 @@ void BurnPathsInit() {
     strncpy(szAppHomePath, "/pfba", MAX_PATH);
 #elif __PS3__
     strncpy(szAppHomePath, "/dev_hdd0/pfba", MAX_PATH);
+#elif __NX__
+    strncpy(szAppHomePath, "/pfba", MAX_PATH);
 #else
     getcwd(szAppHomePath, MAX_PATH);
 #endif

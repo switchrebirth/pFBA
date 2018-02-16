@@ -167,13 +167,13 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         lines[line_index]->setVisibility(C2D_VISIBILITY_VISIBLE);
 
         if (option->flags == Option::Type::INPUT) {
-            Skin::Button *button = gui->getSkin()->getButton(option->value);
-            if (button) {
-                if (button->texture) {
-                    // TODO
-                    lines[line_index]->value->setString(button->name);
+            Skin::Button *buttonTex = gui->getSkin()->getButton(option->value);
+            if (buttonTex) {
+                if (buttonTex->texture) {
+                    // TODO: load button texture
+                    lines[line_index]->value->setString(buttonTex->name);
                 } else {
-                    lines[line_index]->value->setString(button->name);
+                    lines[line_index]->value->setString(buttonTex->name);
                 }
             } else {
                 char btn[16];
@@ -201,7 +201,7 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
     }
 
     highlight->setPosition(lines[0]->value->getGlobalBounds().left - 2,
-                           lines[0]->getGlobalBounds().top - 5);
+                           lines[0]->getGlobalBounds().top - 4);
 }
 
 int GuiMenu::update() {
@@ -218,7 +218,7 @@ int GuiMenu::update() {
             if (optionIndex < 0)
                 optionIndex = optionCount - 1;
             highlight->setPosition(lines[optionIndex]->value->getGlobalBounds().left - 2,
-                                   lines[optionIndex]->getGlobalBounds().top - 5);
+                                   lines[optionIndex]->getGlobalBounds().top - 4);
         }
         // DOWN
         if (key & Input::Key::KEY_DOWN) {
@@ -226,7 +226,7 @@ int GuiMenu::update() {
             if (optionIndex >= optionCount)
                 optionIndex = 0;
             highlight->setPosition(lines[optionIndex]->value->getGlobalBounds().left - 2,
-                                   lines[optionIndex]->getGlobalBounds().top - 5);
+                                   lines[optionIndex]->getGlobalBounds().top - 4);
         }
         // LEFT /RIGHT
         if ((key & Input::Key::KEY_LEFT || key & Input::Key::KEY_RIGHT)

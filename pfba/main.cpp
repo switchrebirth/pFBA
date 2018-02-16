@@ -47,7 +47,7 @@ Renderer *renderer;
 Input *inp;
 Io *io;
 Config *config;
-Gui *gui;
+Gui *ui;
 Skin *skin;
 
 char szAppBurnVer[16] = VERSION;
@@ -110,12 +110,12 @@ int main(int argc, char **argv) {
     Skin *skin = new Skin(szAppSkinPath, buttons);
 
     // run gui
-    gui = new Gui(io, renderer, skin, config, inp);
-    gui->run();
+    ui = new Gui(io, renderer, skin, config, inp);
+    ui->run();
 
     // quit
     BurnLibExit();
-    delete (gui);
+    delete (ui);
     delete (config);
     delete (inp);
     delete (skin);

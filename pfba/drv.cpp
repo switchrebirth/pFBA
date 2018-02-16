@@ -2,7 +2,7 @@
 #include "gui.h"
 #include "gui_progressbox.h"
 
-extern Gui *gui;
+extern Gui *ui;
 extern UINT8 NeoSystem;
 int bDrvOkay = 0;                        // 1 if the Driver has been initted okay, and it's okay to use the BurnDrv functions
 
@@ -25,7 +25,7 @@ static int DoLibInit()                    // Do Init of Burn library driver
     }
 
     NeoSystem &= ~(UINT8) 0x1f;
-    NeoSystem |= NeoSystemList[gui->getConfig()->getValue(Option::Index::ROM_NEOBIOS, true)];
+    NeoSystem |= NeoSystemList[ui->getConfig()->getValue(Option::Index::ROM_NEOBIOS, true)];
 
     nRet = BurnDrvInit();
     printf("DoLibInit: BurnDrvInit = %i\n", nRet);
@@ -126,23 +126,23 @@ static double nProgressPosBurn = 0;
 
 static int ProgressCreate() {
     nProgressPosBurn = 0;
-    gui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_VISIBLE);
+    ui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_VISIBLE);
     return 0;
 }
 
 int ProgressUpdateBurner(double dProgress, const TCHAR *pszText, bool bAbs) {
 
-    gui->getUiProgressBox()->setTitle(BurnDrvGetTextA(DRV_FULLNAME));
+    ui->getUiProgressBox()->setTitle(BurnDrvGetTextA(DRV_FULLNAME));
 
     if (pszText) {
         nProgressPosBurn += dProgress;
-        gui->getUiProgressBox()->setMessage(pszText);
-        gui->getUiProgressBox()->setProgress((float) nProgressPosBurn);
+        ui->getUiProgressBox()->setMessage(pszText);
+        ui->getUiProgressBox()->setProgress((float) nProgressPosBurn);
     } else {
-        gui->getUiProgressBox()->setMessage("Please wait...");
+        ui->getUiProgressBox()->setMessage("Please wait...");
     }
 
-    gui->getRenderer()->flip();
+    ui->getRenderer()->flip();
 
     return 0;
 }

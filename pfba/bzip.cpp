@@ -17,7 +17,7 @@ static int nZipsFound = 0;
 StringSet BzipText;												// Text which describes any problems with loading the zip
 StringSet BzipDetail;											// Text which describes in detail any problems with loading the zip
 
-extern Gui *gui;
+extern Gui *ui;
 
 void BzipListFree()
 {
@@ -370,7 +370,7 @@ int BzipOpen(bool bootApp)
             free(szBzipName[z]);
             szBzipName[z] = (TCHAR*)malloc(MAX_PATH * sizeof(TCHAR));
 
-            _stprintf(szBzipName[z], _T("%s%s"), gui->getConfig()->getRomPath(d), szName);
+            _stprintf(szBzipName[z], _T("%s%s"), ui->getConfig()->getRomPath(d), szName);
 
             if (ZipOpen(TCHARToANSI(szBzipName[z], NULL, 0)) == 0) {	// Open the rom zip file
                 nZipsFound++;

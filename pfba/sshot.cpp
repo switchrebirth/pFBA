@@ -17,7 +17,7 @@ static UINT8* pConvertedImage = NULL;
 static png_bytep* pSShotImageRows = NULL;
 static FILE* ff;
 
-extern Gui *gui;
+extern Gui *ui;
 
 INT32 MakeScreenShot(const char *dest)
 {
@@ -69,7 +69,7 @@ INT32 MakeScreenShot(const char *dest)
 		printf("MakeScreenshot: RunOneFrame\n");
 		// force a frame to be drawn to fba buffer
 		//RunOneFrame(true, 0, 0);
-		gui->getUiEmu()->renderFrame(true, 0, 0);
+		ui->getUiEmu()->renderFrame(true, 0, 0);
 		if (pBurnDraw == NULL) {
 			printf("MakeScreenshot: pBurnDraw == NULL\n");
 			return SSHOT_OTHER_ERROR;

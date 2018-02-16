@@ -20,13 +20,13 @@ public:
 
     int update();
 
-    void loadMenu(bool isRomMenu = false, OptionMenu *om = NULL);
+    void load(bool isRomMenu = false, OptionMenu *om = NULL);
 
 private:
 
     bool isOptionHidden(Option *option);
 
-    Gui *gui = NULL;
+    Gui *ui = NULL;
     c2d::Text *title = NULL;
     c2d::Rectangle *highlight = NULL;
     std::vector<MenuLine *> lines;

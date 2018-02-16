@@ -24,15 +24,18 @@ class GuiRomInfo;
 
 class GuiEmu;
 
+class GuiState;
+
 class GuiProgressBox;
 
 #define UI_KEY_FILTER_ROMS      100
 #define UI_KEY_SHOW_ROMLIST     101
 #define UI_KEY_SHOW_MEMU_UI     102
 #define UI_KEY_SHOW_MEMU_ROM    103
-#define UI_KEY_RUN_ROM          104
-#define UI_KEY_RESUME_ROM       105
-#define UI_KEY_STOP_ROM         106
+#define UI_KEY_SHOW_MEMU_STATE  104
+#define UI_KEY_RUN_ROM          105
+#define UI_KEY_RESUME_ROM       106
+#define UI_KEY_STOP_ROM         107
 
 #define UI_MARGIN   16
 #define INPUT_DELAY 150
@@ -94,6 +97,7 @@ private:
     GuiMenu *uiMenu = NULL;
     GuiRomList *uiRomList = NULL;
     GuiEmu *uiEmu = NULL;
+    GuiState *uiState = NULL;
     GuiProgressBox *uiProgressBox = NULL;
     c2d::MessageBox *uiMessageBox = NULL;
 

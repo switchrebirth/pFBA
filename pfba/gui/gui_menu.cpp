@@ -41,7 +41,7 @@ public:
 
 GuiMenu::GuiMenu(Gui *gui) : Rectangle(Vector2f(0, 0)) {
 
-    this->gui = gui;
+    this->ui = gui;
 
     setFillColor(fillColor[0]);
     setOutlineColor(COL_ORANGE);
@@ -89,13 +89,15 @@ GuiMenu::GuiMenu(Gui *gui) : Rectangle(Vector2f(0, 0)) {
     // build menus
     optionMenuGui = new OptionMenu(NULL, gui->getConfig()->getOptions());
     optionMenuRom = new OptionMenu(NULL, gui->getConfig()->getOptions(true), true);
+
+    setVisibility(C2D_VISIBILITY_HIDDEN);
 }
 
-void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
+void GuiMenu::load(bool isRom, OptionMenu *om) {
 
     isRomMenu = isRom;
-    options = isRomMenu ? gui->getConfig()->getOptions(true)
-                        : gui->getConfig()->getOptions();
+    options = isRomMenu ? ui->getConfig()->getOptions(true)
+                        : ui->getConfig()->getOptions();
 
     if (om == NULL) {
         optionMenu = isRomMenu ? optionMenuRom : optionMenuGui;
@@ -103,7 +105,7 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         optionMenu = om;
     }
 
-    isEmuRunning = gui->getUiEmu()->getVisibility() == C2D_VISIBILITY_VISIBLE;
+    isEmuRunning = ui->getUiEmu()->getVisibility() == C2D_VISIBILITY_VISIBLE;
     setFillColor(fillColor[isEmuRunning]);
 
     optionIndex = 0;
@@ -113,9 +115,9 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         // if frameskip is enabled, we may get a black buffer,
         // force a frame to be drawn
         if (pBurnDraw == NULL) {
-            gui->getUiEmu()->resume();
-            gui->getUiEmu()->renderFrame(true, 0, 0);
-            gui->getUiEmu()->pause();
+            ui->getUiEmu()->resume();
+            ui->getUiEmu()->renderFrame();
+            ui->getUiEmu()->pause();
         }
         if (optionMenu == optionMenuRom) {
             optionMenu->addChild("RETURN");
@@ -127,7 +129,7 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
 
     if (isRomMenu) {
         char name[128];
-        snprintf(name, 128, "%s__________", gui->getUiRomList()->getRom()->name);
+        snprintf(name, 128, "%s__________", ui->getUiRomList()->getRom()->name);
         title->setString(name);
     } else {
         title->setString(optionMenu->title + "__________");
@@ -146,7 +148,7 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         }
 
         // menu types
-        Option *option = gui->getConfig()->getOption(options, optionMenu->option_ids[i]);
+        Option *option = ui->getConfig()->getOption(options, optionMenu->option_ids[i]);
         if (option == NULL) {
             optionCount--;
             continue;
@@ -164,7 +166,7 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         lines[line_index]->setVisibility(C2D_VISIBILITY_VISIBLE);
 
         if (option->flags == Option::Type::INPUT) {
-            Skin::Button *buttonTex = gui->getSkin()->getButton(option->value);
+            Skin::Button *buttonTex = ui->getSkin()->getButton(option->value);
             if (buttonTex) {
                 if (buttonTex->texture) {
                     // TODO: load button texture
@@ -199,13 +201,16 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
 
     highlight->setPosition(lines[0]->value->getGlobalBounds().left - 2,
                            lines[0]->getGlobalBounds().top - 4);
+
+    setVisibility(C2D_VISIBILITY_VISIBLE);
+    setLayer(1);
 }
 
 int GuiMenu::update() {
 
-    bool option_changed = false;
     int ret = 0;
-    int key = gui->getInput()->update()[0].state;
+    bool option_changed = false;
+    int key = ui->getInput()->update()[0].state;
 
     if (key > 0) {
 
@@ -250,17 +255,17 @@ int GuiMenu::update() {
                     case Option::ROM_ROTATION:
                     case Option::Index::ROM_SCALING:
                         if (isEmuRunning) {
-                            gui->getUiEmu()->getVideo()->updateScaling();
+                            ui->getUiEmu()->getVideo()->updateScaling();
                         }
                         break;
                     case Option::Index::ROM_FILTER:
                         if (isEmuRunning) {
-                            gui->getUiEmu()->getVideo()->setFiltering(option->value);
+                            ui->getUiEmu()->getVideo()->setFiltering(option->value);
                         }
                         break;
                     case Option::Index::ROM_SHADER:
                         if (isEmuRunning) {
-                            gui->getUiEmu()->getVideo()->setShader(option->value);
+                            ui->getUiEmu()->getVideo()->setShader(option->value);
                         }
                         break;
                     default:
@@ -290,8 +295,9 @@ int GuiMenu::update() {
                     setVisibility(C2D_VISIBILITY_HIDDEN);
                     ret = UI_KEY_STOP_ROM;
                 } else if (menu->title == "STATES") {
-                    // TODO
-                    //RunStatesMenu();
+                    optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
+                    setVisibility(C2D_VISIBILITY_HIDDEN);
+                    ret = UI_KEY_SHOW_MEMU_STATE;
                 } else if (menu->title == "RETURN") {
                     optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
                     setVisibility(C2D_VISIBILITY_HIDDEN);
@@ -300,7 +306,7 @@ int GuiMenu::update() {
                     if (isEmuRunning && optionMenu == optionMenuRom) {
                         optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
                     }
-                    loadMenu(isRomMenu, menu);
+                    load(isRomMenu, menu);
                 }
             }
         }
@@ -318,7 +324,7 @@ int GuiMenu::update() {
                     ret = UI_KEY_SHOW_ROMLIST;
                 }
             } else {
-                loadMenu(isRomMenu, optionMenu->parent);
+                load(isRomMenu, optionMenu->parent);
             }
         }
 
@@ -327,17 +333,17 @@ int GuiMenu::update() {
             return EV_QUIT;
         }
 
-        gui->getRenderer()->delay(INPUT_DELAY);
+        ui->getRenderer()->delay(INPUT_DELAY);
     }
 
     if (option_changed) {
         if (isRomMenu) {
-            gui->getConfig()->save(gui->getUiRomList()->getRom());
+            ui->getConfig()->save(ui->getUiRomList()->getRom());
             if (isEmuRunning) {
-                gui->updateInputMapping(true);
+                ui->updateInputMapping(true);
             }
         } else {
-            gui->getConfig()->save();
+            ui->getConfig()->save();
         }
     }
 
@@ -346,7 +352,7 @@ int GuiMenu::update() {
 
 bool GuiMenu::isOptionHidden(Option *option) {
 
-    RomList::Rom *rom = gui->getUiRomList()->getRom();
+    RomList::Rom *rom = ui->getUiRomList()->getRom();
 
     if (option->index == Option::Index::ROM_ROTATION
         && rom != NULL && !(rom->flags & BDF_ORIENTATION_VERTICAL)) {

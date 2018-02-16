@@ -22,6 +22,8 @@ GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
     fpsText = new Text("0123456789", *gui->getSkin()->font, (unsigned int) gui->getFontSize());
     fpsText->setPosition(16, 16);
     add(fpsText);
+
+    setVisibility(C2D_VISIBILITY_HIDDEN);
 }
 
 int GuiEmu::run(int driver) {
@@ -239,9 +241,7 @@ int GuiEmu::update() {
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_FIRE5)) {
         pause();
-        // TODO: update for latest cross2d
-        //gui->RunStatesMenu();
-        // restore rom control scheme
+        return UI_KEY_SHOW_MEMU_STATE;
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_FIRE3)) {
         inputServiceSwitch = 1;

@@ -26,7 +26,7 @@ public:
 
     int update();
 
-    void renderFrame(bool draw, int drawFps, float fps);
+    void renderFrame(bool draw = true, int drawFps = false, float fps = 0);
 
     Video *getVideo();
 

@@ -51,6 +51,8 @@ GuiProgressBox::GuiProgressBox(Gui *gui)
     message->setOutlineThickness(2);
     message->setOutlineColor(Color::Black);
     add(message);
+
+    setVisibility(C2D_VISIBILITY_HIDDEN);
 }
 
 void GuiProgressBox::setTitle(std::string title) {

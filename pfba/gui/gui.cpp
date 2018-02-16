@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "gui_menu.h"
 #include "gui_emu.h"
+#include "gui_state.h"
 #include "gui_romlist.h"
 #include "gui_progressbox.h"
 
@@ -28,15 +29,15 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
 
     // build menus from options
     uiMenu = new GuiMenu(this);
-    uiMenu->setVisibility(C2D_VISIBILITY_HIDDEN);
     renderer->add(uiMenu);
 
     uiEmu = new GuiEmu(this);
-    uiEmu->setVisibility(C2D_VISIBILITY_HIDDEN);
     renderer->add(uiEmu);
 
+    uiState = new GuiState(this);
+    renderer->add(uiState);
+
     uiProgressBox = new GuiProgressBox(this);
-    uiProgressBox->setVisibility(C2D_VISIBILITY_HIDDEN);
     renderer->add(uiProgressBox);
 
     uiMessageBox = new MessageBox(
@@ -69,6 +70,8 @@ void Gui::run() {
 
         if (uiMenu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
             key = uiMenu->update();
+        } else if (uiState->getVisibility() == C2D_VISIBILITY_VISIBLE) {
+            key = uiState->update();
         } else if (uiEmu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
             key = uiEmu->update();
         } else {
@@ -95,17 +98,18 @@ void Gui::run() {
 
             case UI_KEY_SHOW_MEMU_UI:
                 getInput()->clear(0);
-                uiMenu->loadMenu();
-                uiMenu->setVisibility(C2D_VISIBILITY_VISIBLE);
-                uiMenu->setLayer(1);
+                uiMenu->load();
                 break;
 
             case UI_KEY_SHOW_MEMU_ROM:
                 getInput()->clear(0);
                 getConfig()->load(uiRomList->getRom());
-                uiMenu->loadMenu(true);
-                uiMenu->setVisibility(C2D_VISIBILITY_VISIBLE);
-                uiMenu->setLayer(1);
+                uiMenu->load(true);
+                break;
+
+            case UI_KEY_SHOW_MEMU_STATE:
+                getInput()->clear(0);
+                uiState->load();
                 break;
 
             case UI_KEY_FILTER_ROMS:

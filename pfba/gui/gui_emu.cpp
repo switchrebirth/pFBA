@@ -25,7 +25,7 @@ GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
     add(fpsText);
 }
 
-int GuiEmu::load(int driver) {
+int GuiEmu::run(int driver) {
 
     bForce60Hz = true;
 #if defined(__PSP2__) || defined(__RPI__)
@@ -117,14 +117,16 @@ int GuiEmu::load(int driver) {
     return 0;
 }
 
-void GuiEmu::unload() {
+void GuiEmu::stop() {
 
     DrvExit();
     InpExit();
+
     if (video) {
         delete (video);
         video = NULL;
     }
+
     if (audio) {
         delete (audio);
         audio = NULL;
@@ -148,6 +150,7 @@ void GuiEmu::resume() {
     if (audio) {
         audio->Pause(0);
     }
+    time_now = time_last = fps = 0;
     bPauseOn = false;
 }
 
@@ -190,6 +193,7 @@ void GuiEmu::updateFrame() {
 
     if (showFps) {
         time_now = gui->getRenderer()->getElapsedTime().asSeconds();
+        // update fps every 100 milliseconds
         if (time_now - time_last > 0.1f) {
             fps = 1.f / gui->getRenderer()->getDeltaTime().asSeconds();
             time_last = time_now;

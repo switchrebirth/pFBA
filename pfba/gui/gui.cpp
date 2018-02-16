@@ -89,7 +89,7 @@ void Gui::run() {
 
             case UI_KEY_STOP_ROM:
                 getInput()->clear(0);
-                uiEmu->unload();
+                uiEmu->stop();
                 uiRomList->setVisibility(C2D_VISIBILITY_VISIBLE);
                 break;
 
@@ -171,7 +171,7 @@ void Gui::runRom(RomList::Rom *rom) {
     config->load(rom);
 
     printf("RunRom: uiEmu->load(%i)\n", nBurnDrvActive);
-    uiEmu->load(nBurnDrvActive);
+    uiEmu->run(nBurnDrvActive);
 }
 
 Input *Gui::getInput() {

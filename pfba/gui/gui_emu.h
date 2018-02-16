@@ -16,9 +16,9 @@ public:
 
     GuiEmu(Gui *gui);
 
-    int load(int driver);
+    int run(int driver);
 
-    void unload();
+    void stop();
 
     void pause();
 

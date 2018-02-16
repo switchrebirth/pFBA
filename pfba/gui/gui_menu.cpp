@@ -113,9 +113,9 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         // if frameskip is enabled, we may get a black buffer,
         // force a frame to be drawn
         if (pBurnDraw == NULL) {
-            bPauseOn = false;
+            gui->getUiEmu()->resume();
             gui->getUiEmu()->renderFrame(true, 0, 0);
-            bPauseOn = true;
+            gui->getUiEmu()->pause();
         }
         if (optionMenu == optionMenuRom) {
             optionMenu->addChild("RETURN");

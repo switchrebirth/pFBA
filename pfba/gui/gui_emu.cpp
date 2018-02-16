@@ -13,7 +13,6 @@ extern int InpMake(Input::Player *players);
 extern unsigned char inputServiceSwitch;
 extern unsigned char inputP1P2Switch;
 extern int nSekCpuCore;
-bool bPauseOn = false;
 
 GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
 
@@ -106,7 +105,7 @@ int GuiEmu::run(int driver) {
     gui->updateInputMapping(true);
 
     // reset
-    bPauseOn = false;
+    paused = false;
     nFramesEmulated = 0;
     nFramesRendered = 0;
     nCurrentFrame = 0;
@@ -137,7 +136,7 @@ void GuiEmu::stop() {
 
 void GuiEmu::pause() {
 
-    bPauseOn = true;
+    paused = true;
     if (audio) {
         audio->Pause(1);
     }
@@ -151,7 +150,7 @@ void GuiEmu::resume() {
         audio->Pause(0);
     }
     time_now = time_last = fps = 0;
-    bPauseOn = false;
+    paused = false;
 }
 
 void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
@@ -159,7 +158,7 @@ void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
     fpsText->setVisibility(
             bDrawFps ? C2D_VISIBILITY_VISIBLE : C2D_VISIBILITY_HIDDEN);
 
-    if (!bPauseOn) {
+    if (!paused) {
 
         nFramesEmulated++;
         nCurrentFrame++;

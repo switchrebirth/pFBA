@@ -210,8 +210,6 @@ void GuiEmu::updateFrame() {
 
 int GuiEmu::update() {
 
-    updateFrame();
-
     inputServiceSwitch = 0;
     inputP1P2Switch = 0;
 
@@ -233,13 +231,8 @@ int GuiEmu::update() {
     // process menu
     if ((players[0].state & Input::Key::KEY_MENU1)
         && (players[0].state & Input::Key::KEY_MENU2)) {
-#ifdef    FAST_EXIT
-        gui->GetInput()->Clear(0);
-        GameLooping = false;
-#else
         pause();
         return UI_KEY_SHOW_MEMU_ROM;
-#endif
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_FIRE5)) {
         pause();
@@ -252,51 +245,12 @@ int GuiEmu::update() {
     } else if ((players[0].state & Input::Key::KEY_MENU2)
                && (players[0].state & Input::Key::KEY_FIRE4)) {
         inputP1P2Switch = 1;
-    } else if ((players[0].state & Input::Key::KEY_MENU2)
-               && (players[0].state & Input::Key::KEY_UP)) {
-        int scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true) + 1;
-        if (scaling <= 5) {
-            int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
-                                                       Option::Index::ROM_SCALING);
-            gui->getConfig()->getOptions(true)->at(index).value = scaling;
-            video->updateScaling();
-            gui->getRenderer()->delay(500);
-        }
-    } else if ((players[0].state & Input::Key::KEY_MENU2)
-               && (players[0].state & Input::Key::KEY_DOWN)) {
-        int scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true) - 1;
-        if (scaling >= 0) {
-            int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
-                                                       Option::Index::ROM_SCALING);
-            gui->getConfig()->getOptions(true)->at(index).value = scaling;
-            video->updateScaling();
-            gui->getRenderer()->delay(500);
-        }
-    } else if ((players[0].state & Input::Key::KEY_MENU2)
-               && (players[0].state & Input::Key::KEY_RIGHT)) {
-        int shader = gui->getConfig()->getValue(Option::Index::ROM_SHADER, true) + 1;
-        if (shader < gui->getRenderer()->getShaderList()->getCount()) {
-            int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
-                                                       Option::Index::ROM_SHADER);
-            gui->getConfig()->getOptions(true)->at(index).value = shader;
-            video->setShader(shader);
-            gui->getRenderer()->delay(500);
-        }
-    } else if ((players[0].state & Input::Key::KEY_MENU2)
-               && (players[0].state & Input::Key::KEY_LEFT)) {
-        int shader = gui->getConfig()->getValue(Option::Index::ROM_SHADER, true) - 1;
-        if (shader >= 0) {
-            int index = gui->getConfig()->getOptionPos(gui->getConfig()->getOptions(true),
-                                                       Option::Index::ROM_SHADER);
-            gui->getConfig()->getOptions(true)->at(index).value = shader;
-            video->setShader(shader);
-            gui->getRenderer()->delay(500);
-        }
     } else if (players[0].state & EV_RESIZE) {
         video->updateScaling();
     }
 
     InpMake(players);
+    updateFrame();
 
     return 0;
 }

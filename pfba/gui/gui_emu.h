@@ -26,13 +26,13 @@ public:
 
     int update();
 
-    void updateFrame();
-
     void renderFrame(bool draw, int drawFps, float fps);
 
     Video *getVideo();
 
 private:
+
+    void updateFrame();
 
     Gui *gui = NULL;
     Video *video = NULL;

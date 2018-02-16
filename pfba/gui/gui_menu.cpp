@@ -125,9 +125,6 @@ void GuiMenu::loadMenu(bool isRom, OptionMenu *om) {
         }
     }
 
-    ///////
-    // UI
-    //////
     if (isRomMenu) {
         char name[128];
         snprintf(name, 128, "%s__________", gui->getUiRomList()->getRom()->name);

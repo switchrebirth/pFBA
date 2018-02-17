@@ -7,7 +7,7 @@
 
 #include "gui.h"
 
-class GUISaveState;
+class GUISaveStateList;
 
 class GuiState : public c2d::Rectangle {
 
@@ -19,15 +19,13 @@ public:
 
     void unload();
 
-    void setSelection(int index);
-
     int update();
 
 private:
 
-    Gui *ui;
-    GUISaveState *states[4];
-    int state_index = 0;
+    Gui *ui = NULL;
+    GUISaveStateList *uiStateList = NULL;
+
     bool isEmuRunning = false;
 };
 

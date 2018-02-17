@@ -6,6 +6,8 @@
 #include "gui_emu.h"
 #include "gui_romlist.h"
 
+#define STATES_COUNT 4
+
 using namespace c2d;
 
 class GUISaveState : public Rectangle {
@@ -14,7 +16,6 @@ public:
 
     GUISaveState(Gui *ui, const FloatRect &rect, int num, const char *zipName) : Rectangle(rect) {
 
-        setOriginCenter();
         setFillColor(Color::GrayLight);
         setOutlineColor(COL_GREEN);
         setOutlineThickness(2);
@@ -67,6 +68,68 @@ public:
     bool exist = false;
 };
 
+class GUISaveStateList : public Rectangle {
+
+public:
+
+    GUISaveStateList(Gui *ui, const FloatRect &rect) : Rectangle(rect) {
+
+        //setFillColor(Color::Transparent);
+
+        // add states items
+        float width = getSize().x / STATES_COUNT;
+        for (int i = 0; i < STATES_COUNT; i++) {
+            FloatRect r = {(width * i) + (width / 2), width / 2, width, width};
+            states[i] = new GUISaveState(ui, r, i, ui->getUiRomList()->getRom()->name);
+            states[i]->setOriginCenter();
+            add(states[i]);
+        }
+
+        setSelection(0);
+    }
+
+    ~GUISaveStateList() {
+        for (int i = 0; i < 4; i++) {
+            delete (states[i]);
+        }
+    }
+
+    void setSelection(int idx) {
+
+        if (idx < 0 || idx > STATES_COUNT) {
+            return;
+        }
+
+        index = idx;
+        for (int i = 0; i < STATES_COUNT; i++) {
+            states[i]->setOutlineColor(i == index ? COL_YELLOW : COL_GREEN);
+            states[i]->setOutlineThickness(i == index ? 6 : 1);
+            states[i]->setLayer(i == index ? 1 : 0);
+            float scale = i == index ? 1.0f : 0.9f;
+            states[i]->setScale(scale, scale);
+        }
+    }
+
+    void left() {
+        index--;
+        if (index < 0) {
+            index = STATES_COUNT - 1;
+        }
+        setSelection(index);
+    }
+
+    void right() {
+        index++;
+        if (index > STATES_COUNT - 1) {
+            index = 0;
+        }
+        setSelection(index);
+    }
+
+    GUISaveState *states[STATES_COUNT];
+    int index = 0;
+};
+
 GuiState::GuiState(Gui *ui) : Rectangle(Vector2f(0, 0)) {
 
     this->ui = ui;
@@ -95,39 +158,22 @@ void GuiState::load() {
         }
     }
 
-    float width = getSize().x / 5;
-    for (int i = 0; i < 4; i++) {
-        FloatRect rect = {width + (width * i), width, width, width};
-        states[i] = new GUISaveState(ui, rect, i, ui->getUiRomList()->getRom()->name);
-        add(states[i]);
-    }
-
-    state_index = 0;
-    setSelection(0);
+    // TODO: LOAD STATES
+    uiStateList = new GUISaveStateList(ui, {
+            getLocalBounds().left + getSize().x / 2,
+            getLocalBounds().top + getSize().y / 2,
+            getSize().x - 64, getSize().x / (STATES_COUNT + 1)
+    });
+    uiStateList->setOriginCenter();
+    add(uiStateList);
 
     setVisibility(C2D_VISIBILITY_VISIBLE);
 }
 
 void GuiState::unload() {
 
-    for (int i = 0; i < 4; i++) {
-        delete (states[i]);
-    }
-
+    delete (uiStateList);
     setVisibility(C2D_VISIBILITY_HIDDEN);
-}
-
-void GuiState::setSelection(int index) {
-
-    if (index < 0 || index > 3) {
-        return;
-    }
-
-    for (int i = 0; i < 4; i++) {
-        states[i]->setOutlineColor(i == index ? COL_YELLOW : COL_GREEN);
-        states[i]->setOutlineThickness(i == index ? 3 : 1);
-        states[i]->setLayer(i == index ? 1 : 0);
-    }
 }
 
 int GuiState::update() {
@@ -138,17 +184,9 @@ int GuiState::update() {
     if (key > 0) {
 
         if (key & Input::Key::KEY_LEFT) {
-            state_index--;
-            if (state_index < 0) {
-                state_index = 3;
-            }
-            setSelection(state_index);
+            uiStateList->left();
         } else if (key & Input::Key::KEY_RIGHT) {
-            state_index++;
-            if (state_index > 3) {
-                state_index = 0;
-            }
-            setSelection(state_index);
+            uiStateList->right();
         }
 
         // FIRE2

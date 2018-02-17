@@ -92,22 +92,22 @@ public:
 
 GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
 
-    gui = g;
+    ui = g;
 
     // build/init roms list
-    rom_list = new RomList(gui);
+    rom_list = new RomList(ui);
 
     // set gui main "window"
     setFillColor(Color::Gray);
     setOutlineColor(COL_ORANGE);
-    setOutlineThickness(gui->getScaling() < 1 ? 1 : 2);
+    setOutlineThickness(ui->getScaling() < 1 ? 1 : 2);
     setPosition(getOutlineThickness(), getOutlineThickness());
     setSize(Vector2f(getSize().x - getOutlineThickness() * 2, getSize().y - getOutlineThickness() * 2));
 
     // add title image if available
-    Skin *skin = gui->getSkin();
+    Skin *skin = ui->getSkin();
     if (skin->tex_title->available) {
-        skin->tex_title->setPosition(UI_MARGIN * gui->getScaling(), UI_MARGIN * gui->getScaling());
+        skin->tex_title->setPosition(UI_MARGIN * ui->getScaling(), UI_MARGIN * ui->getScaling());
         float scale = (getLocalBounds().width / 3) / skin->tex_title->getSize().x;
         skin->tex_title->setScale(scale, scale);
         add(skin->tex_title);
@@ -117,12 +117,12 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
     updateRomList();
 
     // add rom info ui
-    rom_info = new GuiRomInfo(*skin->font, gui->getFontSize(),
+    rom_info = new GuiRomInfo(*skin->font, ui->getFontSize(),
                               FloatRect(
-                                      (getLocalBounds().width / 2) + UI_MARGIN * gui->getScaling(),
-                                      UI_MARGIN * gui->getScaling(),
-                                      (getLocalBounds().width / 2) - UI_MARGIN * gui->getScaling() * 2,
-                                      getLocalBounds().height - UI_MARGIN * gui->getScaling() * 2), gui->getScaling());
+                                      (getLocalBounds().width / 2) + UI_MARGIN * ui->getScaling(),
+                                      UI_MARGIN * ui->getScaling(),
+                                      (getLocalBounds().width / 2) - UI_MARGIN * ui->getScaling() * 2,
+                                      getLocalBounds().height - UI_MARGIN * ui->getScaling() * 2), ui->getScaling());
     rom_info->infoBox->setOutlineThickness(getOutlineThickness());
     rom_info->update(roms.size() > 0 ? roms[0] : NULL);
     add(rom_info);
@@ -130,7 +130,7 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
 
 int GuiRomList::update() {
 
-    Input::Player *players = gui->getInput()->update();
+    Input::Player *players = ui->getInput()->update();
 
     int key = players[0].state;
     if (key > 0) {
@@ -178,13 +178,13 @@ int GuiRomList::update() {
         }
 
         if (timer_input.getElapsedTime().asSeconds() > 12) {
-            gui->getRenderer()->delay(INPUT_DELAY / 8);
+            ui->getRenderer()->delay(INPUT_DELAY / 8);
         } else if (timer_input.getElapsedTime().asSeconds() > 6) {
-            gui->getRenderer()->delay(INPUT_DELAY / 5);
+            ui->getRenderer()->delay(INPUT_DELAY / 5);
         } else if (timer_input.getElapsedTime().asSeconds() > 2) {
-            gui->getRenderer()->delay(INPUT_DELAY / 2);
+            ui->getRenderer()->delay(INPUT_DELAY / 2);
         } else {
-            gui->getRenderer()->delay(INPUT_DELAY);
+            ui->getRenderer()->delay(INPUT_DELAY);
         }
 
         timer_load.restart();
@@ -199,6 +199,8 @@ int GuiRomList::update() {
         timer_input.restart();
     }
 
+    ui->getRenderer()->flip();
+
     return 0;
 }
 
@@ -211,10 +213,10 @@ void GuiRomList::updateRomList() {
     rom_index = 0;
     roms.clear();
 
-    int showClone = gui->getConfig()->getValue(Option::Index::GUI_SHOW_CLONES);
-    int showAll = gui->getConfig()->getValue(Option::Index::GUI_SHOW_ALL);
-    int showHardwareCfg = gui->getConfig()->getValue(Option::Index::GUI_SHOW_HARDWARE);
-    int showHardware = gui->getConfig()->hardwareList[showHardwareCfg].prefix;
+    int showClone = ui->getConfig()->getValue(Option::Index::GUI_SHOW_CLONES);
+    int showAll = ui->getConfig()->getValue(Option::Index::GUI_SHOW_ALL);
+    int showHardwareCfg = ui->getConfig()->getValue(Option::Index::GUI_SHOW_HARDWARE);
+    int showHardware = ui->getConfig()->hardwareList[showHardwareCfg].prefix;
 
     remove_copy_if(rom_list->list.begin(), rom_list->list.end(), back_inserter(roms),
                    [showAll, showClone, showHardware](RomList::Rom *r) {
@@ -229,15 +231,15 @@ void GuiRomList::updateRomList() {
     }
 
     // add rom list ui
-    float top = gui->getSkin()->tex_title->getGlobalBounds().top
-                + gui->getSkin()->tex_title->getGlobalBounds().height
-                + UI_MARGIN * gui->getScaling();
+    float top = ui->getSkin()->tex_title->getGlobalBounds().top
+                + ui->getSkin()->tex_title->getGlobalBounds().height
+                + UI_MARGIN * ui->getScaling();
 
     FloatRect rect = {
-            UI_MARGIN * gui->getScaling(), top,
-            (getLocalBounds().width / 2) - UI_MARGIN * gui->getScaling(),
-            getLocalBounds().height - top - UI_MARGIN * gui->getScaling()};
-    list_box = new ListBox(*gui->getSkin()->font, gui->getFontSize(), rect, (std::vector<Io::File *> &) roms);
+            UI_MARGIN * ui->getScaling(), top,
+            (getLocalBounds().width / 2) - UI_MARGIN * ui->getScaling(),
+            getLocalBounds().height - top - UI_MARGIN * ui->getScaling()};
+    list_box = new ListBox(*ui->getSkin()->font, ui->getFontSize(), rect, (std::vector<Io::File *> &) roms);
     list_box->setOutlineThickness(getOutlineThickness());
     list_box->setFillColor(Color::GrayLight);
     list_box->setOutlineColor(COL_ORANGE);

@@ -34,13 +34,13 @@ private:
 
     void updateFrame();
 
-    Gui *gui = NULL;
+    Gui *ui = NULL;
     Video *video = NULL;
     c2d::Audio *audio = NULL;
     c2d::Text *fpsText = NULL;
     char fpsString[32];
-    float frame_time, time_now, time_last, fps;
     bool paused = false;
+    float frame_duration = 0;
 
 #if defined(__PSP2__) || defined(__RPI__)
 

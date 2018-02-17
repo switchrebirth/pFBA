@@ -33,7 +33,7 @@ public:
 
 private:
 
-    Gui *gui = NULL;
+    Gui *ui = NULL;
     c2d::ListBox *list_box = NULL;
     GuiRomInfo *rom_info = NULL;
 

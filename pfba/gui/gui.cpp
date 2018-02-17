@@ -128,8 +128,6 @@ void Gui::run() {
             default:
                 break;
         }
-
-        renderer->flip();
     }
 }
 

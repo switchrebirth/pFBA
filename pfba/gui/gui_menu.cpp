@@ -347,6 +347,8 @@ int GuiMenu::update() {
         }
     }
 
+    ui->getRenderer()->flip();
+
     return ret;
 }
 

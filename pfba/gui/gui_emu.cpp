@@ -16,10 +16,10 @@ extern int nSekCpuCore;
 
 GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
 
-    gui = g;
+    ui = g;
     setFillColor(Color::Transparent);
 
-    fpsText = new Text("0123456789", *gui->getSkin()->font, (unsigned int) gui->getFontSize());
+    fpsText = new Text("0123456789", *ui->getSkin()->font, (unsigned int) ui->getFontSize());
     fpsText->setPosition(16, 16);
     add(fpsText);
 
@@ -36,7 +36,7 @@ int GuiEmu::run(int driver) {
     // AUDIO
     //////////
     nBurnSoundRate = 0;
-    if (gui->getConfig()->getValue(Option::Index::ROM_AUDIO, true)) {
+    if (ui->getConfig()->getValue(Option::Index::ROM_AUDIO, true)) {
 #ifdef __NX__
         nBurnSoundRate = 0;
 #elif __3DS__
@@ -83,8 +83,8 @@ int GuiEmu::run(int driver) {
         if (audio) {
             delete (audio);
         }
-        gui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
-        gui->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
+        ui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
+        ui->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
         return -1;
     }
 
@@ -94,26 +94,24 @@ int GuiEmu::run(int driver) {
     printf("Creating video device\n");
     int w, h;
     BurnDrvGetFullSize(&w, &h);
-    video = new Video(gui, Vector2f(w, h));
+    video = new Video(ui, Vector2f(w, h));
     add(video);
     // set fps text on top
     fpsText->setLayer(1);
 
     setVisibility(C2D_VISIBILITY_VISIBLE);
-    gui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
-    gui->getUiRomList()->setVisibility(C2D_VISIBILITY_HIDDEN);
+    ui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
+    ui->getUiRomList()->setVisibility(C2D_VISIBILITY_HIDDEN);
 
     // set per rom input configuration
-    gui->updateInputMapping(true);
+    ui->updateInputMapping(true);
 
     // reset
     paused = false;
     nFramesEmulated = 0;
     nFramesRendered = 0;
     nCurrentFrame = 0;
-
-    frame_time = 1.0f / ((float) nBurnFPS / 100.0f);
-    time_now = time_last = fps = 0;
+    frame_duration = 1.0f / ((float) nBurnFPS / 100.0f);
 
     return 0;
 }
@@ -142,16 +140,15 @@ void GuiEmu::pause() {
     if (audio) {
         audio->Pause(1);
     }
-    gui->updateInputMapping(false);
+    ui->updateInputMapping(false);
 }
 
 void GuiEmu::resume() {
 
-    gui->updateInputMapping(true);
+    ui->updateInputMapping(true);
     if (audio) {
         audio->Pause(0);
     }
-    time_now = time_last = fps = 0;
     paused = false;
 }
 
@@ -170,15 +167,14 @@ void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
             nFramesRendered++;
             video->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
         }
-
         BurnDrvFrame();
-
         if (bDraw) {
             video->unlock();
-            if (bDrawFps) {
-                sprintf(fpsString, "FPS: %i/%2d", (int) fps, (nBurnFPS / 100));
-                fpsText->setString(fpsString);
-            }
+        }
+
+        if (bDrawFps) {
+            sprintf(fpsString, "FPS: %i/%2d", (int) fps, (nBurnFPS / 100));
+            fpsText->setString(fpsString);
         }
 
         if (audio) {
@@ -189,27 +185,22 @@ void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
 
 void GuiEmu::updateFrame() {
 
-    int showFps = gui->getConfig()->getValue(Option::Index::ROM_SHOW_FPS, true);
-    int frameSkip = gui->getConfig()->getValue(Option::Index::ROM_FRAMESKIP, true);
-
-    if (showFps) {
-        time_now = gui->getRenderer()->getElapsedTime().asSeconds();
-        // update fps every 100 milliseconds
-        if (time_now - time_last > 0.1f) {
-            fps = 1.f / gui->getRenderer()->getDeltaTime().asSeconds();
-            time_last = time_now;
-        }
-    }
+    int showFps = ui->getConfig()->getValue(Option::Index::ROM_SHOW_FPS, true);
+    int frameSkip = ui->getConfig()->getValue(Option::Index::ROM_FRAMESKIP, true);
 
     if (frameSkip) {
-        float delta = gui->getRenderer()->getDeltaTime().asSeconds() - frame_time;
-        while (delta > frame_time) {
-            renderFrame(false, showFps, fps);
-            delta -= frame_time;
+        bool draw = nFramesEmulated % (frameSkip + 1) == 0;
+        renderFrame(draw, showFps, ui->getRenderer()->getFps());
+        ui->getRenderer()->flip(draw);
+        float delta = ui->getRenderer()->getDeltaTime().asSeconds();
+        if (delta < frame_duration) { // limit fps
+            //printf("f: %f | d: %f | m: %f | s: %i\n", frame_duration, delta, frame_duration - delta,
+            //       (unsigned int) ((frame_duration - delta) * 1000));
+            ui->getRenderer()->delay((unsigned int) ((frame_duration - delta) * 1000));
         }
-        renderFrame(true, showFps, fps);
     } else {
-        renderFrame(true, showFps, fps);
+        renderFrame(true, showFps, ui->getRenderer()->getFps());
+        ui->getRenderer()->flip();
     }
 }
 
@@ -218,7 +209,7 @@ int GuiEmu::update() {
     inputServiceSwitch = 0;
     inputP1P2Switch = 0;
 
-    int rotation = gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
+    int rotation = ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
     int rotate = 0;
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if (rotation == 0) {
@@ -231,7 +222,7 @@ int GuiEmu::update() {
         }
     }
 
-    Input::Player *players = gui->getInput()->update(rotate);
+    Input::Player *players = ui->getInput()->update(rotate);
 
     // process menu
     if ((players[0].state & Input::Key::KEY_MENU1)
@@ -272,10 +263,10 @@ int GuiEmu::getSekCpuCore() {
     std::vector<std::string> zipList;
     int hardware = BurnDrvGetHardwareCode();
 
-    if (!gui->getConfig()->getValue(Option::Index::ROM_NEOBIOS, true)
+    if (!ui->getConfig()->getValue(Option::Index::ROM_NEOBIOS, true)
         && RomList::IsHardware(hardware, HARDWARE_PREFIX_SNK)) {
         sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
-        gui->getUiMessageBox()->show("WARNING", "UNIBIOS DOESNT SUPPORT THE M68K ASM CORE\n"
+        ui->getUiMessageBox()->show("WARNING", "UNIBIOS DOESNT SUPPORT THE M68K ASM CORE\n"
                 "CYCLONE ASM CORE DISABLED", "OK");
     }
 
@@ -286,7 +277,7 @@ int GuiEmu::getSekCpuCore() {
             || hardware & HARDWARE_SEGA_FD1094_ENC
             || hardware & HARDWARE_SEGA_FD1094_ENC_CPU2) {
             sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
-            gui->getUiMessageBox()->show("WARNING", "ROM IS CRYPTED, USE DECRYPTED ROM (CLONE)\n"
+            ui->getUiMessageBox()->show("WARNING", "ROM IS CRYPTED, USE DECRYPTED ROM (CLONE)\n"
                     "TO ENABLE CYCLONE ASM CORE (FASTER)", "OK");
         }
     } else if (RomList::IsHardware(hardware, HARDWARE_PREFIX_TOAPLAN)) {
@@ -307,7 +298,7 @@ int GuiEmu::getSekCpuCore() {
     std::string zip = BurnDrvGetTextA(DRV_NAME);
     for (unsigned int i = 0; i < zipList.size(); i++) {
         if (zipList[i].compare(0, zip.length(), zip) == 0) {
-            gui->getUiMessageBox()->show("WARNING", "THIS ROM DOESNT SUPPORT THE M68K ASM CORE\n"
+            ui->getUiMessageBox()->show("WARNING", "THIS ROM DOESNT SUPPORT THE M68K ASM CORE\n"
                     "CYCLONE ASM CORE DISABLED", "OK");
             sekCpuCore = 1; // SEK_CORE_M68K: USE C M68K CORE
             break;

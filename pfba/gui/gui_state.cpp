@@ -141,8 +141,8 @@ GuiState::GuiState(Gui *ui) : Rectangle(Vector2f(0, 0)) {
     setSize(ui->getRenderer()->getSize().x - (UI_MARGIN * ui->getScaling() * 2),
             ui->getRenderer()->getSize().y - (UI_MARGIN * ui->getScaling() * 2));
 
-    //setVisibility(C2D_VISIBILITY_HIDDEN);
-    load();
+    setVisibility(C2D_VISIBILITY_HIDDEN);
+    //load();
 }
 
 void GuiState::load() {
@@ -206,6 +206,8 @@ int GuiState::update() {
 
         ui->getRenderer()->delay(INPUT_DELAY);
     }
+
+    ui->getRenderer()->flip();
 
     return ret;
 }

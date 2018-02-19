@@ -10,6 +10,10 @@
 #include "video.h"
 #include "skeleton/audio.h"
 
+#ifdef __NX__
+#define Video NXVideo
+#endif
+
 class GuiEmu : public c2d::Rectangle {
 
 public:
@@ -49,6 +53,5 @@ private:
 #endif
 
 };
-
 
 #endif //PFBA_GUI_EMU_H

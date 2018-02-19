@@ -5,6 +5,11 @@
 #ifndef _VIDEO_H_
 #define _VIDEO_H_
 
+#ifdef __NX__
+
+#include "video_nx.h"
+
+#else
 #include <cstring>
 #include <c2d.h>
 
@@ -22,5 +27,5 @@ private:
 
     Gui *gui = NULL;
 };
-
+#endif
 #endif //_VIDEO_H_

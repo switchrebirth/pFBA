@@ -51,8 +51,8 @@ public:
             add(middle_text);
         }
 
-        bottom_text = new C2DText("SLOT " + std::to_string(num),
-                                  *ui->getFont(), (unsigned int) ui->getFontSize());
+        snprintf(bottom_text_char, 32, "SLOT %i", num);
+        bottom_text = new C2DText(bottom_text_char, *ui->getFont(), (unsigned int) ui->getFontSize());
         bottom_text->setOutlineThickness(2);
         bottom_text->setOrigin(bottom_text->getLocalBounds().width / 2, 0);
         bottom_text->setPosition(getLocalBounds().left + getSize().x / 2,
@@ -65,6 +65,7 @@ public:
     Text *bottom_text = NULL;
     char path[MAX_PATH];
     char shot[MAX_PATH];
+    char bottom_text_char[32];
     bool exist = false;
 };
 

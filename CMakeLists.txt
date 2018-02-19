@@ -10,10 +10,10 @@ set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, f
 set(BUILD_SDL1_TINYGL OFF CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
 set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 support (software, osmesa) support")
 set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
-set(BUILD_PSP2 ON CACHE BOOL "Build with PSP2 support")
+set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
+set(BUILD_NX ON CACHE BOOL "Build with NX (SWITCH) support")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")
@@ -514,7 +514,7 @@ endif (BUILD_3DS)
 # NX (SWITCH) target
 #####################
 if (BUILD_NX)
-    set_target_properties(${PROJECT_NAME}.elf PROPERTIES LINK_FLAGS "-specs=switch.specs")
+    set_target_properties(${PROJECT_NAME}.elf PROPERTIES LINK_FLAGS "-specs=${DEVKITPRO}/libnx/switch.specs")
     add_custom_target(${PROJECT_NAME}.nro
             DEPENDS ${PROJECT_NAME}.elf
             COMMAND elf2nro ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro

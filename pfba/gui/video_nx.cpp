@@ -1,11 +1,13 @@
 //
 // Created by cpasjuste on 01/12/16.
 //
-#ifndef __NX__
+
+#ifdef __NX__
 
 #include <burner.h>
 #include <gui/config.h>
-#include "video.h"
+#include <switch.h>
+#include "video_nx.h"
 
 using namespace c2d;
 
@@ -17,7 +19,26 @@ static unsigned int myHighCol16(int r, int g, int b, int /* i */) {
     return t;
 }
 
-Video::Video(Gui *gui, const c2d::Vector2f &size) : C2DTexture(size, C2D_TEXTURE_FMT_RGB565) {
+void NXVideo::clear() {
+
+    u32 x, y, w, h;
+    u32 *buf;
+
+    for (int i = 0; i < 2; i++) {
+        buf = (u32 *) gfxGetFramebuffer(&w, &h);
+        for (y = 0; y < h; y++) {
+            for (x = 0; x < w; x++) {
+                buf[(u32) gfxGetFramebufferDisplayOffset((u32) x, (u32) y)]
+                        = 0xFF000000;
+            }
+        }
+        gfxFlushBuffers();
+        gfxSwapBuffers();
+        gfxWaitForVsync();
+    }
+}
+
+NXVideo::NXVideo(Gui *gui, const c2d::Vector2f &size) : Texture(size, C2D_TEXTURE_FMT_RGB565) {
 
     this->gui = gui;
 
@@ -33,15 +54,76 @@ Video::Video(Gui *gui, const c2d::Vector2f &size) : C2DTexture(size, C2D_TEXTURE
     nBurnBpp = 2;
     BurnHighCol = myHighCol16;
     BurnRecalcPal();
-    lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
-    unlock();
 
-    setShader(gui->getConfig()->getValue(Option::Index::ROM_SHADER, true));
-    setFiltering(gui->getConfig()->getValue(Option::Index::ROM_FILTER, true));
+    pixels = (unsigned char *) malloc((size_t) (size.x * size.y * bpp));
+
     updateScaling();
+
+    clear();
 }
 
-void Video::updateScaling() {
+int NXVideo::lock(c2d::FloatRect *rect, void **pix, int *p) {
+
+    if (!rect) {
+        *pix = pixels;
+    } else {
+        *pix = (void *) (pixels + (int) rect->top * pitch + (int) rect->left * bpp);
+    }
+
+    if (p) {
+        *p = pitch;
+    }
+
+    return 0;
+}
+
+void NXVideo::unlock() {
+
+    unsigned short *q;
+    unsigned int v, r, g, b;
+    int x, y;
+    unsigned subx, suby;
+    int tgtw, tgth, centerx, centery;
+
+    int w = (int) getSize().x;
+    int h = (int) getSize().y;
+    int xsf = (int) getScale().x; // 1280 / w;
+    int ysf = (int) getScale().y; // 720 / h;
+
+    int sf = xsf;
+    if (ysf < sf)
+        sf = ysf;
+    tgtw = w * sf;
+    tgth = h * sf;
+    centerx = (1280 - tgtw) / 2;
+    centery = (720 - tgth) / 2;
+
+    q = (unsigned short *) pixels;
+    u32 *buffer = (u32 *) gfxGetFramebuffer(NULL, NULL);
+
+    for (x = 0; x < w; x++) {
+        for (y = 0; y < h; y++) {
+
+            v = q[y * w + x];
+            r = (v & 0xf800) >> 11;
+            g = (v & 0x07e0) >> 5;
+            b = v & 0x001f;
+
+            //buffer[(u32) gfxGetFramebufferDisplayOffset((u32) x, (u32) y)]
+            //        = RGBA8_MAXALPHA(r << 3, g << 2, b << 3);
+            u32 pixel = RGBA8_MAXALPHA(r << 3, g << 2, b << 3);
+            for (subx = 0; subx < xsf; subx++) {
+                for (suby = 0; suby < ysf; suby++) {
+                    buffer[(u32) gfxGetFramebufferDisplayOffset(
+                            (u32) ((x * sf) + subx + centerx),
+                            (u32) ((y * sf) + suby + centery))] = pixel;
+                }
+            }
+        }
+    }
+}
+
+void NXVideo::updateScaling() {
 
     int rotation = 0;
     int scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true);
@@ -128,10 +210,13 @@ void Video::updateScaling() {
     setRotation(rotation);
 }
 
-Video::~Video() {
+NXVideo::~NXVideo() {
 
-    // TODO: free or not to free ?
+    // TODO: to free or not to free pBurnDraw?
     //pBurnDraw = NULL;
+    if (pixels) {
+        free(pixels);
+    }
 }
 
-#endif // __NX__
+#endif

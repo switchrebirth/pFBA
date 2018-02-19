@@ -15,9 +15,7 @@ char szAppConfigPath[MAX_PATH];
 char szAppHiscorePath[MAX_PATH];
 char szAppSamplesPath[MAX_PATH];
 char szAppPreviewPath[MAX_PATH];
-
 char szAppTitlePath[MAX_PATH];
-
 char szAppBlendPath[MAX_PATH];
 char szAppEEPROMPath[MAX_PATH];
 char szAppSkinPath[MAX_PATH];
@@ -31,7 +29,7 @@ void BurnPathsInit() {
 #elif __PS3__
     strncpy(szAppHomePath, "/dev_hdd0/pfba", MAX_PATH);
 #elif __NX__
-    strncpy(szAppHomePath, "/pfba", MAX_PATH);
+    strncpy(szAppHomePath, "/switch/pfba", MAX_PATH);
 #else
     getcwd(szAppHomePath, MAX_PATH);
 #endif

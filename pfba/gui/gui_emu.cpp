@@ -150,6 +150,9 @@ void GuiEmu::resume() {
         audio->Pause(0);
     }
     paused = false;
+#ifdef __NX__
+    NXVideo::clear();
+#endif
 }
 
 void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
@@ -191,7 +194,11 @@ void GuiEmu::updateFrame() {
     if (frameSkip) {
         bool draw = nFramesEmulated % (frameSkip + 1) == 0;
         renderFrame(draw, showFps, ui->getRenderer()->getFps());
+#ifdef __NX__
+        ui->getRenderer()->flip(false);
+#else
         ui->getRenderer()->flip(draw);
+#endif
         float delta = ui->getRenderer()->getDeltaTime().asSeconds();
         if (delta < frame_duration) { // limit fps
             //printf("f: %f | d: %f | m: %f | s: %i\n", frame_duration, delta, frame_duration - delta,
@@ -200,7 +207,11 @@ void GuiEmu::updateFrame() {
         }
     } else {
         renderFrame(true, showFps, ui->getRenderer()->getFps());
+#ifdef __NX__
+        ui->getRenderer()->flip(false);
+#else
         ui->getRenderer()->flip();
+#endif
     }
 }
 

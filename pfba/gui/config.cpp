@@ -23,6 +23,8 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     roms_paths.push_back("/pfba/roms/");
 #elif __PS3__
     roms_paths.push_back("/dev_hdd0/pfba/roms/");
+#elif __NX__
+    roms_paths.push_back("/switch/pfba/roms/");
 #else
     roms_paths.push_back("./roms/");
 #endif

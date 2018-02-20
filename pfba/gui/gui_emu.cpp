@@ -20,6 +20,7 @@ GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
     setFillColor(Color::Transparent);
 
     fpsText = new Text("0123456789", *ui->getSkin()->font, (unsigned int) ui->getFontSize());
+    fpsText->setString("FPS: 00/60");
     fpsText->setPosition(16, 16);
     add(fpsText);
 

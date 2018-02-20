@@ -397,7 +397,7 @@ elseif (BUILD_NX)
             -ffunction-sections -fomit-frame-pointer)
     #-D__PFBA_ARM__
     set(LDFLAGS
-            cross2d pTinyGL
+            cross2d pTinyGL nxnetprint
             ${DEVKITPRO}/libnx/lib/libnx.a
             ${DEVKITPRO}/portlibs/armv8-a/lib/libfreetype.a
             ${DEVKITPRO}/portlibs/armv8-a/lib/libpng.a

@@ -133,6 +133,10 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
         title->setString(name);
     } else {
         title->setString(optionMenu->title + "__________");
+        if (optionMenu == optionMenuGui) {
+            optionMenu->addChild("EXIT");
+            optionCount += 1;
+        }
     }
 
     for (int i = 0; i < lines.size(); i++) {
@@ -291,9 +295,15 @@ int GuiMenu::update() {
             } else {
                 OptionMenu *menu = optionMenu->childs[optionIndex - optionMenu->option_ids.size()];
                 if (menu->title == "EXIT") {
-                    optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
-                    setVisibility(C2D_VISIBILITY_HIDDEN);
-                    ret = UI_KEY_STOP_ROM;
+                    if (optionMenu == optionMenuGui) {
+                        optionMenu->childs.erase(optionMenu->childs.end() - 1, optionMenu->childs.end());
+                        setVisibility(C2D_VISIBILITY_HIDDEN);
+                        ret = EV_QUIT;
+                    } else {
+                        optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
+                        setVisibility(C2D_VISIBILITY_HIDDEN);
+                        ret = UI_KEY_STOP_ROM;
+                    }
                 } else if (menu->title == "STATES") {
                     optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
                     setVisibility(C2D_VISIBILITY_HIDDEN);
@@ -321,6 +331,9 @@ int GuiMenu::update() {
                     setVisibility(C2D_VISIBILITY_HIDDEN);
                     ret = UI_KEY_RESUME_ROM;
                 } else {
+                    if (!isRomMenu) {
+                        optionMenu->childs.erase(optionMenu->childs.end() - 1, optionMenu->childs.end());
+                    }
                     ret = UI_KEY_SHOW_ROMLIST;
                 }
             } else {

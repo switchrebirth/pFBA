@@ -28,6 +28,7 @@ private:
 
     Gui *gui = NULL;
     unsigned char *pixels = NULL;
+    int scaling = 0;
 };
 
 #endif //NX_VIDEO_H_

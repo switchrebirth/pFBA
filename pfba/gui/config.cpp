@@ -87,7 +87,13 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
 
     // default rom config
     options_gui.push_back(Option("EMULATION", {"EMULATION"}, 0, Option::Index::MENU_ROM_OPTIONS, Option::Type::MENU));
+#ifdef __NX__
+    options_gui.push_back(
+            Option("SCALING", {"NONE", "2X (FAST)", "3X (FAST)", "FIT (SLOW)", "FIT 4:3 (SLOW)", "FULL (SLOW)"},
+                   2, Option::Index::ROM_SCALING));
+#else
     options_gui.push_back(Option("SCALING", {"NONE", "2X", "FIT", "FIT 4:3", "FULL"}, 2, Option::Index::ROM_SCALING));
+#endif
     options_gui.push_back(
             Option("FILTER", {"POINT", "LINEAR"}, 0, Option::Index::ROM_FILTER));
     if (renderer->getShaderList() != NULL) {

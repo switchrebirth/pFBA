@@ -43,6 +43,15 @@ RomList::RomList(Gui *gui) {
     text->setPosition(16, rect->getSize().y - 8);
     rect->add(text);
 
+    std::string v = "fba: ";
+    v += szAppBurnVer;
+    Text *version = new Text(v, *gui->getSkin()->font);
+    version->setOriginBottomRight();
+    version->setOutlineColor(Color::Black);
+    version->setOutlineThickness(2);
+    version->setPosition(rect->getSize().x - 8, rect->getSize().y - 8);
+    rect->add(version);
+
     gui->getRenderer()->add(rect);
     // UI
 

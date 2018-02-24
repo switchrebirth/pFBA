@@ -43,28 +43,49 @@ public:
         this->option = option;
         name->setString(option->getName());
 
+        if (texture != NULL) {
+            delete (texture);
+            texture = NULL;
+        }
+
         if (option->flags == Option::Type::INPUT) {
-            Skin::Button *buttonTex = ui->getSkin()->getButton(option->value);
-            if (buttonTex) {
-                if (buttonTex->texture) {
-                    // TODO: load button texture
-                    value->setString(buttonTex->name);
+            Skin::Button *button = ui->getSkin()->getButton(option->value);
+            if (button) {
+                if (ui->getIo()->exist(button->path.c_str())) {
+                    texture = new C2DTexture(button->path.c_str());
+                    if (texture->available) {
+                        value->setVisibility(Hidden);
+                        float tex_scaling = std::min(
+                                ((getSize().x * 0.33f) - 32) / texture->getSize().x,
+                                (getSize().y / 2 + 4) / texture->getSize().y);
+                        texture->setScale(tex_scaling, tex_scaling);
+                        texture->setPosition((getSize().x * 0.66f) + 16, getSize().y / 2 - 3);
+                        texture->setOrigin(0, texture->getSize().y / 2);
+                        add(texture);
+                    } else {
+                        value->setVisibility(Visible);
+                        value->setString(button->name);
+                    }
                 } else {
-                    value->setString(buttonTex->name);
+                    value->setVisibility(Visible);
+                    value->setString(button->name);
                 }
             } else {
                 char btn[16];
                 snprintf(btn, 16, "%i", option->value);
+                value->setVisibility(Visible);
                 value->setString(btn);
             }
         } else {
+            value->setVisibility(Visible);
             value->setString(option->getValue());
         }
     }
 
-    Gui *ui;
-    c2d::Text *name;
-    c2d::Text *value;
+    Gui *ui = NULL;
+    Text *name = NULL;
+    Text *value = NULL;
+    Texture *texture = NULL;
     Option *option = NULL;
 };
 

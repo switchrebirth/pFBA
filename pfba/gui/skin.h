@@ -12,22 +12,23 @@ class Skin {
 public:
 
     struct Button {
-        std::string name;
-        int id = -1;
-        c2d::Texture *texture = NULL;
-
         Button(int i, const std::string &n) {
             id = i;
             name = n;
         }
+
+        std::string name;
+        std::string path;
+        int id = -1;
     };
 
-    Skin(char *skinPath, std::vector<Button> btns);
+    Skin(const std::string &path, const std::vector<Button> &btns);
 
     ~Skin();
 
     Button *getButton(int id);
 
+    std::string path;
     c2d::Texture *tex_bg = NULL;
     c2d::Texture *tex_title = NULL;
     c2d::Font *font = NULL;

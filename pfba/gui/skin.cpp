@@ -3,7 +3,6 @@
 //
 
 #include "skin.h"
-#include "burner.h"
 
 #ifdef __NX__
 
@@ -14,37 +13,31 @@
 
 using namespace c2d;
 
-Skin::Skin(char *skinPath, std::vector<Button> btns) {
+Skin::Skin(const std::string &path, const std::vector<Button> &btns) {
+
+    this->path = path;
 
 #ifdef __NX__
     tex_bg = (Texture *) new C2DTexture("");
     tex_title = (Texture *) new C2DTexture((const unsigned char *) pfba_title, pfba_title_length);
     font = new C2DFont();
     font->loadFromMemory(pfba_font, pfba_font_length);
-    buttons = btns;
 #else
-    char str[MAX_PATH];
-    memset(str, 0, MAX_PATH);
-    snprintf(str, MAX_PATH, "%s/fba_bg.png", skinPath);
-    tex_bg = (Texture *) new C2DTexture(str);
-
-    memset(str, 0, MAX_PATH);
-    snprintf(str, MAX_PATH, "%s/title.png", skinPath);
-    tex_title = (Texture *) new C2DTexture(str);
-
-    memset(str, 0, MAX_PATH);
-    snprintf(str, MAX_PATH, "%s/default.ttf", skinPath);
+    tex_bg = (Texture *) new C2DTexture((path + "/fba_bg.png").c_str());
+    tex_title = (Texture *) new C2DTexture((path + "/title.png").c_str());
     font = new C2DFont();
-    font->loadFromFile(str);
+    font->loadFromFile(path + "/default.ttf");
+#endif
 
     // load buttons textures
     buttons = btns;
+    char str[MAX_PATH];
     for (unsigned int i = 0; i < buttons.size(); i++) {
         memset(str, 0, MAX_PATH);
-        snprintf(str, MAX_PATH, "%s/buttons/%i.png", skinPath, buttons[i].id);
-        buttons[i].texture = (Texture *) new C2DTexture(str);
+        snprintf(str, MAX_PATH, "%s/buttons/%i.png", path.c_str(), buttons[i].id);
+        buttons[i].path.clear();
+        buttons[i].path.append(str);
     }
-#endif
 }
 
 Skin::Button *Skin::getButton(int id) {

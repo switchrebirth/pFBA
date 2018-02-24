@@ -70,6 +70,7 @@ int main(int argc, char **argv) {
     BurnLibInit();
 
     std::vector<Skin::Button> buttons;
+
 #ifdef __PSP2__
     // set max cpu speed
     scePowerSetArmClockFrequency(444);
@@ -77,6 +78,7 @@ int main(int argc, char **argv) {
     scePowerSetGpuClockFrequency(222);
     scePowerSetGpuXbarClockFrequency(166);
 
+    // see c2d.h for key id
     buttons.push_back({8, "UP"});
     buttons.push_back({6, "DOWN"});
     buttons.push_back({7, "LEFT"});

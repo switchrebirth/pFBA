@@ -24,7 +24,7 @@ GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
     fpsText->setPosition(16, 16);
     add(fpsText);
 
-    setVisibility(C2D_VISIBILITY_HIDDEN);
+    setVisibility(Hidden);
 }
 
 int GuiEmu::run(int driver) {
@@ -84,7 +84,7 @@ int GuiEmu::run(int driver) {
         if (audio) {
             delete (audio);
         }
-        ui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
+        ui->getUiProgressBox()->setVisibility(Hidden);
         ui->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
         return -1;
     }
@@ -100,9 +100,9 @@ int GuiEmu::run(int driver) {
     // set fps text on top
     fpsText->setLayer(1);
 
-    setVisibility(C2D_VISIBILITY_VISIBLE);
-    ui->getUiProgressBox()->setVisibility(C2D_VISIBILITY_HIDDEN);
-    ui->getUiRomList()->setVisibility(C2D_VISIBILITY_HIDDEN);
+    setVisibility(Visible);
+    ui->getUiProgressBox()->setVisibility(Hidden);
+    ui->getUiRomList()->setVisibility(Hidden);
 
     // set per rom input configuration
     ui->updateInputMapping(true);
@@ -132,7 +132,7 @@ void GuiEmu::stop() {
         audio = NULL;
     }
 
-    setVisibility(C2D_VISIBILITY_HIDDEN);
+    setVisibility(Hidden);
 }
 
 void GuiEmu::pause() {
@@ -159,7 +159,7 @@ void GuiEmu::resume() {
 void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
 
     fpsText->setVisibility(
-            bDrawFps ? C2D_VISIBILITY_VISIBLE : C2D_VISIBILITY_HIDDEN);
+            bDrawFps ? Visible : Hidden);
 
     if (!paused) {
 

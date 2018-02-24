@@ -76,6 +76,8 @@ public:
 
     GuiEmu *getUiEmu();
 
+    GuiMenu *getUiMenu();
+
     GuiProgressBox *getUiProgressBox();
 
     c2d::MessageBox *getUiMessageBox();

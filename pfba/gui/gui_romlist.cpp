@@ -42,7 +42,7 @@ public:
         }
 
         if (!rom) {
-            infoText->setVisibility(C2D_VISIBILITY_HIDDEN);
+            infoText->setVisibility(Hidden);
         } else {
             // load preview image
             char path[MAX_PATH];
@@ -77,7 +77,7 @@ public:
                      rom->zip, rom->state == RomList::RomState::MISSING ? "MISSING" : "AVAILABLE",
                      rom->system, rom->manufacturer, rom->year);
             infoText->setString(info);
-            infoText->setVisibility(C2D_VISIBILITY_VISIBLE);
+            infoText->setVisibility(Visible);
         }
     }
 
@@ -164,13 +164,13 @@ int GuiRomList::update() {
             rom_info->update(NULL);
             title_loaded = 0;
         } else if (key & Input::Key::KEY_FIRE1) {
-            if (getRom() != NULL && getRom()->state != RomList::RomState::MISSING) {
+            if (getSelection() != NULL && getSelection()->state != RomList::RomState::MISSING) {
                 return UI_KEY_RUN_ROM;
             }
         } else if (key & Input::Key::KEY_MENU1) {
             return UI_KEY_SHOW_MEMU_UI;
         } else if (key & Input::Key::KEY_MENU2) {
-            if (getRom() != NULL) {
+            if (getSelection() != NULL) {
                 return UI_KEY_SHOW_MEMU_ROM;
             }
         } else if (key & EV_QUIT) {
@@ -204,7 +204,7 @@ int GuiRomList::update() {
     return 0;
 }
 
-RomList::Rom *GuiRomList::getRom() {
+RomList::Rom *GuiRomList::getSelection() {
     return (RomList::Rom *) list_box->getSelection();
 }
 

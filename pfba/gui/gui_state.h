@@ -25,7 +25,7 @@ private:
 
     Gui *ui = NULL;
     GUISaveStateList *uiStateList = NULL;
-
+    c2d::Text *title = NULL;
     bool isEmuRunning = false;
 };
 

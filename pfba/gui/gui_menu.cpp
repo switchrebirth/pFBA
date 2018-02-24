@@ -39,31 +39,31 @@ public:
     Option *option = NULL;
 };
 
-GuiMenu::GuiMenu(Gui *gui) : Rectangle(Vector2f(0, 0)) {
+GuiMenu::GuiMenu(Gui *ui) : Rectangle(Vector2f(0, 0)) {
 
-    this->ui = gui;
+    this->ui = ui;
 
     setFillColor(fillColor[0]);
     setOutlineColor(COL_ORANGE);
     setOutlineThickness(4);
-    setPosition(UI_MARGIN * gui->getScaling(), UI_MARGIN * gui->getScaling());
-    setSize(gui->getRenderer()->getSize().x - (UI_MARGIN * gui->getScaling() * 2),
-            gui->getRenderer()->getSize().y - (UI_MARGIN * gui->getScaling() * 2));
+    setPosition(UI_MARGIN * ui->getScaling(), UI_MARGIN * ui->getScaling());
+    setSize(ui->getRenderer()->getSize().x - (UI_MARGIN * ui->getScaling() * 2),
+            ui->getRenderer()->getSize().y - (UI_MARGIN * ui->getScaling() * 2));
 
     // menu title
-    title = new Text("TITLE_______________________", *gui->getSkin()->font);
+    title = new Text("TITLE_______________________", *ui->getSkin()->font);
     title->setSizeMax(Vector2f(getSize().x - 16, 0));
     title->setFillColor(Color::White);
     title->setOutlineThickness(2);
     title->setOutlineColor(COL_RED);
     title->setStyle(c2d::Text::Underlined);
-    title->setPosition(20 * gui->getScaling(), 20 * gui->getScaling());
-    int start_y = (int) (title->getGlobalBounds().top + title->getGlobalBounds().height + 16 * gui->getScaling());
+    title->setPosition(20 * ui->getScaling(), 20 * ui->getScaling());
+    int start_y = (int) (title->getGlobalBounds().top + title->getGlobalBounds().height + 16 * ui->getScaling());
     add(title);
 
     // calculate lines per menu
-    float font_size = gui->getFontSize();
-    float line_height = gui->getFont()->getLineSpacing((unsigned int) font_size) + 8;
+    float font_size = ui->getFontSize();
+    float line_height = ui->getFont()->getLineSpacing((unsigned int) font_size) + 8;
     int max_lines = (int) ((getSize().y - start_y) / line_height) * 2;
 
     // add selection rectangle (highlight)
@@ -82,15 +82,15 @@ GuiMenu::GuiMenu(Gui *gui) : Rectangle(Vector2f(0, 0)) {
             rect.top = start_y + ((i - (max_lines / 2)) * line_height);
         }
 
-        lines.push_back(new MenuLine(*gui->getSkin()->font, gui->getFontSize(), rect));
+        lines.push_back(new MenuLine(*ui->getSkin()->font, ui->getFontSize(), rect));
         add(lines[i]);
     }
 
     // build menus
-    optionMenuGui = new OptionMenu(NULL, gui->getConfig()->getOptions());
-    optionMenuRom = new OptionMenu(NULL, gui->getConfig()->getOptions(true), true);
+    optionMenuGui = new OptionMenu(NULL, ui->getConfig()->getOptions());
+    optionMenuRom = new OptionMenu(NULL, ui->getConfig()->getOptions(true), true);
 
-    setVisibility(C2D_VISIBILITY_HIDDEN);
+    setVisibility(Hidden);
 }
 
 void GuiMenu::load(bool isRom, OptionMenu *om) {
@@ -105,7 +105,7 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
         optionMenu = om;
     }
 
-    isEmuRunning = ui->getUiEmu()->getVisibility() == C2D_VISIBILITY_VISIBLE;
+    isEmuRunning = ui->getUiEmu()->getVisibility() == Visible;
     setFillColor(fillColor[isEmuRunning]);
 
     optionIndex = 0;
@@ -129,7 +129,7 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
 
     if (isRomMenu) {
         char name[128];
-        snprintf(name, 128, "%s__________", ui->getUiRomList()->getRom()->name);
+        snprintf(name, 128, "%s__________", ui->getUiRomList()->getSelection()->name);
         title->setString(name);
     } else {
         title->setString(optionMenu->title + "__________");
@@ -140,7 +140,7 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
     }
 
     for (int i = 0; i < lines.size(); i++) {
-        lines[i]->setVisibility(C2D_VISIBILITY_HIDDEN);
+        lines[i]->setVisibility(Hidden);
     }
 
     int line_index = 0;
@@ -167,7 +167,7 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
 
         lines[line_index]->name->setString(option->getName());
         lines[line_index]->option = option;
-        lines[line_index]->setVisibility(C2D_VISIBILITY_VISIBLE);
+        lines[line_index]->setVisibility(Visible);
 
         if (option->flags == Option::Type::INPUT) {
             Skin::Button *buttonTex = ui->getSkin()->getButton(option->value);
@@ -197,7 +197,7 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
             break;
         }
 
-        lines[line_index]->setVisibility(C2D_VISIBILITY_VISIBLE);
+        lines[line_index]->setVisibility(Visible);
         lines[line_index]->name->setString(optionMenu->childs[i]->title);
         lines[line_index]->value->setString("GO");
         line_index++;
@@ -206,7 +206,7 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
     highlight->setPosition(lines[0]->value->getGlobalBounds().left - 2,
                            lines[0]->getGlobalBounds().top - 4);
 
-    setVisibility(C2D_VISIBILITY_VISIBLE);
+    setVisibility(Visible);
     setLayer(1);
 }
 
@@ -297,20 +297,20 @@ int GuiMenu::update() {
                 if (menu->title == "EXIT") {
                     if (optionMenu == optionMenuGui) {
                         optionMenu->childs.erase(optionMenu->childs.end() - 1, optionMenu->childs.end());
-                        setVisibility(C2D_VISIBILITY_HIDDEN);
+                        setVisibility(Hidden);
                         ret = EV_QUIT;
                     } else {
                         optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
-                        setVisibility(C2D_VISIBILITY_HIDDEN);
+                        setVisibility(Hidden);
                         ret = UI_KEY_STOP_ROM;
                     }
                 } else if (menu->title == "STATES") {
                     optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
-                    setVisibility(C2D_VISIBILITY_HIDDEN);
+                    setVisibility(Hidden);
                     ret = UI_KEY_SHOW_MEMU_STATE;
                 } else if (menu->title == "RETURN") {
                     optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
-                    setVisibility(C2D_VISIBILITY_HIDDEN);
+                    setVisibility(Hidden);
                     ret = UI_KEY_RESUME_ROM;
                 } else {
                     if (isEmuRunning && optionMenu == optionMenuRom) {
@@ -328,7 +328,7 @@ int GuiMenu::update() {
             if (optionMenu->parent == NULL) {
                 if (isEmuRunning) {
                     optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
-                    setVisibility(C2D_VISIBILITY_HIDDEN);
+                    setVisibility(Hidden);
                     ret = UI_KEY_RESUME_ROM;
                 } else {
                     if (!isRomMenu) {
@@ -351,7 +351,7 @@ int GuiMenu::update() {
 
     if (option_changed) {
         if (isRomMenu) {
-            ui->getConfig()->save(ui->getUiRomList()->getRom());
+            ui->getConfig()->save(ui->getUiRomList()->getSelection());
             if (isEmuRunning) {
                 ui->updateInputMapping(true);
             }
@@ -367,7 +367,7 @@ int GuiMenu::update() {
 
 bool GuiMenu::isOptionHidden(Option *option) {
 
-    RomList::Rom *rom = ui->getUiRomList()->getRom();
+    RomList::Rom *rom = ui->getUiRomList()->getSelection();
 
     if (option->index == Option::Index::ROM_ROTATION
         && rom != NULL && !(rom->flags & BDF_ORIENTATION_VERTICAL)) {

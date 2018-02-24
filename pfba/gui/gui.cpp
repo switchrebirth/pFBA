@@ -68,11 +68,11 @@ void Gui::run() {
 
     while (true) {
 
-        if (uiMenu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
+        if (uiMenu->getVisibility() == C2DObject::Visible) {
             key = uiMenu->update();
-        } else if (uiState->getVisibility() == C2D_VISIBILITY_VISIBLE) {
+        } else if (uiState->getVisibility() == C2DObject::Visible) {
             key = uiState->update();
-        } else if (uiEmu->getVisibility() == C2D_VISIBILITY_VISIBLE) {
+        } else if (uiEmu->getVisibility() == C2DObject::Visible) {
             key = uiEmu->update();
         } else {
             key = uiRomList->update();
@@ -82,7 +82,7 @@ void Gui::run() {
 
             case UI_KEY_RUN_ROM:
                 getInput()->clear(0);
-                runRom(uiRomList->getRom());
+                runRom(uiRomList->getSelection());
                 break;
 
             case UI_KEY_RESUME_ROM:
@@ -93,7 +93,7 @@ void Gui::run() {
             case UI_KEY_STOP_ROM:
                 getInput()->clear(0);
                 uiEmu->stop();
-                uiRomList->setVisibility(C2D_VISIBILITY_VISIBLE);
+                uiRomList->setVisibility(C2DObject::Visible);
                 break;
 
             case UI_KEY_SHOW_MEMU_UI:
@@ -103,7 +103,7 @@ void Gui::run() {
 
             case UI_KEY_SHOW_MEMU_ROM:
                 getInput()->clear(0);
-                getConfig()->load(uiRomList->getRom());
+                getConfig()->load(uiRomList->getSelection());
                 uiMenu->load(true);
                 break;
 
@@ -118,8 +118,8 @@ void Gui::run() {
 
             case UI_KEY_SHOW_ROMLIST:
                 getInput()->clear(0);
-                uiMenu->setVisibility(C2D_VISIBILITY_HIDDEN);
-                uiRomList->setVisibility(C2D_VISIBILITY_VISIBLE);
+                uiMenu->setVisibility(C2DObject::Hidden);
+                uiRomList->setVisibility(C2DObject::Visible);
                 break;
 
             case EV_QUIT:
@@ -203,6 +203,11 @@ GuiRomList *Gui::getUiRomList() {
 GuiEmu *Gui::getUiEmu() {
     return uiEmu;
 }
+
+GuiMenu *Gui::getUiMenu() {
+    return uiMenu;
+}
+
 
 GuiProgressBox *Gui::getUiProgressBox() {
     return uiProgressBox;

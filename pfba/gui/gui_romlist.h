@@ -27,7 +27,7 @@ public:
 
     void updateRomList();
 
-    RomList::Rom *getRom();
+    RomList::Rom *getSelection();
 
     void setLoadDelay(int delay);
 

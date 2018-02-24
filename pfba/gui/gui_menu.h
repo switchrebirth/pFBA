@@ -14,7 +14,7 @@ class GuiMenu : public c2d::Rectangle {
 
 public:
 
-    GuiMenu(Gui *gui);
+    GuiMenu(Gui *ui);
 
     ~GuiMenu();
 

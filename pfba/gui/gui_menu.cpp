@@ -12,12 +12,16 @@ class MenuLine : public c2d::Rectangle {
 
 public:
 
-    MenuLine(Font &font, int fontSize, FloatRect &rect)
+    MenuLine(Gui *ui, FloatRect &rect)
             : Rectangle(rect) {
 
         setFillColor(Color::Transparent);
 
-        name = new Text("OPTION NAME", font, (unsigned int) fontSize);
+        this->ui = ui;
+        Font *font = ui->getSkin()->font;
+        int fontSize = ui->getFontSize();
+
+        name = new Text("OPTION NAME", *font, (unsigned int) fontSize);
         name->setOutlineThickness(1);
         name->setOutlineColor(Color::Black);
         name->setOrigin(0, fontSize / 2);
@@ -25,7 +29,7 @@ public:
         name->setSizeMax(Vector2f((getSize().x * 0.66f) - 32, 0));
         add(name);
 
-        value = new Text("OPTION VALUE", font, (unsigned int) fontSize);
+        value = new Text("OPTION VALUE", *font, (unsigned int) fontSize);
         value->setOutlineThickness(1);
         value->setOutlineColor(Color::Black);
         value->setOrigin(0, fontSize / 2);
@@ -34,6 +38,31 @@ public:
         add(value);
     }
 
+    void update(Option *option) {
+
+        this->option = option;
+        name->setString(option->getName());
+
+        if (option->flags == Option::Type::INPUT) {
+            Skin::Button *buttonTex = ui->getSkin()->getButton(option->value);
+            if (buttonTex) {
+                if (buttonTex->texture) {
+                    // TODO: load button texture
+                    value->setString(buttonTex->name);
+                } else {
+                    value->setString(buttonTex->name);
+                }
+            } else {
+                char btn[16];
+                snprintf(btn, 16, "%i", option->value);
+                value->setString(btn);
+            }
+        } else {
+            value->setString(option->getValue());
+        }
+    }
+
+    Gui *ui;
     c2d::Text *name;
     c2d::Text *value;
     Option *option = NULL;
@@ -82,7 +111,7 @@ GuiMenu::GuiMenu(Gui *ui) : Rectangle(Vector2f(0, 0)) {
             rect.top = start_y + ((i - (max_lines / 2)) * line_height);
         }
 
-        lines.push_back(new MenuLine(*ui->getSkin()->font, ui->getFontSize(), rect));
+        lines.push_back(new MenuLine(ui, rect));
         add(lines[i]);
     }
 
@@ -165,27 +194,8 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
             continue;
         }
 
-        lines[line_index]->name->setString(option->getName());
-        lines[line_index]->option = option;
+        lines[line_index]->update(option);
         lines[line_index]->setVisibility(Visible);
-
-        if (option->flags == Option::Type::INPUT) {
-            Skin::Button *buttonTex = ui->getSkin()->getButton(option->value);
-            if (buttonTex) {
-                if (buttonTex->texture) {
-                    // TODO: load button texture
-                    lines[line_index]->value->setString(buttonTex->name);
-                } else {
-                    lines[line_index]->value->setString(buttonTex->name);
-                }
-            } else {
-                char btn[16];
-                snprintf(btn, 16, "%i", option->value);
-                lines[line_index]->value->setString(btn);
-            }
-        } else {
-            lines[line_index]->value->setString(option->getValue());
-        }
 
         line_index++;
     }
@@ -248,7 +258,8 @@ int GuiMenu::update() {
                 } else {
                     option->next();
                 }
-                lines[optionIndex]->value->setString(option->getValue());
+                lines[optionIndex]->update(option);
+
                 switch (option->index) {
                     case Option::Index::GUI_SHOW_CLONES:
                     case Option::Index::GUI_SHOW_ALL:
@@ -283,14 +294,14 @@ int GuiMenu::update() {
             if (optionIndex < optionMenu->option_ids.size()) {
                 Option *option = lines[optionIndex]->option;
                 if (option && option->flags == Option::Type::INPUT) {
-                    // TODO
-                    /*
-                    int btn = GetButton();
-                    if (btn >= 0) {
-                        option->value = btn;
+                    int new_key = 0;
+                    int res = ui->getUiMessageBox()->show("NEW INPUT", "PRESS A BUTTON", "", "", &new_key, 5);
+                    if (res != MessageBox::TIMEOUT) {
+                        // TODO: update ui
+                        option->value = new_key;
                         option_changed = true;
+                        lines[optionIndex]->update(option);
                     }
-                    */
                 }
             } else {
                 OptionMenu *menu = optionMenu->childs[optionIndex - optionMenu->option_ids.size()];

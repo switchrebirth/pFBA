@@ -260,14 +260,14 @@ int GuiState::update() {
             if (isEmuRunning) {
                 GUISaveState *state = uiStateList->getSelection();
                 if (state->exist) {
-                    int btn = ui->getUiMessageBox()->show(
+                    int res = ui->getUiMessageBox()->show(
                             state->bottom_text->getString(),
                             "PRESS FIRE2 TO CANCEL", "LOAD", "SAVE");
-                    if (btn == MessageBox::BTN_LEFT) {
+                    if (res == MessageBox::LEFT) {
                         state->load();
                         unload();
                         ret = UI_KEY_RESUME_ROM;
-                    } else if (btn == MessageBox::BTN_RIGHT) {
+                    } else if (res == MessageBox::RIGHT) {
                         state->save();
                         unload();
                         ret = UI_KEY_RESUME_ROM;

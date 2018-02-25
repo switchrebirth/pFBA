@@ -132,6 +132,7 @@ void GuiEmu::stop() {
         audio = NULL;
     }
 
+    ui->updateInputMapping(false);
     setVisibility(Hidden);
 }
 
@@ -209,6 +210,7 @@ void GuiEmu::updateFrame() {
     } else {
         renderFrame(true, showFps, ui->getRenderer()->getFps());
 #ifdef __NX__
+        // on switch we directly draw to the framebuffer
         ui->getRenderer()->flip(false);
 #else
         ui->getRenderer()->flip();

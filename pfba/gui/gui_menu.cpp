@@ -384,9 +384,6 @@ int GuiMenu::update() {
     if (option_changed) {
         if (isRomMenu) {
             ui->getConfig()->save(ui->getUiRomList()->getSelection());
-            if (isEmuRunning) {
-                ui->updateInputMapping(true);
-            }
         } else {
             ui->getConfig()->save();
         }

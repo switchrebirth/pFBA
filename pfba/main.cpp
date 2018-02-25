@@ -69,6 +69,7 @@ int main(int argc, char **argv) {
     BurnPathsInit();
     BurnLibInit();
 
+    // buttons used for ui config menu
     std::vector<Skin::Button> buttons;
 
 #ifdef __PSP2__
@@ -77,20 +78,38 @@ int main(int argc, char **argv) {
     scePowerSetBusClockFrequency(222);
     scePowerSetGpuClockFrequency(222);
     scePowerSetGpuXbarClockFrequency(166);
-
     // see c2d.h for key id
-    buttons.push_back({8, "UP"});
-    buttons.push_back({6, "DOWN"});
-    buttons.push_back({7, "LEFT"});
-    buttons.push_back({9, "RIGHT"});
-    buttons.push_back({0, "TRIANGLE"});
-    buttons.push_back({1, "CIRCLE"});
-    buttons.push_back({2, "CROSS"});
-    buttons.push_back({3, "SQUARE"});
-    buttons.push_back({4, "L"});
-    buttons.push_back({5, "R"});
-    buttons.push_back({10, "SELECT"});
-    buttons.push_back({11, "START"});
+    buttons.push_back({KEY_JOY_UP_DEFAULT, "UP"});
+    buttons.push_back({KEY_JOY_DOWN_DEFAULT, "DOWN"});
+    buttons.push_back({KEY_JOY_LEFT_DEFAULT, "LEFT"});
+    buttons.push_back({KEY_JOY_RIGHT_DEFAULT, "RIGHT"});
+    buttons.push_back({KEY_JOY_FIRE1_DEFAULT, "TRIANGLE"});
+    buttons.push_back({KEY_JOY_FIRE2_DEFAULT, "CIRCLE"});
+    buttons.push_back({KEY_JOY_FIRE3_DEFAULT, "CROSS"});
+    buttons.push_back({KEY_JOY_FIRE4_DEFAULT, "SQUARE"});
+    buttons.push_back({KEY_JOY_FIRE5_DEFAULT, "L"});
+    buttons.push_back({KEY_JOY_FIRE6_DEFAULT, "R"});
+    buttons.push_back({KEY_JOY_COIN1_DEFAULT, "SELECT"});
+    buttons.push_back({KEY_JOY_START1_DEFAULT, "START"});
+#elif __NX__
+    // see c2d.h for key id
+    buttons.push_back({KEY_JOY_UP_DEFAULT, "UP"});
+    buttons.push_back({KEY_JOY_DOWN_DEFAULT, "DOWN"});
+    buttons.push_back({KEY_JOY_LEFT_DEFAULT, "LEFT"});
+    buttons.push_back({KEY_JOY_RIGHT_DEFAULT, "RIGHT"});
+    buttons.push_back({KEY_JOY_FIRE1_DEFAULT, "A"});
+    buttons.push_back({KEY_JOY_FIRE2_DEFAULT, "B"});
+    buttons.push_back({KEY_JOY_FIRE3_DEFAULT, "X"});
+    buttons.push_back({KEY_JOY_FIRE4_DEFAULT, "Y"});
+    buttons.push_back({KEY_JOY_FIRE5_DEFAULT, "L"});
+    buttons.push_back({KEY_JOY_FIRE6_DEFAULT, "R"});
+    buttons.push_back({KEY_JOY_COIN1_DEFAULT, "+"});
+    buttons.push_back({KEY_JOY_START1_DEFAULT, "-"});
+    // switch special keys
+    buttons.push_back({KEY_JOY_ZL_DEFAULT, "ZL"});
+    buttons.push_back({KEY_JOY_ZR_DEFAULT, "ZR"});
+    buttons.push_back({KEY_JOY_SL_DEFAULT, "SL"});
+    buttons.push_back({KEY_JOY_SR_DEFAULT, "SR"});
 #endif
 
 #ifdef __SFML__

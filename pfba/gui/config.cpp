@@ -111,7 +111,12 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
                                              "MVS_USA_V5S4", "MVS_USA_V5S6", "MVS_JPN_V6", "MVS_JPN_V5",
                                              "MVS_JPN_V3S4", "NEO_MVH_MV1C", "MVS_JPN_J3", "DECK_V6"},
                                  0, Option::Index::ROM_NEOBIOS));
+#ifdef __NX__
+    // audio not working fine yet..
+    options_gui.push_back(Option("AUDIO", {"OFF", "ON"}, 0, Option::Index::ROM_AUDIO));
+#else
     options_gui.push_back(Option("AUDIO", {"OFF", "ON"}, 1, Option::Index::ROM_AUDIO));
+#endif
 
     // joystick
     options_gui.push_back(Option("JOYPAD", {"JOYPAD"}, 0, Option::Index::MENU_JOYPAD, Option::Type::MENU));

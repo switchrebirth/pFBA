@@ -143,6 +143,11 @@ void GuiEmu::pause() {
         audio->Pause(1);
     }
     ui->updateInputMapping(false);
+#ifdef __NX__
+    // restore ui rotation
+    gfxConfigureTransform(NATIVE_WINDOW_TRANSFORM_FLIP_V);
+    gfxConfigureResolution(0, 0);
+#endif
 }
 
 void GuiEmu::resume() {
@@ -154,6 +159,8 @@ void GuiEmu::resume() {
     paused = false;
 #ifdef __NX__
     NXVideo::clear();
+    // restore game rotation
+    video->updateScaling();
 #endif
 }
 

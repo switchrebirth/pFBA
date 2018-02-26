@@ -89,19 +89,21 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     options_gui.push_back(Option("EMULATION", {"EMULATION"}, 0, Option::Index::MENU_ROM_OPTIONS, Option::Type::MENU));
 #ifdef __NX__
     options_gui.push_back(
-            Option("SCALING", {"NONE", "2X (FAST)", "3X (FAST)", "FIT (SLOW)", "FIT 4:3 (SLOW)", "FULL (SLOW)"},
-                   2, Option::Index::ROM_SCALING));
+            Option("SCALING", {"NONE", "2X", "3X", "FIT", "FIT 4:3", "FULL"},
+                   3, Option::Index::ROM_SCALING));
+    options_gui.push_back(
+            Option("FILTER", {"POINT (SLOW)", "LINEAR (FAST)"}, 1, Option::Index::ROM_FILTER));
 #else
     options_gui.push_back(Option("SCALING", {"NONE", "2X", "FIT", "FIT 4:3", "FULL"}, 2, Option::Index::ROM_SCALING));
-#endif
     options_gui.push_back(
             Option("FILTER", {"POINT", "LINEAR"}, 0, Option::Index::ROM_FILTER));
+#endif
     if (renderer->getShaderList() != NULL) {
         options_gui.push_back(
                 Option("SHADER", renderer->getShaderList()->getNames(), 0, Option::Index::ROM_SHADER));
     }
     options_gui.push_back(
-            Option("ROTATION", {"OFF", "ON", "OFF+FLIP", "OFF+CAB MODE"}, 0, Option::Index::ROM_ROTATION));
+            Option("ROTATION", {"OFF", "ON", "FLIP", "CAB MODE"}, 0, Option::Index::ROM_ROTATION));
     options_gui.push_back(Option("SHOW_FPS", {"OFF", "ON"}, 0, Option::Index::ROM_SHOW_FPS));
     options_gui.push_back(Option("FRAMESKIP", {"OFF", "1", "2", "3", "4", "5", "6", "7", "8", "9"},
                                  0, Option::Index::ROM_FRAMESKIP, Option::Type::INTEGER));

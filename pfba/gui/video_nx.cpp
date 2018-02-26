@@ -6,7 +6,6 @@
 
 #include <burner.h>
 #include <gui/config.h>
-#include <switch.h>
 #include "video_nx.h"
 
 using namespace c2d;
@@ -21,26 +20,29 @@ static unsigned int myHighCol16(int r, int g, int b, int /* i */) {
 
 void NXVideo::clear() {
 
-    u32 x, y, w, h;
-    u32 *buf;
-
     for (int i = 0; i < 2; i++) {
-        buf = (u32 *) gfxGetFramebuffer(&w, &h);
-        for (y = 0; y < h; y++) {
-            for (x = 0; x < w; x++) {
-                buf[(u32) gfxGetFramebufferDisplayOffset((u32) x, (u32) y)]
-                        = 0xFF000000;
+
+        u32 w, h;
+        u32 *dst = (u32 *) gfxGetFramebuffer(&w, &h);
+
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x += 4) {
+                *((u128 *) &dst[gfxGetFramebufferDisplayOffset(x, y)]) = 0;
             }
         }
-        gfxFlushBuffers();
+
+        //gfxFlushBuffers();
         gfxSwapBuffers();
-        gfxWaitForVsync();
+        //gfxWaitForVsync();
     }
+
+    gfxFlushBuffers();
+    gfxWaitForVsync();
 }
 
 NXVideo::NXVideo(Gui *gui, const c2d::Vector2f &size) : Texture(size, C2D_TEXTURE_FMT_RGB565) {
 
-    this->gui = gui;
+    this->ui = gui;
 
     printf("game resolution: %ix%i\n", (int) getSize().x, (int) getSize().y);
 
@@ -79,71 +81,67 @@ int NXVideo::lock(c2d::FloatRect *rect, void **pix, int *p) {
 
 void NXVideo::unlock() {
 
-    if (scaling > 2) {
-        // this can scale to any w/h, but slow for now
-        double sw = getScale().x;
-        double sh = getScale().y;
-        int dst_w = (int) (getSize().x * sw);
-        int dst_h = (int) (getSize().y * sh);
-        int src_w = (int) getSize().x;
-        int cx = (1280 - dst_w) / 2;
-        int cy = (720 - dst_h) / 2;
+    u32 fb_w, fb_h;
+    unsigned short *tex_buf = (unsigned short *) pixels;
+    unsigned int p, r, g, b;
 
-        u32 *dst = (u32 *) gfxGetFramebuffer(NULL, NULL);
-        unsigned short *src = (unsigned short *) pixels;
-        unsigned int p, r, g, b;
+    // give the ability to use slower (software)
+    // scaling but with no filtering
+    if (filtering == C2D_TEXTURE_FILTER_POINT && scale_mode < 3) {
+        // 1x, 2x, 3x - software scaling
+        gfxConfigureResolution(0, 0);
+        u32 *fb_buf = (u32 *) gfxGetFramebuffer(&fb_w, &fb_h);
+        unsigned subx, suby;
+        int x, y, w, h, sf;
+        int cx, cy;
+        w = (int) getSize().x;
+        h = (int) getSize().y;
+        sf = scale_mode + 1;
+        cx = (fb_w - (w * sf)) / 2;
+        cy = (fb_h - (h * sf)) / 2;
 
-        for (int y = 0; y < dst_h; y++) {
-            for (int x = 0; x < dst_w; x++) {
+        for (y = 0; y < h; y++) {
+            for (x = 0; x < w; x++) {
 
-                p = src[((int) (y / sh) * src_w) + (int) (x / sw)];
-                r = ((p & 0xf800) >> 11);
-                g = ((p & 0x07e0) >> 5);
-                b = (p & 0x001f);
+                p = tex_buf[y * w + x];
+                r = ((p & 0xf800) >> 11) << 3;
+                g = ((p & 0x07e0) >> 5) << 2;
+                b = (p & 0x001f) << 3;
 
-                dst[(u32) gfxGetFramebufferDisplayOffset((u32) x + cx, (u32) y + cy)] =
-                        RGBA8_MAXALPHA(r << 3, g << 2, b << 3);
+                for (subx = 0; subx < sf; subx++) {
+                    for (suby = 0; suby < sf; suby++) {
+                        fb_buf[(u32) gfxGetFramebufferDisplayOffset(
+                                (u32) ((x * sf) + subx + cx),
+                                (u32) ((y * sf) + suby + cy))] =
+                                RGBA8_MAXALPHA(r, g, b);
+                    }
+                }
             }
         }
     } else {
-        // fast 2x and 3x scaling, from retroarch
-        int tgtw, tgth, centerx, centery;
-        unsigned short *q;
-        unsigned int v, r, g, b;
-        unsigned subx, suby;
-        int x, y, w, h, xsf, ysf, sf;
 
-        w = (int) getSize().x;
-        h = (int) getSize().y;
-        xsf = sf = (int) getScale().x;
-        ysf = (int) getScale().y;
-        if (ysf < sf) {
-            sf = ysf;
-        }
-        tgtw = w * sf;
-        tgth = h * sf;
-        centerx = (1280 - tgtw) / 2;
-        centery = (720 - tgth) / 2;
+        Vector2f screen = ui->getRenderer()->getSize();
+        s32 vw = (s32) (screen.x / getScale().x);
+        s32 vh = (s32) (screen.y / getScale().y);
+        gfxConfigureResolution(vw, vh);
+        u32 *fb_buf = (u32 *) gfxGetFramebuffer(&fb_w, &fb_h);
 
-        q = (unsigned short *) pixels;
-        u32 *buffer = (u32 *) gfxGetFramebuffer(NULL, NULL);
+        int x, y;
+        int w = (int) getSize().x;
+        int h = (int) getSize().y;
+        int cx = (fb_w - w) / 2;
+        int cy = (fb_h - h) / 2;
 
-        for (x = 0; x < w; x++) {
-            for (y = 0; y < h; y++) {
+        for (y = 0; y < h; y++) {
+            for (x = 0; x < w; x++) {
 
-                v = q[y * w + x];
-                r = (v & 0xf800) >> 11;
-                g = (v & 0x07e0) >> 5;
-                b = v & 0x001f;
+                p = tex_buf[y * w + x];
+                r = ((p & 0xf800) >> 11) << 3;
+                g = ((p & 0x07e0) >> 5) << 2;
+                b = (p & 0x001f) << 3;
 
-                u32 pixel = RGBA8_MAXALPHA(r << 3, g << 2, b << 3);
-                for (subx = 0; subx < xsf; subx++) {
-                    for (suby = 0; suby < ysf; suby++) {
-                        buffer[(u32) gfxGetFramebufferDisplayOffset(
-                                (u32) ((x * sf) + subx + centerx),
-                                (u32) ((y * sf) + suby + centery))] = pixel;
-                    }
-                }
+                fb_buf[(u32) gfxGetFramebufferDisplayOffset((u32) x + cx, (u32) y + cy)] =
+                        RGBA8_MAXALPHA(r, g, b);
             }
         }
     }
@@ -151,81 +149,79 @@ void NXVideo::unlock() {
 
 void NXVideo::updateScaling() {
 
-    int rotation = 0;
-    scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true);
+    int rotation_video = 0;
+    int rotation_config = 0;
+    int vertical = BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL;
+    int flipped = BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED;
 
     // TODO: force right to left orientation on psp2,
     // should add platform specific code
-    if ((gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 0
-         || gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 3)
-        && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-        if (!(BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED)) {
-            rotation = 180;
-        }
-    } else if (gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 2
-               && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-        if ((BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED)) {
-            rotation = 180;
-        }
-    } else {
-        if (BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED) {
-            rotation = 90;
-        } else if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-            rotation = -90;
-        } else {
-            rotation = 0;
-        }
+    rotation_config = ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
+
+    switch (rotation_config) {
+
+        case 1: // ON
+            gfxConfigureTransform(NATIVE_WINDOW_TRANSFORM_ROT_90);
+            rotation_video = 90;
+            break;
+
+        case 2: // FLIP
+            rotation_video = 180;
+            break;
+
+        case 3: // CAB MODE ?
+            break;
+
+        default: // OFF
+            gfxConfigureTransform(NATIVE_WINDOW_TRANSFORM_FLIP_V);
+            break;
     }
 
-    c2d::Vector2f scale = getSize();
+    scale_mode = ui->getConfig()->getValue(Option::Index::ROM_SCALING, true);
+    c2d::Vector2f scaling = {1, 1};
 
-    switch (scaling) {
+    // on switch, the scaling factor is used
+    // for virtual screen dimensions.
+    // if filtering is point and 1x, 2x, 3x modes, the "texture" is software scaled
+    // else if filtering is linear, the "texture" is hardware scaled
+    switch (scale_mode) {
 
         case 1: // 2x
-            scale.x = scale.x * 2;
-            scale.y = scale.y * 2;
+            scaling = {2, 2};
             break;
 
         case 2: // 3x
-            scale.x = scale.x * 3;
-            scale.y = scale.y * 3;
+            scaling = {3, 3};
             break;
 
         case 3: // fit
-            if (rotation == 0 || rotation == 180) {
-                scale.y = gui->getRenderer()->getSize().y;
-                scale.x = (int) (scale.x * (scale.y / getSize().y));
-                if (scale.x > gui->getRenderer()->getSize().x) {
-                    scale.x = gui->getRenderer()->getSize().x;
-                    scale.y = (int) (scale.x * (getSize().y / getSize().x));
-                }
+            if (rotation_video == 0 || rotation_video == 180) {
+                float f = std::min(
+                        ui->getRenderer()->getSize().x / getSize().x,
+                        ui->getRenderer()->getSize().y / getSize().y);
+                scaling = {f, f};
             } else {
-                scale.x = gui->getRenderer()->getSize().y;
-                scale.y = (int) (scale.x * (getSize().y / getSize().x));
+                // TODO
             }
             break;
 
         case 4: // fit 4:3
-            if (rotation == 0 || rotation == 180) {
-                scale.y = gui->getRenderer()->getSize().y;
-                scale.x = (int) ((scale.y * 4.0) / 3.0);
-                if (scale.x > gui->getRenderer()->getSize().x) {
-                    scale.x = gui->getRenderer()->getSize().x;
-                    scale.y = (int) ((scale.x * 3.0) / 4.0);
-                }
+            if (rotation_video == 0 || rotation_video == 180) {
+                float fx = std::min(
+                        ui->getRenderer()->getSize().x / getSize().x,
+                        ui->getRenderer()->getSize().y / getSize().y);
+                scaling = {fx * (3.f / 4.f), fx};
             } else {
-                scale.x = gui->getRenderer()->getSize().y;
-                scale.y = (int) ((scale.x * 3.0) / 4.0);
+                // TODO
             }
             break;
 
         case 5: // fullscreen
-            if (rotation == 0 || rotation == 180) {
-                scale.y = gui->getRenderer()->getSize().y;
-                scale.x = gui->getRenderer()->getSize().x;
+            if (rotation_video == 0 || rotation_video == 180) {
+                scaling.x = ui->getRenderer()->getSize().x / getSize().x;
+                scaling.y = ui->getRenderer()->getSize().y / getSize().y;
             } else {
-                scale.y = gui->getRenderer()->getSize().x;
-                scale.x = gui->getRenderer()->getSize().y;
+                // TODO
             }
             break;
 
@@ -233,10 +229,7 @@ void NXVideo::updateScaling() {
             break;
     }
 
-    setOriginCenter();
-    setPosition(gui->getRenderer()->getSize().x / 2, gui->getRenderer()->getSize().y / 2);
-    setScale(scale.x / getSize().x, scale.y / getSize().y);
-    setRotation(rotation);
+    setScale(scaling);
 }
 
 NXVideo::~NXVideo() {

@@ -19,7 +19,7 @@ static unsigned int myHighCol16(int r, int g, int b, int /* i */) {
 
 Video::Video(Gui *gui, const c2d::Vector2f &size) : C2DTexture(size, C2D_TEXTURE_FMT_RGB565) {
 
-    this->gui = gui;
+    this->ui = gui;
 
     printf("game resolution: %ix%i\n", (int) getSize().x, (int) getSize().y);
 
@@ -43,13 +43,32 @@ Video::Video(Gui *gui, const c2d::Vector2f &size) : C2DTexture(size, C2D_TEXTURE
 
 void Video::updateScaling() {
 
-
+    int rotated = 0;
+    float rotation = 0;
+    int rotation_cfg = ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
+    int scale_mode = ui->getConfig()->getValue(Option::Index::ROM_SCALING, true);
     int vertical = BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL;
-    int flipped = BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED;
-    int rotation_config = gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
-    int rotation_video = 0;
+    int flip = BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED;
+    Vector2f screen = ui->getRenderer()->getSize();
+    Vector2f scale_max;
+    float sx = 1, sy = 1;
 
-#ifdef __PSP2__
+#ifndef __PSP2__
+    if (vertical) {
+        switch (rotation_cfg) {
+            case 1: // ON
+                rotation = flip ? 90 : 270;
+                rotated = 1;
+                break;
+            case 2: // CAB MODE
+                rotation = flip ? 0 : 180;
+                break;
+            default: // OFF
+                rotation = flip ? 180 : 0;
+                break;
+        }
+    }
+#else
     // TODO: force right to left orientation on psp2,
     // should add platform specific code
     if ((gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 0
@@ -72,78 +91,51 @@ void Video::updateScaling() {
             rotation_video = 0;
         }
     }
-#else
-
-    switch (rotation_config) {
-
-        case 0: // OFF
-            rotation_video = 0;
-            break;
-
-        case 1: // ON
-            rotation_video = -90;
-            break;
-
-        case 2: // FLIP
-            //rotation_video =
-            break;
-
-        case 3: // CAB MODE ?
-            break;
-
-        default:
-
-            break;
+#endif
+    if (rotated) {
+        scale_max.x = screen.x / getSize().y;
+        scale_max.y = screen.y / getSize().x;
+    } else {
+        scale_max.x = screen.x / getSize().x;
+        scale_max.y = screen.y / getSize().y;
     }
 
-#endif
-
-    int scaling = gui->getConfig()->getValue(Option::Index::ROM_SCALING, true);
-    c2d::Vector2f scale = getSize();
-
-    switch (scaling) {
+    switch (scale_mode) {
 
         case 1: // 2x
-            scale.x = scale.x * 2;
-            scale.y = scale.y * 2;
-            break;
-
-        case 2: // fit
-            if (rotation_video == 0 || rotation_video == 180) {
-                scale.y = gui->getRenderer()->getSize().y;
-                scale.x = (int) (scale.x * (scale.y / getSize().y));
-                if (scale.x > gui->getRenderer()->getSize().x) {
-                    scale.x = gui->getRenderer()->getSize().x;
-                    scale.y = (int) (scale.x * (getSize().y / getSize().x));
-                }
-            } else {
-                scale.x = gui->getRenderer()->getSize().y;
-                scale.y = (int) (scale.x * (getSize().y / getSize().x));
+            sx = sy = std::min(scale_max.x, 2.0f);
+            if (sy > scale_max.y) {
+                sx = sy = std::min(scale_max.y, 2.0f);
             }
             break;
 
-        case 3: // fit 4:3
-            if (rotation_video == 0 || rotation_video == 180) {
-                scale.y = gui->getRenderer()->getSize().y;
-                scale.x = (int) ((scale.y * 4.0) / 3.0);
-                if (scale.x > gui->getRenderer()->getSize().x) {
-                    scale.x = gui->getRenderer()->getSize().x;
-                    scale.y = (int) ((scale.x * 3.0) / 4.0);
-                }
-            } else {
-                scale.x = gui->getRenderer()->getSize().y;
-                scale.y = (int) ((scale.x * 3.0) / 4.0);
+        case 2: // 3x
+            sx = sy = std::min(scale_max.x, 3.0f);
+            if (sy > scale_max.y) {
+                sx = sy = std::min(scale_max.y, 3.0f);
             }
             break;
 
-        case 4: // fullscreen
-            if (rotation_video == 0 || rotation_video == 180) {
-                scale.y = gui->getRenderer()->getSize().y;
-                scale.x = gui->getRenderer()->getSize().x;
-            } else {
-                scale.y = gui->getRenderer()->getSize().x;
-                scale.x = gui->getRenderer()->getSize().y;
+        case 3: // fit
+            sx = sy = scale_max.y;
+            if (sx > scale_max.x) {
+                sx = sy = scale_max.x;
             }
+            break;
+
+        case 4: // fit 4:3
+            if (rotated) {
+                sx = scale_max.y;
+                sy = std::min(scale_max.x, sx * 4 / 3);
+            } else {
+                sy = scale_max.y;
+                sx = std::min(scale_max.x, sy * 3 / 4);
+            }
+            break;
+
+        case 5: // fullscreen
+            sx = rotated ? scale_max.y : scale_max.x;
+            sy = rotated ? scale_max.x : scale_max.y;
             break;
 
         default:
@@ -151,15 +143,12 @@ void Video::updateScaling() {
     }
 
     setOriginCenter();
-    setPosition(gui->getRenderer()->getSize().x / 2, gui->getRenderer()->getSize().y / 2);
-    setScale(scale.x / getSize().x, scale.y / getSize().y);
-    setRotation(rotation_video);
+    setPosition(screen.x / 2, screen.y / 2);
+    setScale(sx, sy);
+    setRotation(rotation);
 }
 
 Video::~Video() {
-
-    // TODO: free or not to free ?
-    //pBurnDraw = NULL;
 }
 
 #endif // __NX__

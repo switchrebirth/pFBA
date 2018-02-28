@@ -29,6 +29,8 @@ private:
     Gui *ui = NULL;
     unsigned char *pixels = NULL;
     int scale_mode = 0;
+
+    virtual void draw(c2d::Transform &transform);
 };
 
 #endif //NX_VIDEO_H_

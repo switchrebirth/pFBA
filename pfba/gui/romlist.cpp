@@ -15,6 +15,8 @@ using namespace c2d;
 
 RomList::RomList(Gui *gui) {
 
+    printf("RomList\n");
+
     hardwareList = &gui->getConfig()->hardwareList;
     std::vector<std::string> paths = gui->getConfig()->getRomPaths();
 

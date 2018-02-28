@@ -25,7 +25,7 @@ public:
 
 private:
 
-    Gui *gui = NULL;
+    Gui *ui = NULL;
 };
 #endif
 #endif //_VIDEO_H_

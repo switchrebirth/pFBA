@@ -91,6 +91,7 @@ public:
 
 GuiMenu::GuiMenu(Gui *ui) : Rectangle(Vector2f(0, 0)) {
 
+    printf("GuiMenu (%p)\n", this);
     this->ui = ui;
 
     setFillColor(fillColor[0]);
@@ -138,7 +139,11 @@ GuiMenu::GuiMenu(Gui *ui) : Rectangle(Vector2f(0, 0)) {
 
     // build menus
     optionMenuGui = new OptionMenu(NULL, ui->getConfig()->getOptions());
+    optionMenuGui->addChild("EXIT");
     optionMenuRom = new OptionMenu(NULL, ui->getConfig()->getOptions(true), true);
+    optionMenuRom->addChild("RETURN");
+    optionMenuRom->addChild("STATES");
+    optionMenuRom->addChild("EXIT");
 
     setVisibility(Hidden);
 }
@@ -169,12 +174,6 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
             ui->getUiEmu()->renderFrame();
             ui->getUiEmu()->pause();
         }
-        if (optionMenu == optionMenuRom) {
-            optionMenu->addChild("RETURN");
-            optionMenu->addChild("STATES");
-            optionMenu->addChild("EXIT");
-            optionCount += 3;
-        }
     }
 
     if (isRomMenu) {
@@ -183,10 +182,6 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
         title->setString(name);
     } else {
         title->setString(optionMenu->title + "__________");
-        if (optionMenu == optionMenuGui) {
-            optionMenu->addChild("EXIT");
-            optionCount += 1;
-        }
     }
 
     for (int i = 0; i < lines.size(); i++) {
@@ -226,6 +221,15 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
         if (i >= lines.size()) {
             // oups
             break;
+        }
+
+        // don't show custom in-game options when a game is not running
+        if (isRomMenu && !isEmuRunning) {
+            std::string title = optionMenu->childs[i]->title;
+            if (title == "EXIT" || title == "RETURN" || title == "STATES") {
+                optionCount--;
+                continue;
+            }
         }
 
         lines[line_index]->setVisibility(Visible);
@@ -291,7 +295,9 @@ int GuiMenu::update() {
                     case Option::ROM_ROTATION:
                     case Option::Index::ROM_SCALING:
                         if (isEmuRunning) {
+#ifndef __NX__
                             ui->getUiEmu()->getVideo()->updateScaling();
+#endif
                         }
                         break;
                     case Option::Index::ROM_FILTER:
@@ -314,40 +320,28 @@ int GuiMenu::update() {
         if (key & Input::Key::KEY_FIRE1) {
             if (optionIndex < optionMenu->option_ids.size()) {
                 Option *option = lines[optionIndex]->option;
-                if (option && option->flags == Option::Type::INPUT) {
+                if (option->flags == Option::Type::INPUT) {
                     int new_key = 0;
                     int res = ui->getUiMessageBox()->show("NEW INPUT", "PRESS A BUTTON", "", "", &new_key, 5);
                     if (res != MessageBox::TIMEOUT) {
-                        // TODO: update ui
                         option->value = new_key;
                         option_changed = true;
                         lines[optionIndex]->update(option);
                     }
                 }
             } else {
+                // extra options in menu (manually added)
                 OptionMenu *menu = optionMenu->childs[optionIndex - optionMenu->option_ids.size()];
                 if (menu->title == "EXIT") {
-                    if (optionMenu == optionMenuGui) {
-                        optionMenu->childs.erase(optionMenu->childs.end() - 1, optionMenu->childs.end());
-                        setVisibility(Hidden);
-                        ret = EV_QUIT;
-                    } else {
-                        optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
-                        setVisibility(Hidden);
-                        ret = UI_KEY_STOP_ROM;
-                    }
+                    setVisibility(Hidden);
+                    ret = isRomMenu ? UI_KEY_STOP_ROM : EV_QUIT;
                 } else if (menu->title == "STATES") {
-                    optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
                     setVisibility(Hidden);
                     ret = UI_KEY_SHOW_MEMU_STATE;
                 } else if (menu->title == "RETURN") {
-                    optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
                     setVisibility(Hidden);
                     ret = UI_KEY_RESUME_ROM;
                 } else {
-                    if (isEmuRunning && optionMenu == optionMenuRom) {
-                        optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
-                    }
                     load(isRomMenu, menu);
                 }
             }
@@ -359,13 +353,9 @@ int GuiMenu::update() {
             || (key & Input::Key::KEY_MENU2 && isRomMenu)) {
             if (optionMenu->parent == NULL) {
                 if (isEmuRunning) {
-                    optionMenu->childs.erase(optionMenu->childs.end() - 3, optionMenu->childs.end());
                     setVisibility(Hidden);
                     ret = UI_KEY_RESUME_ROM;
                 } else {
-                    if (!isRomMenu) {
-                        optionMenu->childs.erase(optionMenu->childs.end() - 1, optionMenu->childs.end());
-                    }
                     ret = UI_KEY_SHOW_ROMLIST;
                 }
             } else {
@@ -373,7 +363,6 @@ int GuiMenu::update() {
             }
         }
 
-        // QUIT ?
         if (key & EV_QUIT) {
             return EV_QUIT;
         }
@@ -412,8 +401,7 @@ bool GuiMenu::isOptionHidden(Option *option) {
 }
 
 GuiMenu::~GuiMenu() {
-
-    delete (optionMenuGui);
-    delete (optionMenuRom);
+    printf("GuiMenu\n");
+    delete(optionMenuGui);
+    delete(optionMenuRom);
 }
-

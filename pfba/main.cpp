@@ -39,8 +39,8 @@ int _newlib_heap_size_user = 192 * 1024 * 1024;
 #define SCR_W   1280
 #define SCR_H   720
 #else
-#define SCR_W   960
-#define SCR_H   544
+#define SCR_W   1280
+#define SCR_H   720
 #endif
 
 Renderer *renderer;
@@ -129,18 +129,20 @@ int main(int argc, char **argv) {
 
     // skin
     Skin *skin = new Skin(szAppSkinPath, buttons);
-
     // run gui
     ui = new Gui(io, renderer, skin, config, inp);
+#ifdef __PSP2__
+    ui->getUiRomList()->setLoadDelay(500);
+#endif
     ui->run();
 
     // quit
     BurnLibExit();
     delete (ui);
-    delete (config);
-    delete (inp);
     delete (skin);
+    delete (config);
     delete (io);
+    delete (inp);
     delete (renderer);
 
 #ifdef __PSP2__

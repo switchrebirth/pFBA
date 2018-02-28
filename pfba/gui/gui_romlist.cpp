@@ -14,6 +14,8 @@ public:
 
     GuiRomInfo(const Font &font, int fontSize, const FloatRect &rect, float scale) : Rectangle(rect) {
 
+        printf("GuiRomInfo\n");
+
         setFillColor(Color::Transparent);
         scaling = scale;
         margin = UI_MARGIN * scaling;
@@ -32,6 +34,10 @@ public:
         infoBox->add(infoText);
 
         add(infoBox);
+    }
+
+    ~GuiRomInfo() {
+        printf("~GuiRomInfo\n");
     }
 
     void update(RomList::Rom *rom) {
@@ -73,9 +79,16 @@ public:
             }
 
             // update info text
-            snprintf(info, 512, "ZIP: %s.ZIP\nSTATUS: %s\nSYSTEM: %s\nMANUFACTURER: %s\nYEAR: %s",
+            strcpy(rotation, "ROTATION: HORIZONTAL");
+            if (rom->flags & BDF_ORIENTATION_VERTICAL) {
+                sprintf(rotation, "ROTATION: VERTICAL");
+                if (rom->flags & BDF_ORIENTATION_FLIPPED) {
+                    strncat(rotation, " / FLIPPED", MAX_PATH);
+                }
+            }
+            snprintf(info, 1024, "ZIP: %s.ZIP\nSTATUS: %s\nSYSTEM: %s\nMANUFACTURER: %s\nYEAR: %s\n%s",
                      rom->zip, rom->state == RomList::RomState::MISSING ? "MISSING" : "AVAILABLE",
-                     rom->system, rom->manufacturer, rom->year);
+                     rom->system, rom->manufacturer, rom->year, rotation);
             infoText->setString(info);
             infoText->setVisibility(Visible);
         }
@@ -84,13 +97,16 @@ public:
     Texture *texture = NULL;
     Rectangle *infoBox = NULL;
     Text *infoText = NULL;
-    char info[512];
+    char info[1024];
+    char rotation[64];
     float margin = 0;
 
     float scaling = 1;
 };
 
 GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
+
+    printf("GuiRomList\n");
 
     ui = g;
 
@@ -164,7 +180,8 @@ int GuiRomList::update() {
             rom_info->update(NULL);
             title_loaded = 0;
         } else if (key & Input::Key::KEY_FIRE1) {
-            if (getSelection() != NULL && getSelection()->state != RomList::RomState::MISSING) {
+            if (getSelection() != NULL
+                && getSelection()->state != RomList::RomState::MISSING) {
                 return UI_KEY_RUN_ROM;
             }
         } else if (key & Input::Key::KEY_MENU1) {
@@ -244,6 +261,12 @@ void GuiRomList::updateRomList() {
     list_box->setFillColor(Color::GrayLight);
     list_box->setOutlineColor(COL_ORANGE);
     add(list_box);
+
+    if (rom_info) {
+        rom_info->update(NULL);
+        title_loaded = 0;
+        timer_load.restart();
+    }
 }
 
 void GuiRomList::setLoadDelay(int delay) {
@@ -252,5 +275,6 @@ void GuiRomList::setLoadDelay(int delay) {
 
 GuiRomList::~GuiRomList() {
 
+    printf("~GuiRomList\n");
     delete (rom_list);
 }

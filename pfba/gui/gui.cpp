@@ -24,7 +24,6 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
     scaling = std::min(renderer->getSize().x / 960, 1.0f);
 
     uiRomList = new GuiRomList(this, renderer->getSize());
-    uiRomList->setLoadDelay(500);
     renderer->add(uiRomList);
 
     // build menus from options
@@ -57,9 +56,8 @@ Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
 }
 
 Gui::~Gui() {
-
-    delete (uiMenu);
-    delete (uiRomList);
+    // ui elements (C2DObject)
+    // are deleted by the renderer
 }
 
 void Gui::run() {

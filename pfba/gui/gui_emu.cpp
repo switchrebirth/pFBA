@@ -158,7 +158,6 @@ void GuiEmu::resume() {
     }
     paused = false;
 #ifdef __NX__
-    NXVideo::clear();
     // restore game rotation
     video->updateScaling();
 #endif
@@ -230,8 +229,10 @@ int GuiEmu::update() {
     inputServiceSwitch = 0;
     inputP1P2Switch = 0;
 
-    int rotation = ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
-    int rotate = 0;
+    int rotate = ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
+    int rotation = 0;
+#ifdef __PSP2__
+    // TODO: find a way to unify platforms
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if (rotation == 0) {
             //rotate controls by 90 degrees
@@ -242,8 +243,13 @@ int GuiEmu::update() {
             rotate = 3;
         }
     }
+#else
+    if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
+        rotation = rotate ? 0 : 3;
+    }
+#endif
 
-    Input::Player *players = ui->getInput()->update(rotate);
+    Input::Player *players = ui->getInput()->update(rotation);
 
     // process menu
     if ((players[0].state & Input::Key::KEY_MENU1)

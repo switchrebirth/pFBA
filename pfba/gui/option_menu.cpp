@@ -24,6 +24,7 @@ OptionMenu::OptionMenu(OptionMenu *parent, std::vector<Option> *options, bool is
         }
 
         if (option.flags & Option::Type::MENU) {
+            //printf("NEW MENU: %s (%i)\n", option.getName(), option.index);
             if (i == 0 && !isRomCfg) {
                 menu->title = option.getName();
             } else {
@@ -32,6 +33,7 @@ OptionMenu::OptionMenu(OptionMenu *parent, std::vector<Option> *options, bool is
                 childs.push_back(menu);
             }
         } else {
+            //printf("NEW OPTION: %s (%i)\n", option.getName(), option.index);
             menu->option_ids.push_back(option.index);
         }
     }

@@ -8,15 +8,17 @@
 #include <string>
 #include <vector>
 
+#define BIT(n) (1U<<(n))
+
 class Option {
 
 public:
 
     enum Type {
-        MENU = 0x0001,
-        INTEGER = 0x0002,
-        INPUT = 0x0004,
-        HIDDEN = 0x0008
+        MENU =      BIT(0),
+        INTEGER =   BIT(1),
+        INPUT =     BIT(2),
+        HIDDEN =    BIT(3)
     };
 
     enum Index {

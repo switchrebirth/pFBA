@@ -397,11 +397,20 @@ bool GuiMenu::isOptionHidden(Option *option) {
         return true;
     }
 
+#ifdef __NX__
+    // TODO: disabled until gpu ?
+    if (option->index == Option::Index::ROM_FILTER
+        || option->index == Option::Index::ROM_SHOW_FPS
+        || option->index == Option::Index::ROM_FRAMESKIP) {
+        return true;
+    }
+#endif
+
     return false;
 }
 
 GuiMenu::~GuiMenu() {
     printf("GuiMenu\n");
-    delete(optionMenuGui);
-    delete(optionMenuRom);
+    delete (optionMenuGui);
+    delete (optionMenuRom);
 }

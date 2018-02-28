@@ -90,10 +90,8 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     options_gui.push_back(
             Option("SCALING", {"NONE", "2X", "3X", "FIT", "FIT 4:3", "FULL"},
                    3, Option::Index::ROM_SCALING));
-#ifndef __NX__
     options_gui.push_back(
             Option("FILTER", {"POINT", "LINEAR"}, 0, Option::Index::ROM_FILTER));
-#endif
     if (renderer->getShaderList() != NULL) {
         options_gui.push_back(
                 Option("SHADER", renderer->getShaderList()->getNames(), 0, Option::Index::ROM_SHADER));
@@ -105,11 +103,9 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
     options_gui.push_back(
             Option("ROTATION", {"OFF", "ON", "CAB MODE"}, 0, Option::Index::ROM_ROTATION));
 #endif
-#ifndef __NX__ // TODO
     options_gui.push_back(Option("SHOW_FPS", {"OFF", "ON"}, 0, Option::Index::ROM_SHOW_FPS));
     options_gui.push_back(Option("FRAMESKIP", {"OFF", "1", "2", "3", "4", "5", "6", "7", "8", "9"},
                                  0, Option::Index::ROM_FRAMESKIP, Option::Type::INTEGER));
-#endif
     //options_gui.push_back(Option("M68K", {"ASM", "C"}, 0, Option::Index::ROM_M68K));
     options_gui.push_back(Option("NEOBIOS", {"UNIBIOS_3_2", "AES_ASIA", "AES_JPN", "DEVKIT", "MVS_ASIA_EUR_V6S1",
                                              "MVS_ASIA_EUR_V5S1", "MVS_ASIA_EUR_V3S4", "MVS_USA_V5S2",

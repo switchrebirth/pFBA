@@ -197,10 +197,12 @@ void NXVideo::updateScaling() {
         case 4: // fit 4:3
             if (rotated) {
                 sx = scale_max.y;
-                sy = std::min(scale_max.x, sx * 4 / 3);
+                float size_y = sx * getSize().x * 1.33f;
+                sy = std::min(scale_max.x, size_y / getSize().y);
             } else {
                 sy = scale_max.y;
-                sx = std::min(scale_max.x, sy * 3 / 4);
+                float size_x = sy * getSize().y * 1.33f;
+                sx = std::min(scale_max.x, size_x / getSize().x);
             }
             break;
 

@@ -206,8 +206,7 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
         }
 
         // skip rotation option if not needed
-        if ((isRomMenu && isOptionHidden(option))
-            || option->flags & Option::Type::HIDDEN) {
+        if ((isOptionHidden(option)) || option->flags & Option::Type::HIDDEN) {
             optionCount--;
             continue;
         }
@@ -389,12 +388,12 @@ bool GuiMenu::isOptionHidden(Option *option) {
 
     RomList::Rom *rom = ui->getUiRomList()->getSelection();
 
-    if (option->index == Option::Index::ROM_ROTATION
+    if (isRomMenu && option->index == Option::Index::ROM_ROTATION
         && rom != NULL && !(rom->flags & BDF_ORIENTATION_VERTICAL)) {
         return true;
     }
 
-    if (option->index == Option::Index::ROM_NEOBIOS
+    if (isRomMenu && option->index == Option::Index::ROM_NEOBIOS
         && rom != NULL && !(RomList::IsHardware(rom->hardware, HARDWARE_PREFIX_SNK))) {
         return true;
     }

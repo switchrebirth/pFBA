@@ -239,11 +239,23 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
         line_index++;
     }
 
-    highlight->setPosition(lines[0]->value->getGlobalBounds().left - 2,
-                           lines[0]->getGlobalBounds().top - 4);
+    updateHighlight();
 
     setVisibility(Visible);
     setLayer(1);
+}
+
+void GuiMenu::updateHighlight() {
+
+    for (int i = 0; i < lines.size(); i++) {
+        lines[i]->name->setFillColor(
+                optionIndex == i ? COL_GREEN : Color::White);
+        lines[i]->value->setFillColor(
+                optionIndex == i ? COL_GREEN : Color::White);
+    }
+
+    highlight->setPosition(lines[optionIndex]->value->getGlobalBounds().left - 2,
+                           lines[optionIndex]->getGlobalBounds().top - 4);
 }
 
 int GuiMenu::update() {
@@ -259,16 +271,14 @@ int GuiMenu::update() {
             optionIndex--;
             if (optionIndex < 0)
                 optionIndex = optionCount - 1;
-            highlight->setPosition(lines[optionIndex]->value->getGlobalBounds().left - 2,
-                                   lines[optionIndex]->getGlobalBounds().top - 4);
+            updateHighlight();
         }
         // DOWN
         if (key & Input::Key::KEY_DOWN) {
             optionIndex++;
             if (optionIndex >= optionCount)
                 optionIndex = 0;
-            highlight->setPosition(lines[optionIndex]->value->getGlobalBounds().left - 2,
-                                   lines[optionIndex]->getGlobalBounds().top - 4);
+            updateHighlight();
         }
         // LEFT /RIGHT
         if ((key & Input::Key::KEY_LEFT || key & Input::Key::KEY_RIGHT)

@@ -24,6 +24,8 @@ public:
 
 private:
 
+    void updateHighlight();
+
     bool isOptionHidden(Option *option);
 
     Gui *ui = NULL;

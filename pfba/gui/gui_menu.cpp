@@ -97,11 +97,17 @@ GuiMenu::GuiMenu(Gui *ui) : Rectangle(Vector2f(0, 0)) {
     this->ui = ui;
 
     setFillColor(fillColor[0]);
-    setOutlineColor(COL_ORANGE);
-    setOutlineThickness(4);
-    setPosition(UI_MARGIN * ui->getScaling(), UI_MARGIN * ui->getScaling());
-    setSize(ui->getRenderer()->getSize().x - (UI_MARGIN * ui->getScaling() * 2),
-            ui->getRenderer()->getSize().y - (UI_MARGIN * ui->getScaling() * 2));
+    setOutlineColor(COL_YELLOW);
+    setOutlineThickness(2);
+    if (ui->getRenderer()->getSize().y < 544) {
+        setPosition(UI_MARGIN * ui->getScaling(), UI_MARGIN * ui->getScaling());
+        setSize(ui->getRenderer()->getSize().x - (UI_MARGIN * ui->getScaling() * 2),
+                ui->getRenderer()->getSize().y - (UI_MARGIN * ui->getScaling() * 2));
+    } else {
+        setPosition(UI_MARGIN * ui->getScaling() * 4, UI_MARGIN * ui->getScaling() * 4);
+        setSize(ui->getRenderer()->getSize().x - (UI_MARGIN * ui->getScaling() * 8),
+                ui->getRenderer()->getSize().y - (UI_MARGIN * ui->getScaling() * 8));
+    }
 
     // menu title
     title = new Text("TITLE_______________________", *ui->getSkin()->font);
@@ -123,7 +129,11 @@ GuiMenu::GuiMenu(Gui *ui) : Rectangle(Vector2f(0, 0)) {
     highlight = new Rectangle(Vector2f(((getSize().x / 2) * 0.3f) - 4, line_height));
     highlight->setOutlineThickness(1);
     highlight->setOutlineColor(COL_ORANGE);
+#ifdef __TINYGL__
+    highlight->setFillColor(Color(61, 100, 20, 255));
+#else
     highlight->setFillColor(Color(153, 255, 51, 100));
+#endif
     add(highlight);
 
     // add lines of text
@@ -247,13 +257,14 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
 
 void GuiMenu::updateHighlight() {
 
+    /*
     for (int i = 0; i < lines.size(); i++) {
         lines[i]->name->setFillColor(
-                optionIndex == i ? COL_GREEN : Color::White);
+                optionIndex == i ? COL_ORANGE : Color::White);
         lines[i]->value->setFillColor(
-                optionIndex == i ? COL_GREEN : Color::White);
+                optionIndex == i ? COL_ORANGE : Color::White);
     }
-
+    */
     highlight->setPosition(lines[optionIndex]->value->getGlobalBounds().left - 2,
                            lines[optionIndex]->getGlobalBounds().top - 4);
 }

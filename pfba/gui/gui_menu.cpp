@@ -97,7 +97,7 @@ GuiMenu::GuiMenu(Gui *ui) : Rectangle(Vector2f(0, 0)) {
     this->ui = ui;
 
     setFillColor(fillColor[0]);
-    setOutlineColor(COL_YELLOW);
+    setOutlineColor(COL_RED);
     setOutlineThickness(2);
     if (ui->getRenderer()->getSize().y < 544) {
         setPosition(UI_MARGIN * ui->getScaling(), UI_MARGIN * ui->getScaling());

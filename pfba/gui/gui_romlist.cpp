@@ -51,15 +51,14 @@ public:
             infoText->setVisibility(Hidden);
         } else {
             // load preview image
-            char path[MAX_PATH];
-            sprintf(path, "%s/%s.png", szAppPreviewPath, rom->zip);
-            texture = new C2DTexture(path);
+            snprintf(texture_path, MAX_PATH, "%s/%s.png", szAppPreviewPath, rom->zip);
+            texture = new C2DTexture(texture_path);
             if (!texture->available && rom->parent) {
                 // try parent image
                 delete (texture);
-                memset(path, 0, MAX_PATH);
-                sprintf(path, "%s/%s.png", szAppPreviewPath, rom->parent);
-                texture = new C2DTexture(path);
+                memset(texture_path, 0, MAX_PATH);
+                sprintf(texture_path, "%s/%s.png", szAppPreviewPath, rom->parent);
+                texture = new C2DTexture(texture_path);
             }
             // set preview image
             if (texture->available) {
@@ -97,10 +96,10 @@ public:
     Texture *texture = NULL;
     Rectangle *infoBox = NULL;
     Text *infoText = NULL;
+    char texture_path[MAX_PATH];
     char info[1024];
     char rotation[64];
     float margin = 0;
-
     float scaling = 1;
 };
 
@@ -140,7 +139,7 @@ GuiRomList::GuiRomList(Gui *g, const c2d::Vector2f &size) : Rectangle(size) {
                                       (getLocalBounds().width / 2) - UI_MARGIN * ui->getScaling() * 2,
                                       getLocalBounds().height - UI_MARGIN * ui->getScaling() * 2), ui->getScaling());
     rom_info->infoBox->setOutlineThickness(getOutlineThickness());
-    rom_info->update(roms.size() > 0 ? roms[0] : NULL);
+    rom_info->update(!roms.empty() ? roms[0] : NULL);
     add(rom_info);
 }
 
@@ -245,6 +244,7 @@ void GuiRomList::updateRomList() {
 
     if (list_box != NULL) {
         delete (list_box);
+        list_box = NULL;
     }
 
     // add rom list ui

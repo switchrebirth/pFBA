@@ -71,27 +71,27 @@ void Video::updateScaling() {
 #else
     // TODO: force right to left orientation on psp2,
     // should add platform specific code
-    if ((gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 0
-         || gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 3)
-        && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-        if (!(BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED)) {
-            rotation_video = 180;
+    if ((rotation_cfg == 0 || rotation_cfg == 3) && vertical) {
+        if (!flip) {
+            rotation = 180;
         }
-    } else if (gui->getConfig()->getValue(Option::Index::ROM_ROTATION, true) == 2
-               && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-        if ((BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED)) {
-            rotation_video = 180;
+    } else if (rotation_cfg == 2 && vertical) {
+        if (flip) {
+            rotation = 180;
         }
     } else {
-        if (BurnDrvGetFlags() & BDF_ORIENTATION_FLIPPED) {
-            rotation_video = 90;
-        } else if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-            rotation_video = -90;
+        if (flip) {
+            rotation = 90;
+            rotated = 1;
+        } else if (vertical) {
+            rotation = -90;
+            rotated = 1;
         } else {
-            rotation_video = 0;
+            rotation = 0;
         }
     }
 #endif
+
     if (rotated) {
         scale_max.x = screen.x / getSize().y;
         scale_max.y = screen.y / getSize().x;

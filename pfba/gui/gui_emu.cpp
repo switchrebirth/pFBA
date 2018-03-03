@@ -38,8 +38,6 @@ int GuiEmu::run(int driver) {
     //////////
     nBurnSoundRate = 0;
     if (ui->getConfig()->getValue(Option::Index::ROM_AUDIO, true)) {
-//#ifdef __NX__
-//        nBurnSoundRate = 0;
 #ifdef __3DS__
         nBurnSoundRate = 44100;
 #else

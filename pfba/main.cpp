@@ -18,6 +18,7 @@
  */
 
 #include <gui/gui.h>
+#include <gui/gui_romlist.h>
 
 using namespace c2d;
 
@@ -79,37 +80,37 @@ int main(int argc, char **argv) {
     scePowerSetGpuClockFrequency(222);
     scePowerSetGpuXbarClockFrequency(166);
     // see c2d.h for key id
-    buttons.push_back({KEY_JOY_UP_DEFAULT, "UP"});
-    buttons.push_back({KEY_JOY_DOWN_DEFAULT, "DOWN"});
-    buttons.push_back({KEY_JOY_LEFT_DEFAULT, "LEFT"});
-    buttons.push_back({KEY_JOY_RIGHT_DEFAULT, "RIGHT"});
-    buttons.push_back({KEY_JOY_FIRE1_DEFAULT, "TRIANGLE"});
-    buttons.push_back({KEY_JOY_FIRE2_DEFAULT, "CIRCLE"});
-    buttons.push_back({KEY_JOY_FIRE3_DEFAULT, "CROSS"});
-    buttons.push_back({KEY_JOY_FIRE4_DEFAULT, "SQUARE"});
-    buttons.push_back({KEY_JOY_FIRE5_DEFAULT, "L"});
-    buttons.push_back({KEY_JOY_FIRE6_DEFAULT, "R"});
-    buttons.push_back({KEY_JOY_COIN1_DEFAULT, "SELECT"});
-    buttons.push_back({KEY_JOY_START1_DEFAULT, "START"});
+    buttons.emplace_back(KEY_JOY_UP_DEFAULT, "UP");
+    buttons.emplace_back(KEY_JOY_DOWN_DEFAULT, "DOWN");
+    buttons.emplace_back(KEY_JOY_LEFT_DEFAULT, "LEFT");
+    buttons.emplace_back(KEY_JOY_RIGHT_DEFAULT, "RIGHT");
+    buttons.emplace_back(KEY_JOY_FIRE1_DEFAULT, "TRIANGLE");
+    buttons.emplace_back(KEY_JOY_FIRE2_DEFAULT, "CIRCLE");
+    buttons.emplace_back(KEY_JOY_FIRE3_DEFAULT, "CROSS");
+    buttons.emplace_back(KEY_JOY_FIRE4_DEFAULT, "SQUARE");
+    buttons.emplace_back(KEY_JOY_FIRE5_DEFAULT, "L");
+    buttons.emplace_back(KEY_JOY_FIRE6_DEFAULT, "R");
+    buttons.emplace_back(KEY_JOY_COIN1_DEFAULT, "SELECT");
+    buttons.emplace_back(KEY_JOY_START1_DEFAULT, "START");
 #elif __NX__
     // see c2d.h for key id
-    buttons.push_back({KEY_JOY_UP_DEFAULT, "UP"});
-    buttons.push_back({KEY_JOY_DOWN_DEFAULT, "DOWN"});
-    buttons.push_back({KEY_JOY_LEFT_DEFAULT, "LEFT"});
-    buttons.push_back({KEY_JOY_RIGHT_DEFAULT, "RIGHT"});
-    buttons.push_back({KEY_JOY_FIRE1_DEFAULT, "A"});
-    buttons.push_back({KEY_JOY_FIRE2_DEFAULT, "B"});
-    buttons.push_back({KEY_JOY_FIRE3_DEFAULT, "X"});
-    buttons.push_back({KEY_JOY_FIRE4_DEFAULT, "Y"});
-    buttons.push_back({KEY_JOY_FIRE5_DEFAULT, "L"});
-    buttons.push_back({KEY_JOY_FIRE6_DEFAULT, "R"});
-    buttons.push_back({KEY_JOY_COIN1_DEFAULT, "+"});
-    buttons.push_back({KEY_JOY_START1_DEFAULT, "-"});
+    buttons.emplace_back(KEY_JOY_UP_DEFAULT, "UP");
+    buttons.emplace_back(KEY_JOY_DOWN_DEFAULT, "DOWN");
+    buttons.emplace_back(KEY_JOY_LEFT_DEFAULT, "LEFT");
+    buttons.emplace_back(KEY_JOY_RIGHT_DEFAULT, "RIGHT");
+    buttons.emplace_back(KEY_JOY_FIRE1_DEFAULT, "A");
+    buttons.emplace_back(KEY_JOY_FIRE2_DEFAULT, "B");
+    buttons.emplace_back(KEY_JOY_FIRE3_DEFAULT, "X");
+    buttons.emplace_back(KEY_JOY_FIRE4_DEFAULT, "Y");
+    buttons.emplace_back(KEY_JOY_FIRE5_DEFAULT, "L");
+    buttons.emplace_back(KEY_JOY_FIRE6_DEFAULT, "R");
+    buttons.emplace_back(KEY_JOY_COIN1_DEFAULT, "+");
+    buttons.emplace_back(KEY_JOY_START1_DEFAULT, "-");
     // switch special keys
-    buttons.push_back({KEY_JOY_ZL_DEFAULT, "ZL"});
-    buttons.push_back({KEY_JOY_ZR_DEFAULT, "ZR"});
-    buttons.push_back({KEY_JOY_SL_DEFAULT, "SL"});
-    buttons.push_back({KEY_JOY_SR_DEFAULT, "SR"});
+    buttons.emplace_back(KEY_JOY_ZL_DEFAULT, "ZL");
+    buttons.emplace_back(KEY_JOY_ZR_DEFAULT, "ZR");
+    buttons.emplace_back(KEY_JOY_SL_DEFAULT, "SL");
+    buttons.emplace_back(KEY_JOY_SR_DEFAULT, "SR");
 #endif
 
 #ifdef __SFML__
@@ -131,9 +132,6 @@ int main(int argc, char **argv) {
     Skin *skin = new Skin(szAppSkinPath, buttons);
     // run gui
     ui = new Gui(io, renderer, skin, config, inp);
-#ifdef __PSP2__
-    ui->getUiRomList()->setLoadDelay(500);
-#endif
     ui->run();
 
     // quit

@@ -38,9 +38,9 @@ public:
         add(value);
     }
 
-    void update(Option *option) {
+    void update(Option *opt) {
 
-        this->option = option;
+        this->option = opt;
         name->setString(option->getName());
 
         if (texture != NULL) {
@@ -63,6 +63,8 @@ public:
                         texture->setOrigin(0, texture->getSize().y / 2);
                         add(texture);
                     } else {
+                        delete (texture);
+                        texture = NULL;
                         value->setVisibility(Visible);
                         value->setString(button->name);
                     }
@@ -86,7 +88,7 @@ public:
     Text *name = NULL;
     Text *value = NULL;
     Texture *texture = NULL;
-    Option *option = NULL;
+    Option *option;
 };
 
 GuiMenu::GuiMenu(Gui *ui) : Rectangle(Vector2f(0, 0)) {
@@ -410,7 +412,7 @@ bool GuiMenu::isOptionHidden(Option *option) {
 }
 
 GuiMenu::~GuiMenu() {
-    printf("GuiMenu\n");
+    printf("~GuiMenu\n");
     delete (optionMenuGui);
     delete (optionMenuRom);
 }

@@ -40,7 +40,6 @@ private:
 
     Gui *ui = NULL;
     Video *video = NULL;
-    c2d::Audio *audio = NULL;
     c2d::Text *fpsText = NULL;
     char fpsString[32];
     bool paused = false;

@@ -11,13 +11,14 @@
 
 using namespace c2d;
 
-Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in) {
+Gui::Gui(Io *i, Renderer *r, Skin *s, Config *cfg, Input *in, Audio *aud) {
 
     io = i;
     renderer = r;
     skin = s;
     config = cfg;
     input = in;
+    audio = aud;
 
     // scaling factor mainly used for borders,
     // based on vita resolution..
@@ -192,6 +193,10 @@ Config *Gui::getConfig() {
 
 Io *Gui::getIo() {
     return io;
+}
+
+c2d::Audio *Gui::getAudio() {
+    return audio;
 }
 
 GuiRomList *Gui::getUiRomList() {

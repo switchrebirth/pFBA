@@ -50,15 +50,13 @@ class Gui {
 public:
 
     Gui(c2d::Io *io, c2d::Renderer *rdr,
-        Skin *skin, Config *cfg, c2d::Input *input);
+        Skin *skin, Config *cfg, c2d::Input *input, c2d::Audio *audio);
 
     ~Gui();
 
     void run();
 
     void runRom(RomList::Rom *rom);
-
-    int getButton();
 
     void updateInputMapping(bool isRomCfg);
 
@@ -71,6 +69,8 @@ public:
     c2d::Input *getInput();
 
     c2d::Io *getIo();
+
+    c2d::Audio *getAudio();
 
     GuiRomList *getUiRomList();
 
@@ -95,6 +95,7 @@ private:
     c2d::Renderer *renderer = NULL;
     Skin *skin = NULL;
     c2d::Input *input = NULL;
+    c2d::Audio *audio = NULL;
 
     GuiMenu *uiMenu = NULL;
     GuiRomList *uiRomList = NULL;

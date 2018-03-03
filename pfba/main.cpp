@@ -130,13 +130,19 @@ int main(int argc, char **argv) {
 
     // skin
     Skin *skin = new Skin(szAppSkinPath, buttons);
+
+    // audio
+    Audio *audio = new C2DAudio(48000);
+
     // run gui
-    ui = new Gui(io, renderer, skin, config, inp);
+    ui = new Gui(io, renderer, skin, config, inp, audio);
     ui->run();
 
     // quit
     BurnLibExit();
+
     delete (ui);
+    delete (audio);
     delete (skin);
     delete (config);
     delete (io);

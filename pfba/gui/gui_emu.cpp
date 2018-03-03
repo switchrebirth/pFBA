@@ -36,33 +36,17 @@ int GuiEmu::run(int driver) {
     ///////////
     // AUDIO
     //////////
-    nBurnSoundRate = 0;
-    if (ui->getConfig()->getValue(Option::Index::ROM_AUDIO, true)) {
-#ifdef __3DS__
-        nBurnSoundRate = 44100;
-#else
-        nBurnSoundRate = 48000;
-#endif
-    }
-    if (nBurnSoundRate > 0) {
+    int audio = ui->getConfig()->getValue(Option::Index::ROM_AUDIO, true);
+    if (audio && ui->getAudio()->available) {
         printf("Creating audio device\n");
         // disable interpolation as it produce "cracking" sound
         // on some games (cps1 (SF2), cave ...)
         nInterpolation = 1;
         nFMInterpolation = 0;
-        audio = new C2DAudio(nBurnSoundRate, nBurnFPS);
-        if (audio->available) {
-            nBurnSoundRate = audio->frequency;
-            nBurnSoundLen = audio->buffer_len;
-            pBurnSoundOut = audio->buffer;
-        }
-    }
-
-    if (!audio || !audio->available) {
-        printf("Audio disabled\n");
-        nBurnSoundRate = 0;
-        nBurnSoundLen = 0;
-        pBurnSoundOut = NULL;
+        nBurnSoundRate = ui->getAudio()->frequency;
+        nBurnSoundLen = ui->getAudio()->buffer_len;
+        pBurnSoundOut = ui->getAudio()->buffer;
+        ui->getAudio()->reset();
     }
 
     ///////////
@@ -79,9 +63,6 @@ int GuiEmu::run(int driver) {
                        "- Memory error\n\n");
         DrvExit();
         InpExit();
-        if (audio) {
-            delete (audio);
-        }
         ui->getUiProgressBox()->setVisibility(Hidden);
         ui->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
         return -1;
@@ -125,11 +106,6 @@ void GuiEmu::stop() {
         video = NULL;
     }
 
-    if (audio) {
-        delete (audio);
-        audio = NULL;
-    }
-
     ui->updateInputMapping(false);
     setVisibility(Hidden);
 }
@@ -137,8 +113,8 @@ void GuiEmu::stop() {
 void GuiEmu::pause() {
 
     paused = true;
-    if (audio) {
-        audio->Pause(1);
+    if (ui->getAudio()) {
+        ui->getAudio()->pause(1);
     }
     ui->updateInputMapping(false);
 #ifdef __NX__
@@ -151,8 +127,8 @@ void GuiEmu::pause() {
 void GuiEmu::resume() {
 
     ui->updateInputMapping(true);
-    if (audio) {
-        audio->Pause(0);
+    if (ui->getAudio()) {
+        ui->getAudio()->pause(0);
     }
     paused = false;
 #ifdef __NX__
@@ -186,8 +162,8 @@ void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
             fpsText->setString(fpsString);
         }
 
-        if (audio) {
-            audio->Play();
+        if (ui->getAudio() && ui->getAudio()->available) {
+            ui->getAudio()->play();
         }
     }
 }

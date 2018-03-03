@@ -133,6 +133,7 @@ int main(int argc, char **argv) {
 
     // audio
     Audio *audio = new C2DAudio(48000);
+    audio->pause(1);
 
     // run gui
     ui = new Gui(io, renderer, skin, config, inp, audio);

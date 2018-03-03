@@ -101,6 +101,10 @@ void GuiEmu::stop() {
     DrvExit();
     InpExit();
 
+    if (ui->getAudio()) {
+        ui->getAudio()->pause(1);
+    }
+
     if (video) {
         delete (video);
         video = NULL;

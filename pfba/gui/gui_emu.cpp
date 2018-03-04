@@ -219,27 +219,27 @@ int GuiEmu::update() {
     inputServiceSwitch = 0;
     inputP1P2Switch = 0;
 
-    int rotate = ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
-    int rotation = 0;
+    int rotation_config =
+            ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
+    int rotate_input = 0;
 #ifdef __PSP2__
     // TODO: find a way to unify platforms
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-        if (rotation == 0) {
+        if (rotation_config == 0) {
             //rotate controls by 90 degrees
-            rotate = 1;
-        }
-        if (rotation == 2) {
+            rotate_input = 1;
+        } else if (rotation_config == 2) {
             //rotate controls by 270 degrees
-            rotate = 3;
+            rotate_input = 3;
         }
     }
 #else
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-        rotation = rotate ? 0 : 3;
+        rotation = rotation_config ? 0 : 3;
     }
 #endif
 
-    Input::Player *players = ui->getInput()->update(rotation);
+    Input::Player *players = ui->getInput()->update(rotate_input);
 
     // process menu
     if ((players[0].state & Input::Key::KEY_MENU1)

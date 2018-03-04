@@ -68,16 +68,11 @@ INT32 MakeScreenShot(const char *dest) {
         return SSHOT_LIBPNG_ERROR;
     }
 
+    // force a frame to be drawn to fba buffer
+    ui->getUiEmu()->updateFramebuffer();
     if (pBurnDraw == NULL) {
-        printf("MakeScreenshot: RunOneFrame\n");
-        // force a frame to be drawn to fba buffer
-        ui->getUiEmu()->resume();
-        ui->getUiEmu()->renderFrame();
-        ui->getUiEmu()->pause();
-        if (pBurnDraw == NULL) {
-            printf("MakeScreenshot: pBurnDraw == NULL\n");
-            return SSHOT_OTHER_ERROR;
-        }
+        printf("MakeScreenshot: pBurnDraw == NULL\n");
+        return SSHOT_OTHER_ERROR;
     }
 
     if (nBurnBpp < 2 || nBurnBpp > 4) {

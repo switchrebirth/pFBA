@@ -141,6 +141,18 @@ void GuiEmu::resume() {
 #endif
 }
 
+void GuiEmu::updateFramebuffer() {
+
+    if (pBurnDraw == NULL) {
+        nFramesEmulated++;
+        nCurrentFrame++;
+        nFramesRendered++;
+        video->lock(NULL, (void **) &pBurnDraw, &nBurnPitch);
+        BurnDrvFrame();
+        video->unlock();
+    }
+}
+
 void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
 
     fpsText->setVisibility(

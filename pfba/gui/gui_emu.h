@@ -30,13 +30,14 @@ public:
 
     int update();
 
-    void renderFrame(bool draw = true, int drawFps = false, float fps = 0);
+    void updateFramebuffer();
 
     Video *getVideo();
 
 private:
 
     void updateFrame();
+    void renderFrame(bool draw = true, int drawFps = false, float fps = 0);
 
     Gui *ui = NULL;
     Video *video = NULL;

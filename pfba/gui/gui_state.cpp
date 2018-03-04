@@ -218,11 +218,7 @@ void GuiState::load() {
     if (isEmuRunning) {
         // if frameskip is enabled, we may get a black buffer,
         // force a frame to be drawn
-        if (pBurnDraw == NULL) {
-            ui->getUiEmu()->resume();
-            ui->getUiEmu()->renderFrame();
-            ui->getUiEmu()->pause();
-        }
+        ui->getUiEmu()->updateFramebuffer();
     }
 
     char name[128];

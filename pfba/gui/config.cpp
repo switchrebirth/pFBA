@@ -98,12 +98,12 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
         options_gui.emplace_back(
                 Option("SHADER", renderer->getShaderList()->getNames(), 0, Option::Index::ROM_SHADER));
     }
-#ifdef __PSP2__
+#ifdef __HANDLED_CABMODE__
     options_gui.emplace_back(
             Option("ROTATION", {"OFF", "ON", "FLIP", "CAB MODE"}, 0, Option::Index::ROM_ROTATION));
 #else
     options_gui.emplace_back(
-            Option("ROTATION", {"OFF", "ON", "CAB MODE"}, 0, Option::Index::ROM_ROTATION));
+            Option("ROTATION", {"OFF", "ON"}, 0, Option::Index::ROM_ROTATION));
 #endif
     options_gui.emplace_back(Option("SHOW_FPS", {"OFF", "ON"}, 0, Option::Index::ROM_SHOW_FPS));
     options_gui.emplace_back(Option("FRAMESKIP", {"OFF", "1", "2", "3", "4", "5", "6", "7", "8", "9"},

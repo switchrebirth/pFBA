@@ -222,7 +222,7 @@ int GuiEmu::update() {
     int rotation_config =
             ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
     int rotate_input = 0;
-#ifdef __PSP2__
+#ifdef __HANDLED_CABMODE__
     // TODO: find a way to unify platforms
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if (rotation_config == 0) {
@@ -235,7 +235,7 @@ int GuiEmu::update() {
     }
 #else
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-        rotation = rotation_config ? 0 : 3;
+        rotate_input = rotation_config ? 0 : 3;
     }
 #endif
 

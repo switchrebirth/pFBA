@@ -96,7 +96,7 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
             Option("FILTER", {"POINT", "LINEAR"}, 0, Option::Index::ROM_FILTER));
     if (renderer->getShaderList() != NULL) {
         options_gui.emplace_back(
-                Option("SHADER", renderer->getShaderList()->getNames(), 0, Option::Index::ROM_SHADER));
+                Option("EFFECT", renderer->getShaderList()->getNames(), 0, Option::Index::ROM_SHADER));
     }
 #ifdef __HANDLED_CABMODE__
     options_gui.emplace_back(

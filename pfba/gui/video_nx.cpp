@@ -119,7 +119,7 @@ void NXVideo::unlock() {
     //printf("res:%ix%i | fb:%ix%i | tex:%ix%i | scale:%fx%f\n",
     //       vw, vh, fb_w, fb_h, (int) getSize().x, (int) getSize().y, getScale().x, getScale().y);
 
-    float scanline_factor = 0.75f;
+    float scanline_factor = 0.85f;
 
     for (y = 0; y < h; y++) {
         for (x = 0; x < w; x++) {

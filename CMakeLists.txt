@@ -400,9 +400,10 @@ elseif (BUILD_NX)
             cross2d nxnetprint
             ${DEVKITPRO}/portlibs/switch/lib/libSDL2.a
             ${DEVKITPRO}/libnx/lib/libnx.a
-            ${DEVKITPRO}/portlibs/armv8-a/lib/libfreetype.a
-            ${DEVKITPRO}/portlibs/armv8-a/lib/libpng.a
-            ${DEVKITPRO}/portlibs/armv8-a/lib/libz.a
+            ${DEVKITPRO}/portlibs/switch/lib/libfreetype.a
+            ${DEVKITPRO}/portlibs/switch/lib/libpng.a
+            ${DEVKITPRO}/portlibs/switch/lib/libbz2.a
+            ${DEVKITPRO}/portlibs/switch/lib/libz.a
             m)
 elseif (BUILD_SDL2)
     ##############

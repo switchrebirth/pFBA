@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_SYSTEM_NAME "Generic")
 
@@ -10,10 +10,10 @@ set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, f
 set(BUILD_SDL1_TINYGL OFF CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
 set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 support (software, osmesa) support")
 set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
-set(BUILD_PSP2 ON CACHE BOOL "Build with PSP2 support")
+set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
+set(BUILD_NX ON CACHE BOOL "Build with NX (SWITCH) support")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")
@@ -392,12 +392,13 @@ elseif (BUILD_NX)
     ##############
     # NX (SWITCH)
     ##############
-    list(APPEND FLAGS -D_NX -D__NX__
+    list(APPEND FLAGS -D_NX -D__NX__ -D__SWITCH__
             -DNO_KEYBOARD -DUSE_FILE32API -DLSB_FIRST
             -ffunction-sections -fomit-frame-pointer)
     #-D__PFBA_ARM__
     set(LDFLAGS
-            cross2d pTinyGL nxnetprint
+            cross2d nxnetprint
+            ${DEVKITPRO}/portlibs/switch/lib/libSDL2.a
             ${DEVKITPRO}/libnx/lib/libnx.a
             ${DEVKITPRO}/portlibs/armv8-a/lib/libfreetype.a
             ${DEVKITPRO}/portlibs/armv8-a/lib/libpng.a

@@ -119,6 +119,8 @@ void NXVideo::unlock() {
     //printf("res:%ix%i | fb:%ix%i | tex:%ix%i | scale:%fx%f\n",
     //       vw, vh, fb_w, fb_h, (int) getSize().x, (int) getSize().y, getScale().x, getScale().y);
 
+    float scanline_factor = 0.75f;
+
     for (y = 0; y < h; y++) {
         for (x = 0; x < w; x++) {
 
@@ -127,8 +129,15 @@ void NXVideo::unlock() {
             g = ((p & 0x07e0) >> 5) << 2;
             b = (p & 0x001f) << 3;
 
-            fb_buf[(u32) gfxGetFramebufferDisplayOffset((u32) x + cx, (u32) y + cy)] =
-                    RGBA8_MAXALPHA(r, g, b);
+            if (y % 2 == 0) {
+                fb_buf[(u32) gfxGetFramebufferDisplayOffset((u32) x + cx, (u32) y + cy)] =
+                        RGBA8_MAXALPHA(r, g, b);
+            } else {
+                fb_buf[(u32) gfxGetFramebufferDisplayOffset((u32) x + cx, (u32) y + cy)] =
+                        RGBA8_MAXALPHA((u32) (r * scanline_factor),
+                                       (u32) (g * scanline_factor),
+                                       (u32) (b * scanline_factor));
+            }
         }
     }
 }
@@ -145,6 +154,8 @@ void NXVideo::updateScaling() {
     Vector2f scale_max;
     float sx = 1, sy = 1;
 
+    gfxSetMode(GfxMode_TiledDouble);
+
     // clear fb before changing res/rot
     clear();
 
@@ -154,7 +165,8 @@ void NXVideo::updateScaling() {
                 rotation = flip ? 90 : 270;
                 rotated = 1;
                 break;
-            case 2: // CAB MODE
+            case 2: // FLIP // TODO
+            case 3: // CAB MODE
                 rotation = flip ? 0 : 180;
                 break;
             default: // OFF

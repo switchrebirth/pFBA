@@ -123,6 +123,7 @@ void GuiEmu::pause() {
     ui->updateInputMapping(false);
 #ifdef __NX__
     // restore ui rotation
+    gfxSetMode(GfxMode_LinearDouble);
     gfxConfigureTransform(NATIVE_WINDOW_TRANSFORM_FLIP_V);
     gfxConfigureResolution(0, 0);
 #endif

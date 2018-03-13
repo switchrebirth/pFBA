@@ -223,8 +223,9 @@ int GuiEmu::update() {
     int rotation_config =
             ui->getConfig()->getValue(Option::Index::ROM_ROTATION, true);
     int rotate_input = 0;
-#ifdef __HANDLED_CABMODE__
-    // TODO: find a way to unify platforms
+#ifdef __PSP2__
+    // TODO: find a way to unify platforms,
+    // or allow rotation config from main.cpp
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
         if (rotation_config == 0) {
             //rotate controls by 90 degrees
@@ -232,6 +233,19 @@ int GuiEmu::update() {
         } else if (rotation_config == 2) {
             //rotate controls by 270 degrees
             rotate_input = 3;
+        }
+    }
+#elif __SWITCH__
+    if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
+        if (rotation_config == 0) {             // OFF
+            //rotate controls by 270 degrees
+            rotate_input = 3;
+        } else if (rotation_config == 1) {      // ON
+            //rotate controls by 270 degrees
+            rotate_input = 0;
+        } else if (rotation_config == 2) {      // FLIP
+            //rotate controls by 270 degrees
+            rotate_input = 1;
         }
     }
 #else

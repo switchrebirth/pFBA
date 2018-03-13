@@ -93,6 +93,8 @@ int GuiEmu::run(int driver) {
     nCurrentFrame = 0;
     frame_duration = 1.0f / ((float) nBurnFPS / 100.0f);
 
+    ui->getRenderer()->clear();
+
     return 0;
 }
 
@@ -122,7 +124,8 @@ void GuiEmu::pause() {
     }
     ui->updateInputMapping(false);
 #ifdef __NX__
-    // restore ui rotation
+    // restore ui rotation and scaling
+    video->clear();
     gfxSetMode(GfxMode_LinearDouble);
     gfxConfigureTransform(NATIVE_WINDOW_TRANSFORM_FLIP_V);
     gfxConfigureResolution(0, 0);
@@ -136,8 +139,9 @@ void GuiEmu::resume() {
         ui->getAudio()->pause(0);
     }
     paused = false;
+    ui->getRenderer()->clear();
 #ifdef __NX__
-    // restore game rotation
+    // restore game rotation and scaling
     video->updateScaling();
 #endif
 }

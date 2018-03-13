@@ -253,14 +253,6 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
 
 void GuiMenu::updateHighlight() {
 
-    /*
-    for (int i = 0; i < lines.size(); i++) {
-        lines[i]->name->setFillColor(
-                optionIndex == i ? COL_ORANGE : Color::White);
-        lines[i]->value->setFillColor(
-                optionIndex == i ? COL_ORANGE : Color::White);
-    }
-    */
     highlight->setPosition(lines[optionIndex]->value->getGlobalBounds().left - 2,
                            lines[optionIndex]->getGlobalBounds().top - 4);
 }
@@ -417,8 +409,7 @@ bool GuiMenu::isOptionHidden(Option *option) {
 
 #ifdef __NX__
     // TODO: disabled until gpu ?
-    if (option->index == Option::Index::ROM_FILTER
-        || option->index == Option::Index::ROM_SHOW_FPS
+    if (option->index == Option::Index::ROM_SHOW_FPS
         || option->index == Option::Index::ROM_FRAMESKIP) {
         return true;
     }

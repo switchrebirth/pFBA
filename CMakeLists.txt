@@ -3,12 +3,15 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_SYSTEM_NAME "Generic")
 
+# pfba version
+set(PFBA_VERSION 1.52)
+
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
 set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) support")
 set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
 set(BUILD_SDL1_TINYGL OFF CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
-set(BUILD_SDL2 ON CACHE BOOL "Build with SDL2 (software) support")
+set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 (software) support")
 set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
@@ -306,6 +309,7 @@ set(INC ${PFBA_DIRS}
 # flags
 set(FLAGS
         #-DUNICODE
+        -D__PFBA_VERSION__=${PFBA_VERSION}
         -D__PFBA__
         -DINCLUDE_7Z_SUPPORT
         -DUSE_SPEEDHACKS
@@ -519,7 +523,7 @@ if (BUILD_NX)
     set_target_properties(${PROJECT_NAME}.elf PROPERTIES LINK_FLAGS "-specs=${DEVKITPRO}/libnx/switch.specs")
     add_custom_target(${PROJECT_NAME}.nro
             DEPENDS ${PROJECT_NAME}.elf
-            COMMAND nacptool --create "pFBA" "Cpasjuste" "1.51" pfba.nacp
+            COMMAND nacptool --create "pFBA" "Cpasjuste" "${PFBA_VERSION}" pfba.nacp
             COMMAND elf2nro ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro --icon=${CMAKE_SOURCE_DIR}/pfba/data/nx/icon.jpg --nacp=pfba.nacp
             )
 endif (BUILD_NX)

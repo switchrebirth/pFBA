@@ -35,8 +35,6 @@ public:
 
     Option *getOption(std::vector<Option> *options, int index);
 
-    int getOptionPos(std::vector<Option> *options, int index);
-
     int *getGuiPlayerInputKeys(int player);
 
     int *getGuiPlayerInputButtons(int player);

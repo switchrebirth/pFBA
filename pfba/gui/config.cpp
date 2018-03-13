@@ -232,9 +232,18 @@ void Config::load(RomList::Rom *rom) {
 
         config_setting_t *settings_root = config_lookup(&cfg, "FBA_CONFIG");
         if (settings_root) {
+            // verify cfg version
+            double version = 0;
+            if (!config_setting_lookup_float(settings_root, "VERSION", &version)
+                || version != __PFBA_VERSION__) {
+                // update cfg to newer version
+                printf("CFG VERSION (%f) != PFBA VERSION (%f)\n", version, __PFBA_VERSION__);
+                save();
+                config_destroy(&cfg);
+                return;
+            }
 
             config_setting_t *settings = NULL;
-
             if (!isRomCfg) {
                 settings = config_setting_lookup(settings_root, "ROMS_PATHS");
                 if (settings) {
@@ -300,8 +309,12 @@ void Config::save(RomList::Rom *rom) {
 
     // create root
     config_setting_t *setting_root = config_root_setting(&cfg);
+
     // create main group
     config_setting_t *setting_fba = config_setting_add(setting_root, "FBA_CONFIG", CONFIG_TYPE_GROUP);
+    // add version
+    config_setting_t *setting_cfg = config_setting_add(setting_fba, "VERSION", CONFIG_TYPE_FLOAT);
+    config_setting_set_float(setting_cfg, __PFBA_VERSION__);
 
     config_setting_t *sub_setting = NULL;
 
@@ -375,15 +388,6 @@ Option *Config::getOption(std::vector<Option> *options, int index) {
         }
     }
     return NULL;
-}
-
-int Config::getOptionPos(std::vector<Option> *options, int index) {
-    for (unsigned int i = 0; i < options->size(); i++) {
-        if (options->at(i).index == index) {
-            return i;
-        }
-    }
-    return 0;
 }
 
 int *Config::getGuiPlayerInputKeys(int player) {

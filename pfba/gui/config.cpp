@@ -9,28 +9,18 @@
 
 using namespace c2d;
 
-Config::Config(const std::string &cfgPath, Renderer *renderer) {
+Config::Config(c2d::Renderer *renderer, const std::string &cfgPath, const std::string &defaultRomPath) {
 
     configPath = cfgPath;
 
+    // gui config
     options_gui.clear();
 
-    // gui config
     roms_paths.clear();
-#ifdef __PSP2__
-    roms_paths.emplace_back("ux0:/data/pfba/roms/");
-#elif __3DS__
-    roms_paths.emplace_back("/pfba/roms/");
-#elif __PS3__
-    roms_paths.emplace_back("/dev_hdd0/pfba/roms/");
-#elif __NX__
-    roms_paths.emplace_back("/switch/pfba/roms/");
-#else
-    roms_paths.emplace_back("./roms/");
-#endif
-    roms_paths.emplace_back("");
-    roms_paths.emplace_back("");
-    roms_paths.emplace_back("");
+    roms_paths.emplace_back(defaultRomPath);
+    for (size_t i = roms_paths.size(); i < DIRS_MAX; i++) {
+        roms_paths.emplace_back("");
+    }
 
     // build hardware list configuration
     hardwareList.emplace_back(HARDWARE_PREFIX_ALL, "All");

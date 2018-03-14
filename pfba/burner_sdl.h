@@ -45,7 +45,7 @@
 
 #define BZIP_MAX (20)                                // Maximum zip files to search through
 #undef DIRS_MAX
-#define DIRS_MAX (4)                                // Maximum number of directories to search
+#define DIRS_MAX (20)                                // Maximum number of directories to search
 
 // Define macros for appliction title and description
 #ifdef FBA_DEBUG
@@ -154,6 +154,7 @@ INT32 BzipStatus();
 
 // paths.cpp
 extern char szAppHomePath[MAX_PATH];
+extern char szAppRomPath[MAX_PATH];
 extern char szAppSavePath[MAX_PATH];
 extern char szAppConfigPath[MAX_PATH];
 extern char szAppSamplesPath[MAX_PATH]; // for burn/snd/samples.cpp

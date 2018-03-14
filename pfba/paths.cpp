@@ -10,6 +10,7 @@
 #endif
 
 char szAppHomePath[MAX_PATH];
+char szAppRomPath[MAX_PATH];
 char szAppSavePath[MAX_PATH];
 char szAppConfigPath[MAX_PATH];
 char szAppHiscorePath[MAX_PATH];
@@ -36,6 +37,9 @@ void BurnPathsInit() {
     strcat(szAppHomePath, "/");
     mkdir(szAppHomePath, 0777);
     //printf("szAppHomePath: %s\n", szAppHomePath);
+
+    snprintf(szAppRomPath, MAX_PATH, "%s%s", szAppHomePath, "roms");
+    mkdir(szAppRomPath, 0777);
 
     snprintf(szAppSavePath, MAX_PATH, "%s%s", szAppHomePath, "saves");
     mkdir(szAppSavePath, 0777);

@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
     // load configuration
     std::string cfgPath = szAppHomePath;
     cfgPath += "pfba.cfg";
-    config = new Config(cfgPath, renderer);
+    config = new Config(renderer, cfgPath, szAppRomPath);
 
     // skin
     Skin *skin = new Skin(szAppSkinPath, buttons);

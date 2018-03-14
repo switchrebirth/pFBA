@@ -86,7 +86,7 @@ Config::Config(const std::string &cfgPath, Renderer *renderer) {
             Option("SKIN", {"SKIN"}, 0, Option::Index::MENU_SKIN, Option::Type::MENU | Option::Type::HIDDEN));
     if (renderer->getSize().y > 544) {
         options_gui.emplace_back(
-                Option("SKIN_FONT_SIZE", {"24"}, 24, Option::Index::SKIN_FONT_SIZE, Option::Type::HIDDEN));
+                Option("SKIN_FONT_SIZE", {"22"}, 22, Option::Index::SKIN_FONT_SIZE, Option::Type::HIDDEN));
     } else {
         options_gui.emplace_back(
                 Option("SKIN_FONT_SIZE", {"20"}, 20, Option::Index::SKIN_FONT_SIZE, Option::Type::HIDDEN));

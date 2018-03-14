@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-#set(CMAKE_VERBOSE_MAKEFILE ON)
-
-set(CMAKE_SYSTEM_NAME "Generic")
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # pfba version
 set(PFBA_VERSION 1.53)
@@ -15,7 +13,7 @@ set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, f
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-set(BUILD_NX ON CACHE BOOL "Build with NX (SWITCH) support")
+set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")
@@ -307,9 +305,8 @@ set(INC ${PFBA_DIRS}
 
 # flags
 set(FLAGS
-        #-DUNICODE
-        -D__PFBA_VERSION__=${PFBA_VERSION}
         -D__PFBA__
+        -D__PFBA_VERSION__=${PFBA_VERSION}
         -DINCLUDE_7Z_SUPPORT
         -DUSE_SPEEDHACKS
         -DBUILD_SDL -DBUILD_M68K
@@ -329,9 +326,7 @@ set(FLAGS
 if (BUILD_PSP2)
     list(APPEND INC pfba/cpu/cyclone)
     list(APPEND SRC_PFBA pfba/cpu/cyclone/Cyclone.s)
-    list(APPEND FLAGS
-            -Wl,-q -D__PSP2__ -D__PFBA_ARM__
-            -DNO_KEYBOARD -DBUILD_C68K -DUSE_FILE32API -DLSB_FIRST)
+    list(APPEND FLAGS -D__PFBA_ARM__ -DNO_KEYBOARD -DBUILD_C68K -DUSE_FILE32API -DLSB_FIRST)
     if (BUILD_DEBUG)
         list(APPEND FLAGS
                 -D__PSP2_DEBUG__ -g # TODO: cyclone arm asm core not working without O2/O3
@@ -346,12 +341,7 @@ if (BUILD_PSP2)
                 -fsingle-precision-constant
                 )
     endif (BUILD_DEBUG)
-    set(LDFLAGS
-            cross2d SDL2 vita2d
-            SceDisplay_stub SceGxm_stub SceSysmodule_stub
-            SceCtrl_stub ScePgf_stub ScePower_stub SceCommonDialog_stub
-            SceAudio_stub SceTouch_stub SceHid_stub
-            freetype png jpeg z m c)
+    set(LDFLAGS ScePower_stub)
 elseif (BUILD_PS3)
     ##############
     # PS3
@@ -395,49 +385,24 @@ elseif (BUILD_NX)
     ##############
     # NX (SWITCH)
     ##############
-    list(APPEND FLAGS -D__NX__ -D__SWITCH__
+    list(APPEND FLAGS
             -DNO_KEYBOARD -DUSE_FILE32API -DLSB_FIRST
             -ffunction-sections -fomit-frame-pointer)
-    #-D__PFBA_ARM__
-    set(LDFLAGS
-            cross2d nxnetprint
-            ${DEVKITPRO}/portlibs/switch/lib/libSDL2.a
-            ${DEVKITPRO}/libnx/lib/libnx.a
-            ${DEVKITPRO}/portlibs/switch/lib/libfreetype.a
-            ${DEVKITPRO}/portlibs/switch/lib/libpng.a
-            ${DEVKITPRO}/portlibs/switch/lib/libbz2.a
-            ${DEVKITPRO}/portlibs/switch/lib/libz.a
-            m)
 elseif (BUILD_SDL2)
     ##############
     # SDL2
     ##############
-    list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST)
-    set(LDFLAGS cross2d SDL2 freetype png z)
-    if (BUILD_SDL2_GL)
-        list(APPEND FLAGS -D__SDL2_GL__ -D__GL__)
-        list(APPEND LDFLAGS GL)
-    endif (BUILD_SDL2_GL)
+    list(APPEND FLAGS -DLSB_FIRST)
 elseif (BUILD_SDL1)
     ##############
     # SDL1
     ##############
-    list(APPEND FLAGS -D__SDL1__ -D__GL__ -DLSB_FIRST)
-    set(LDFLAGS cross2d SDL freetype png z)
-    if (BUILD_SDL1_GL)
-        list(APPEND FLAGS -D__SDL1_GL__)
-        list(APPEND LDFLAGS GL)
-    else ()
-        list(APPEND LDFLAGS OSMesa pthread)
-    endif (BUILD_SDL1_GL)
+    list(APPEND FLAGS -DLSB_FIRST)
 elseif (BUILD_SFML)
     ##############
     # SFML
     ##############
-    list(APPEND FLAGS -D__SFML__ -DLSB_FIRST)
-    set(LDFLAGS
-            cross2d SDL2 sfml-graphics sfml-window sfml-system
-            GL png z)
+    list(APPEND FLAGS -DLSB_FIRST)
 endif (BUILD_PSP2)
 
 # source files
@@ -473,7 +438,7 @@ add_executable(${PROJECT_NAME}.elf ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
 target_compile_options(${PROJECT_NAME}.elf PRIVATE ${FLAGS})
 target_compile_options(${PROJECT_NAME}.elf PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++11 -fpermissive>)
 target_include_directories(${PROJECT_NAME}.elf PRIVATE ${INC})
-target_link_libraries(${PROJECT_NAME}.elf ${LDFLAGS})
+target_link_libraries(${PROJECT_NAME}.elf cross2d ${LDFLAGS})
 add_dependencies(${PROJECT_NAME}.elf ${PROJECT_NAME}.data)
 
 #####################

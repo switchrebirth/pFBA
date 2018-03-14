@@ -74,13 +74,8 @@ Config::Config(c2d::Renderer *renderer, const std::string &cfgPath, const std::s
     // skin config, hidden in gui for now
     options_gui.emplace_back(
             Option("SKIN", {"SKIN"}, 0, Option::Index::MENU_SKIN, Option::Type::MENU | Option::Type::HIDDEN));
-    if (renderer->getSize().y > 544) {
-        options_gui.emplace_back(
-                Option("SKIN_FONT_SIZE", {"22"}, 22, Option::Index::SKIN_FONT_SIZE, Option::Type::HIDDEN));
-    } else {
-        options_gui.emplace_back(
-                Option("SKIN_FONT_SIZE", {"20"}, 20, Option::Index::SKIN_FONT_SIZE, Option::Type::HIDDEN));
-    }
+    options_gui.emplace_back(
+            Option("SKIN_FONT_SIZE", {"20"}, 20, Option::Index::SKIN_FONT_SIZE, Option::Type::HIDDEN));
     // default rom config
     options_gui.emplace_back(
             Option("EMULATION", {"EMULATION"}, 0, Option::Index::MENU_ROM_OPTIONS, Option::Type::MENU));

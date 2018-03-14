@@ -238,7 +238,7 @@ void Config::load(RomList::Rom *rom) {
                 || version != __PFBA_VERSION__) {
                 // update cfg to newer version
                 printf("CFG VERSION (%f) != PFBA VERSION (%f)\n", version, __PFBA_VERSION__);
-                save();
+                save(rom);
                 config_destroy(&cfg);
                 return;
             }

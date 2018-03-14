@@ -82,8 +82,13 @@ Config::Config(c2d::Renderer *renderer, const std::string &cfgPath, const std::s
     options_gui.emplace_back(
             Option("SCALING", {"NONE", "2X", "3X", "FIT", "FIT 4:3", "FULL"},
                    3, Option::Index::ROM_SCALING));
+#ifdef __NX__
+    options_gui.emplace_back(
+            Option("FILTER", {"POINT", "LINEAR"}, 1, Option::Index::ROM_FILTER));
+#else
     options_gui.emplace_back(
             Option("FILTER", {"POINT", "LINEAR"}, 0, Option::Index::ROM_FILTER));
+#endif
     if (renderer->getShaderList() != NULL) {
         options_gui.emplace_back(
                 Option("EFFECT", renderer->getShaderList()->getNames(), 0, Option::Index::ROM_SHADER));

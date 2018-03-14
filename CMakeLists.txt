@@ -10,13 +10,12 @@ set(PFBA_VERSION 1.53)
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
 set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) support")
 set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
-set(BUILD_SDL1_TINYGL OFF CACHE BOOL "Build with SDL1 support (software rendering, slow, needs BUILD_SDL1=ON)")
 set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 (software) support")
 set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
+set(BUILD_NX ON CACHE BOOL "Build with NX (SWITCH) support")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")
@@ -396,7 +395,7 @@ elseif (BUILD_NX)
     ##############
     # NX (SWITCH)
     ##############
-    list(APPEND FLAGS -D_NX -D__NX__ -D__SWITCH__
+    list(APPEND FLAGS -D__NX__ -D__SWITCH__
             -DNO_KEYBOARD -DUSE_FILE32API -DLSB_FIRST
             -ffunction-sections -fomit-frame-pointer)
     #-D__PFBA_ARM__
@@ -416,21 +415,18 @@ elseif (BUILD_SDL2)
     list(APPEND FLAGS -D__SDL2__ -DLSB_FIRST)
     set(LDFLAGS cross2d SDL2 freetype png z)
     if (BUILD_SDL2_GL)
+        list(APPEND FLAGS -D__SDL2_GL__ -D__GL__)
         list(APPEND LDFLAGS GL)
-    elseif (BUILD_SDL2_TINYGL)
-    else ()
-        list(APPEND LDFLAGS OSMesa pthread)
     endif (BUILD_SDL2_GL)
 elseif (BUILD_SDL1)
     ##############
     # SDL1
     ##############
-    list(APPEND FLAGS -D__SDL1__ -DLSB_FIRST)
+    list(APPEND FLAGS -D__SDL1__ -D__GL__ -DLSB_FIRST)
     set(LDFLAGS cross2d SDL freetype png z)
     if (BUILD_SDL1_GL)
+        list(APPEND FLAGS -D__SDL1_GL__)
         list(APPEND LDFLAGS GL)
-    elseif (BUILD_SDL1_TINYGL)
-        list(APPEND LDFLAGS pTinyGL)
     else ()
         list(APPEND LDFLAGS OSMesa pthread)
     endif (BUILD_SDL1_GL)

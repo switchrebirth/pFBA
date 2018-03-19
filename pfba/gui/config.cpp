@@ -17,7 +17,7 @@ Config::Config(c2d::Renderer *renderer, const std::string &cfgPath, const std::s
     options_gui.clear();
 
     roms_paths.clear();
-    roms_paths.emplace_back(defaultRomPath);
+    roms_paths.emplace_back(defaultRomPath + "/");
     for (size_t i = roms_paths.size(); i < DIRS_MAX; i++) {
         roms_paths.emplace_back("");
     }

@@ -40,17 +40,24 @@ public:
 
     void update(Option *opt) {
 
-        this->option = opt;
-        name->setString(option->getName());
-
         if (texture != NULL) {
             delete (texture);
             texture = NULL;
         }
 
+        option = opt;
+        if (option) {
+            name->setString(option->getName());
+        } else {
+            value->setVisibility(Visible);
+            value->setString("GO");
+            return;
+        }
+
         if (option->flags == Option::Type::INPUT) {
             Skin::Button *button = ui->getSkin()->getButton(option->value);
-            if (button) {
+            // don't use button textures on keyboard for now
+            if (button && option->index < Option::Index::MENU_KEYBOARD) {
                 if (ui->getIo()->exist(button->path.c_str())) {
                     texture = new C2DTexture(button->path.c_str());
                     if (texture->available) {
@@ -239,9 +246,9 @@ void GuiMenu::load(bool isRom, OptionMenu *om) {
             }
         }
 
-        lines[line_index]->setVisibility(Visible);
+        lines[line_index]->update(NULL);
         lines[line_index]->name->setString(optionMenu->childs[i]->title);
-        lines[line_index]->value->setString("GO");
+        lines[line_index]->setVisibility(Visible);
         line_index++;
     }
 

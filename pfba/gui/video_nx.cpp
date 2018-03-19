@@ -163,6 +163,10 @@ void NXVideo::unlock() {
             }
         }
     }
+
+    gfxFlushBuffers();
+    gfxSwapBuffers();
+    gfxWaitForVsync();
 }
 
 void NXVideo::updateScaling() {

@@ -72,6 +72,7 @@ int GuiEmu::run(int driver) {
     // VIDEO
     //////////
     printf("Creating video device\n");
+    ui->getRenderer()->clear();
     int w, h;
     BurnDrvGetFullSize(&w, &h);
     video = new Video(ui, Vector2f(w, h));
@@ -92,8 +93,6 @@ int GuiEmu::run(int driver) {
     nFramesRendered = 0;
     nCurrentFrame = 0;
     frame_duration = 1.0f / ((float) nBurnFPS / 100.0f);
-
-    ui->getRenderer()->clear();
 
     return 0;
 }
@@ -126,7 +125,7 @@ void GuiEmu::pause() {
 #ifdef __NX__
     // restore ui rotation and scaling
     video->clear();
-    gfxSetMode(GfxMode_LinearDouble);
+    gfxSetMode(GfxMode_TiledDouble);
     gfxConfigureTransform(NATIVE_WINDOW_TRANSFORM_FLIP_V);
     gfxConfigureResolution(0, 0);
 #endif
@@ -197,9 +196,7 @@ void GuiEmu::updateFrame() {
     if (frameSkip) {
         bool draw = nFramesEmulated % (frameSkip + 1) == 0;
         renderFrame(draw, showFps, ui->getRenderer()->getFps());
-#ifdef __NX__
-        ui->getRenderer()->flip(false);
-#else
+#ifndef __NX__
         ui->getRenderer()->flip(draw);
 #endif
         float delta = ui->getRenderer()->getDeltaTime().asSeconds();
@@ -210,10 +207,7 @@ void GuiEmu::updateFrame() {
         }
     } else {
         renderFrame(true, showFps, ui->getRenderer()->getFps());
-#ifdef __NX__
-        // on switch we directly draw to the framebuffer
-        ui->getRenderer()->flip(false);
-#else
+#ifndef __NX__
         ui->getRenderer()->flip();
 #endif
     }

@@ -229,11 +229,6 @@ void Config::load(RomList::Rom *rom) {
                 // update cfg to newer version
                 printf("CFG VERSION (%i) != PFBA VERSION (%i)\n", version,
                        (__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__);
-                // set default rom options // TODO: why did i do that ?
-                options_rom.clear();
-                for (int i = Option::Index::MENU_ROM_OPTIONS; i < Option::Index::END; i++) {
-                    options_rom.emplace_back(options_gui[i]);
-                }
                 save(rom);
                 config_destroy(&cfg);
                 return;
@@ -273,16 +268,9 @@ void Config::load(RomList::Rom *rom) {
             }
         }
         //printf("###########################\n");
-    } else {
+    } else if (!isRomCfg) {
         // no need to save default rom config
-        if (!isRomCfg) {
-            save();
-        }
-        // set default rom options // TODO: why did i do that ?
-        options_rom.clear();
-        for (int i = Option::Index::MENU_ROM_OPTIONS; i < Option::Index::END; i++) {
-            options_rom.emplace_back(options_gui[i]);
-        }
+        save();
     }
 
     config_destroy(&cfg);

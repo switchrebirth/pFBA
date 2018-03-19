@@ -57,7 +57,7 @@ public:
         if (option->flags == Option::Type::INPUT) {
             Skin::Button *button = ui->getSkin()->getButton(option->value);
             // don't use button textures on keyboard for now
-            if (button && option->index < Option::Index::MENU_KEYBOARD) {
+            if (button && option->index < Option::Index::JOY_DEADZONE) {
                 if (ui->getIo()->exist(button->path.c_str())) {
                     texture = new C2DTexture(button->path.c_str());
                     if (texture->available) {

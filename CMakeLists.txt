@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # pfba version
-set(PFBA_VERSION 1.53)
+set(PFBA_VERSION_MAJOR 1)
+set(PFBA_VERSION_MINOR 54)
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
@@ -306,7 +307,8 @@ set(INC ${PFBA_DIRS}
 # flags
 set(FLAGS
         -D__PFBA__
-        -D__PFBA_VERSION__=${PFBA_VERSION}
+        -D__PFBA_VERSION_MAJOR__=${PFBA_VERSION_MAJOR}
+        -D__PFBA_VERSION_MINOR__=${PFBA_VERSION_MINOR}
         -DINCLUDE_7Z_SUPPORT
         -DUSE_SPEEDHACKS
         -DBUILD_SDL -DBUILD_M68K
@@ -484,7 +486,7 @@ if (BUILD_NX)
     set_target_properties(${PROJECT_NAME}.elf PROPERTIES LINK_FLAGS "-specs=${DEVKITPRO}/libnx/switch.specs")
     add_custom_target(${PROJECT_NAME}.nro
             DEPENDS ${PROJECT_NAME}.elf
-            COMMAND nacptool --create "pFBA" "Cpasjuste" "${PFBA_VERSION}" pfba.nacp
+            COMMAND nacptool --create "pFBA" "Cpasjuste" "${PFBA_VERSION_MAJOR}.${PFBA_VERSION_MINOR}" pfba.nacp
             COMMAND elf2nro ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro --icon=${CMAKE_SOURCE_DIR}/pfba/data/nx/icon.jpg --nacp=pfba.nacp
             )
 endif (BUILD_NX)

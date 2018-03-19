@@ -223,11 +223,17 @@ void Config::load(RomList::Rom *rom) {
         config_setting_t *settings_root = config_lookup(&cfg, "FBA_CONFIG");
         if (settings_root) {
             // verify cfg version
-            double version = 0;
-            if (!config_setting_lookup_float(settings_root, "VERSION", &version)
-                || version != __PFBA_VERSION__) {
+            int version = 0;
+            if (!config_setting_lookup_int(settings_root, "VERSION", &version)
+                || version != (__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__) {
                 // update cfg to newer version
-                printf("CFG VERSION (%f) != PFBA VERSION (%f)\n", version, __PFBA_VERSION__);
+                printf("CFG VERSION (%i) != PFBA VERSION (%i)\n", version,
+                       (__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__);
+                // set default rom options // TODO: why did i do that ?
+                options_rom.clear();
+                for (int i = Option::Index::MENU_ROM_OPTIONS; i < Option::Index::END; i++) {
+                    options_rom.emplace_back(options_gui[i]);
+                }
                 save(rom);
                 config_destroy(&cfg);
                 return;
@@ -272,7 +278,7 @@ void Config::load(RomList::Rom *rom) {
         if (!isRomCfg) {
             save();
         }
-        // set default rom options
+        // set default rom options // TODO: why did i do that ?
         options_rom.clear();
         for (int i = Option::Index::MENU_ROM_OPTIONS; i < Option::Index::END; i++) {
             options_rom.emplace_back(options_gui[i]);
@@ -303,8 +309,8 @@ void Config::save(RomList::Rom *rom) {
     // create main group
     config_setting_t *setting_fba = config_setting_add(setting_root, "FBA_CONFIG", CONFIG_TYPE_GROUP);
     // add version
-    config_setting_t *setting_cfg = config_setting_add(setting_fba, "VERSION", CONFIG_TYPE_FLOAT);
-    config_setting_set_float(setting_cfg, __PFBA_VERSION__);
+    config_setting_t *setting_cfg = config_setting_add(setting_fba, "VERSION", CONFIG_TYPE_INT);
+    config_setting_set_int(setting_cfg, (__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__);
 
     config_setting_t *sub_setting = NULL;
 
@@ -334,7 +340,7 @@ void Config::save(RomList::Rom *rom) {
     config_destroy(&cfg);
 
     if (!isRomCfg) {
-        // set default rom options
+        // set default rom options // TODO: why did i do that ?
         options_rom.clear();
         for (int i = Option::Index::MENU_ROM_OPTIONS; i < Option::Index::END; i++) {
             options_rom.emplace_back(options_gui[i]);

@@ -270,6 +270,7 @@ int GuiEmu::update() {
                && (players[0].state & Input::Key::KEY_FIRE4)) {
         inputP1P2Switch = 1;
     } else if (players[0].state & EV_RESIZE) {
+        // useful for sdl resize event for example
         video->updateScaling();
     }
 

@@ -109,8 +109,6 @@ int main(int argc, char **argv) {
     // switch special keys
     buttons.emplace_back(KEY_JOY_ZL_DEFAULT, "ZL");
     buttons.emplace_back(KEY_JOY_ZR_DEFAULT, "ZR");
-    buttons.emplace_back(KEY_JOY_SL_DEFAULT, "SL");
-    buttons.emplace_back(KEY_JOY_SR_DEFAULT, "SR");
 #endif
 
 #ifdef __SFML__

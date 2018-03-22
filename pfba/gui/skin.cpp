@@ -18,7 +18,6 @@ Skin::Skin(const std::string &path, const std::vector<Button> &btns) {
     this->path = path;
 
 #ifdef __NX__
-    //tex_bg = (Texture *) new C2DTexture("");
     tex_title = (Texture *) new C2DTexture((const unsigned char *) pfba_title, pfba_title_length);
     font = new C2DFont();
     font->loadFromMemory(pfba_font, pfba_font_length);
@@ -51,10 +50,18 @@ Skin::Button *Skin::getButton(int id) {
 }
 
 Skin::~Skin() {
-    if (font)
+
+    if (font) {
         delete (font);
+    }
+
+    buttons.clear();
+
+    // deleted by renderer
+    /*
     if (tex_bg)
         delete (tex_bg);
     if (tex_title)
         delete (tex_title);
+    */
 }

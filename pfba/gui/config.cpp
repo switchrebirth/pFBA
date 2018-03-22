@@ -137,10 +137,10 @@ Config::Config(c2d::Renderer *renderer, const std::string &cfgPath, const std::s
             Option("JOY_COIN1", {"6"}, KEY_JOY_COIN1_DEFAULT, Option::Index::JOY_COIN1, Option::Type::INPUT));
     options_gui.emplace_back(
             Option("JOY_START1", {"7"}, KEY_JOY_START1_DEFAULT, Option::Index::JOY_START1, Option::Type::INPUT));
-    options_gui.emplace_back(
-            Option("JOY_MENU1", {"6"}, KEY_JOY_MENU1_DEFAULT, Option::Index::JOY_MENU1, Option::Type::INPUT));
-    options_gui.emplace_back(
-            Option("JOY_MENU2", {"7"}, KEY_JOY_MENU2_DEFAULT, Option::Index::JOY_MENU2, Option::Type::INPUT));
+    //options_gui.emplace_back(
+    //        Option("JOY_MENU1", {"6"}, KEY_JOY_MENU1_DEFAULT, Option::Index::JOY_MENU1, Option::Type::INPUT));
+    //options_gui.emplace_back(
+    //        Option("JOY_MENU2", {"7"}, KEY_JOY_MENU2_DEFAULT, Option::Index::JOY_MENU2, Option::Type::INPUT));
     // TODO: add gui option for axis in option menu
     options_gui.emplace_back(
             Option("JOY_AXIS_LX", {"0"}, KEY_JOY_AXIS_LX, Option::Index::JOY_AXIS_LX, Option::Type::HIDDEN));
@@ -412,8 +412,8 @@ int *Config::getGuiPlayerInputButtons(int player) {
     joystick_keys[9] = getValue(Option::Index::JOY_FIRE4);
     joystick_keys[10] = getValue(Option::Index::JOY_FIRE5);
     joystick_keys[11] = getValue(Option::Index::JOY_FIRE6);
-    joystick_keys[12] = getValue(Option::Index::JOY_MENU1);
-    joystick_keys[13] = getValue(Option::Index::JOY_MENU2);
+    //joystick_keys[12] = getValue(Option::Index::JOY_MENU1);
+    //joystick_keys[13] = getValue(Option::Index::JOY_MENU2);
 
     return joystick_keys;
 }
@@ -456,8 +456,8 @@ int *Config::getRomPlayerInputButtons(int player) {
     joystick_keys[9] = getValue(Option::Index::JOY_FIRE4, true);
     joystick_keys[10] = getValue(Option::Index::JOY_FIRE5, true);
     joystick_keys[11] = getValue(Option::Index::JOY_FIRE6, true);
-    joystick_keys[12] = getValue(Option::Index::JOY_MENU1, true);
-    joystick_keys[13] = getValue(Option::Index::JOY_MENU2, true);
+    //joystick_keys[12] = getValue(Option::Index::JOY_MENU1, true);
+    //joystick_keys[13] = getValue(Option::Index::JOY_MENU2, true);
 
     return joystick_keys;
 }

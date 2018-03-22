@@ -183,9 +183,9 @@ int GuiRomList::update() {
                 && getSelection()->state != RomList::RomState::MISSING) {
                 return UI_KEY_RUN_ROM;
             }
-        } else if (key & Input::Key::KEY_MENU1) {
+        } else if (key & Input::Key::KEY_START) {
             return UI_KEY_SHOW_MEMU_UI;
-        } else if (key & Input::Key::KEY_MENU2) {
+        } else if (key & Input::Key::KEY_COIN) {
             if (getSelection() != NULL) {
                 return UI_KEY_SHOW_MEMU_ROM;
             }

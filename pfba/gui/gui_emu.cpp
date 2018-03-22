@@ -255,18 +255,18 @@ int GuiEmu::update() {
     Input::Player *players = ui->getInput()->update(rotate_input);
 
     // process menu
-    if ((players[0].state & Input::Key::KEY_MENU1)
-        && (players[0].state & Input::Key::KEY_MENU2)) {
+    if ((players[0].state & Input::Key::KEY_START)
+        && (players[0].state & Input::Key::KEY_COIN)) {
         pause();
         return UI_KEY_SHOW_MEMU_ROM;
-    } else if ((players[0].state & Input::Key::KEY_MENU2)
+    } else if ((players[0].state & Input::Key::KEY_START)
                && (players[0].state & Input::Key::KEY_FIRE5)) {
         pause();
         return UI_KEY_SHOW_MEMU_STATE;
-    } else if ((players[0].state & Input::Key::KEY_MENU2)
+    } else if ((players[0].state & Input::Key::KEY_START)
                && (players[0].state & Input::Key::KEY_FIRE3)) {
         inputServiceSwitch = 1;
-    } else if ((players[0].state & Input::Key::KEY_MENU2)
+    } else if ((players[0].state & Input::Key::KEY_START)
                && (players[0].state & Input::Key::KEY_FIRE4)) {
         inputP1P2Switch = 1;
     } else if (players[0].state & EV_RESIZE) {

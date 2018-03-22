@@ -52,8 +52,6 @@ public:
         JOY_FIRE6,
         JOY_COIN1,
         JOY_START1,
-        JOY_MENU1,
-        JOY_MENU2,
         JOY_AXIS_LX,
         JOY_AXIS_LY,
         JOY_AXIS_RX,
@@ -72,9 +70,7 @@ public:
         KEY_FIRE5,
         KEY_FIRE6,
         KEY_COIN1,
-        KEY_START1,
-        KEY_MENU1,
-        KEY_MENU2,
+        KEY_START1
 #endif
         END
     };

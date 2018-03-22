@@ -366,8 +366,8 @@ int GuiMenu::update() {
 
         // FIRE2
         if (key & Input::Key::KEY_FIRE2
-            || (key & Input::Key::KEY_MENU1 && !isRomMenu)
-            || (key & Input::Key::KEY_MENU2 && isRomMenu)) {
+            || (key & Input::Key::KEY_START && !isRomMenu)
+            || (key & Input::Key::KEY_COIN && isRomMenu)) {
             if (optionMenu->parent == NULL) {
                 if (isEmuRunning) {
                     setVisibility(Hidden);

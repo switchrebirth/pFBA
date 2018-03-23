@@ -178,7 +178,7 @@ void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
         }
 
         if (bDrawFps) {
-            sprintf(fpsString, "FPS: %i/%2d", (int) fps, (nBurnFPS / 100));
+            sprintf(fpsString, "FPS: %.2g/%2d", fps, (nBurnFPS / 100));
             fpsText->setString(fpsString);
         }
 
@@ -188,6 +188,8 @@ void GuiEmu::renderFrame(bool bDraw, int bDrawFps, float fps) {
     }
 }
 
+float timer = 0;
+
 void GuiEmu::updateFrame() {
 
     int showFps = ui->getConfig()->getValue(Option::Index::ROM_SHOW_FPS, true);
@@ -196,7 +198,9 @@ void GuiEmu::updateFrame() {
     if (frameSkip) {
         bool draw = nFramesEmulated % (frameSkip + 1) == 0;
         renderFrame(draw, showFps, ui->getRenderer()->getFps());
-#ifndef __NX__
+#ifdef __NX__
+        ui->getRenderer()->flip(false);
+#else
         ui->getRenderer()->flip(draw);
 #endif
         float delta = ui->getRenderer()->getDeltaTime().asSeconds();
@@ -207,9 +211,17 @@ void GuiEmu::updateFrame() {
         }
     } else {
         renderFrame(true, showFps, ui->getRenderer()->getFps());
-#ifndef __NX__
+#ifdef __NX__
+        ui->getRenderer()->flip(false);
+#else
         ui->getRenderer()->flip();
 #endif
+        timer += ui->getRenderer()->getDeltaTime().asSeconds();
+        if (timer >= 1) {
+            timer = 0;
+            printf("fps: %.2g/%2d, delta: %f\n", ui->getRenderer()->getFps(), (nBurnFPS / 100),
+                   ui->getRenderer()->getDeltaTime().asSeconds());
+        }
     }
 }
 

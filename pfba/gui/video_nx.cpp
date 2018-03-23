@@ -128,16 +128,6 @@ void NXVideo::unlock() {
     //printf("res:%ix%i | fb:%ix%i | tex:%ix%i | scale:%fx%f\n",
     //       vw, vh, fb_w, fb_h, (int) getSize().x, (int) getSize().y, getScale().x, getScale().y);
 
-    float scanline = 1;
-    int effect = ui->getConfig()->getValue(Option::Index::ROM_SHADER, true);
-    if (effect == 1) { // SCANLINE
-        scanline = 0.90f;
-    } else if (effect == 2) { // SCANLINE+
-        scanline = 0.80f;
-    } else if (effect == 3) { // SCANLINE++
-        scanline = 0.70f;
-    }
-
     for (y = 0; y < h; y++) {
         for (x = 0; x < w; x++) {
 
@@ -145,11 +135,8 @@ void NXVideo::unlock() {
             r = ((p & 0xf800) >> 11) << 3;
             g = ((p & 0x07e0) >> 5) << 2;
             b = (p & 0x001f) << 3;
-            pixel = y % 2 == 0 ?
-                    RGBA8_MAXALPHA(r, g, b) :
-                    RGBA8_MAXALPHA((u32) ((float) r * scanline),
-                                   (u32) ((float) g * scanline),
-                                   (u32) ((float) b * scanline));
+            pixel = RGBA8_MAXALPHA(r, g, b);
+
             if (point) {
                 for (subx = 0; subx < sf; subx++) {
                     for (suby = 0; suby < sf; suby++) {

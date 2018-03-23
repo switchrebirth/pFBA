@@ -14,7 +14,7 @@ set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, f
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-set(BUILD_NX ON CACHE BOOL "Build with NX (SWITCH) support")
+set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")

@@ -11,10 +11,11 @@ set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) suppor
 set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
 set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 (software) support")
 set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
-set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
+set(BUILD_PSP2 ON CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
 set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
+set(BUILD_NX_GL OFF CACHE BOOL "Build with NX (SWITCH) support (software, osmesa)")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")

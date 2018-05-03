@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 
 # pfba version
 set(PFBA_VERSION_MAJOR 1)
-set(PFBA_VERSION_MINOR 54)
+set(PFBA_VERSION_MINOR 55)
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
@@ -146,6 +146,7 @@ set(CPU_DIRS
         fba/src/cpu/h6280
         fba/src/cpu/hd6309
         fba/src/cpu/i8039
+        fba/src/cpu/i8x41
         fba/src/cpu/i8051
         fba/src/cpu/konami
         fba/src/cpu/m68k
@@ -164,6 +165,7 @@ set(CPU_DIRS
         fba/src/cpu/upd7810
         fba/src/cpu/v60
         fba/src/cpu/z80
+        fba/src/cpu/z180
         )
 file(GLOB SRC_CPU
         fba/src/cpu/*.c*
@@ -175,6 +177,7 @@ file(GLOB SRC_CPU
         fba/src/cpu/h6280/*.c*
         fba/src/cpu/hd6309/*.c*
         fba/src/cpu/i8039/*.c*
+        fba/src/cpu/i8x41/*.c*
         fba/src/cpu/i8051/*.c*
         fba/src/cpu/konami/*.c*
         fba/src/cpu/m68k/*.c*
@@ -193,6 +196,7 @@ file(GLOB SRC_CPU
         fba/src/cpu/upd7810/*.c*
         fba/src/cpu/v60/*.c*
         fba/src/cpu/z80/*.c*
+        fba/src/cpu/z180/*.c*
         # PFBA
         pfba/cpu/c68000_intf.cpp
         )
@@ -222,10 +226,12 @@ list(REMOVE_ITEM SRC_CPU
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6805/6805ops.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6809/6809ops.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m6809/6809tbl.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/mips3/mips3_dasm.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/nec/necinstr.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/nec/v25sfr.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/nec/v25instr.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/i8051/mcs51ops.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/i8x41/8x41dasm.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/upd7810/7810ops.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/upd7810/7810tbl.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/op12.c
@@ -242,6 +248,12 @@ list(REMOVE_ITEM SRC_CPU
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/optable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/v60mem.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/v60/v60d.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/z180/z180cb.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/z180/z180dd.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/z180/z180ed.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/z180/z180fd.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/z180/z180op.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/z180/z180xy.c
         )
 
 ##############
@@ -313,7 +325,6 @@ set(FLAGS
         -DINCLUDE_7Z_SUPPORT
         -DUSE_SPEEDHACKS
         -DBUILD_SDL -DBUILD_M68K
-        -DTOAPLAN_SOUND_SAMPLES_HACK
         -Wno-write-strings -Wno-narrowing
         -fforce-addr -finline-limit=1200
         -Wno-sign-compare

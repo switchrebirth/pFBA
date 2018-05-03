@@ -17,7 +17,8 @@ PFBA: Portable Final Burn Alpha
 **Currently supported devices**
 
 >- Linux (sdl1, sdl2)
->- Ps Vita (vita2d)
+>- Sony Ps Vita (vita2d)
+>- Nintendo Switch (libnx, sdl2)
 
 -----
 

@@ -12,7 +12,7 @@ extern int InpMake(Input::Player *players);
 
 extern unsigned char inputServiceSwitch;
 extern unsigned char inputP1P2Switch;
-extern int nSekCpuCore;
+//extern int nSekCpuCore;
 
 GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
 
@@ -30,9 +30,11 @@ GuiEmu::GuiEmu(Gui *g) : Rectangle(g->getRenderer()->getSize()) {
 int GuiEmu::run(int driver) {
 
     bForce60Hz = true;
+/*
 #if defined(__PSP2__) || defined(__RPI__)
     nSekCpuCore = getSekCpuCore();
 #endif
+*/
     ///////////
     // AUDIO
     //////////
@@ -296,6 +298,10 @@ Video *GuiEmu::getVideo() {
     return video;
 }
 
+/*
+ * it seems cyclone asm core needs fixes to work with fba 0.2.97.43+
+ * disable it for now as it's not really useful anyway...
+ *
 #if defined(__PSP2__) || defined(__RPI__)
 
 int GuiEmu::getSekCpuCore() {
@@ -352,5 +358,5 @@ int GuiEmu::getSekCpuCore() {
 
     return sekCpuCore;
 }
-
+*/
 #endif

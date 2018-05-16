@@ -70,12 +70,16 @@ RomList::RomList(Gui *gui) {
 
     char path[MAX_PATH];
     char pathUppercase[MAX_PATH]; // sometimes on FAT32 short files appear as all uppercase
+
     for (UINT32 i = 0; i < nBurnDrvCount; i++) {
 
         nBurnDrvActive = i;
 
         Rom *rom = new Rom();
-        rom->zip = BurnDrvGetTextA(DRV_NAME);
+        char *zn;
+        BurnDrvGetZipName(&zn, 0);
+        strncpy(rom->zip, zn, 64);
+        TODO
         rom->parent = BurnDrvGetTextA(DRV_PARENT);
         rom->name = BurnDrvGetTextA(DRV_FULLNAME);
         rom->year = BurnDrvGetTextA(DRV_DATE);
@@ -101,14 +105,17 @@ RomList::RomList(Gui *gui) {
             }
         }
 
+        snprintf(path, MAX_PATH, "%s.zip", rom->zip);
+        for (int k = 0; k < MAX_PATH; k++) {
+            pathUppercase[k] = (char) toupper(path[k]);
+        }
+
         for (int j = 0; j < DIRS_MAX; j++) {
+
             if (files[j].empty()) {
                 continue;
             }
-            sprintf(path, "%s.zip", rom->zip);
-            for (int k = 0; k < MAX_PATH; k++) {
-                pathUppercase[k] = toupper(path[k]);
-            }
+
             if (std::find(files[j].begin(), files[j].end(), path) != files[j].end() ||
                 std::find(files[j].begin(), files[j].end(), pathUppercase) != files[j].end()) {
                 rom->state = BurnDrvIsWorking() ? RomState::WORKING : RomState::NOT_WORKING;

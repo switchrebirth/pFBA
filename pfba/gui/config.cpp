@@ -9,15 +9,26 @@
 
 using namespace c2d;
 
-Config::Config(c2d::Renderer *renderer, const std::string &cfgPath, const std::string &defaultRomPath) {
+Config::Config(c2d::Renderer *renderer, const std::string &cfgPath,
+               const std::string &romPath, const std::string &homePath) {
 
     configPath = cfgPath;
 
     // gui config
     options_gui.clear();
 
+    // set default roms paths
     roms_paths.clear();
-    roms_paths.emplace_back(defaultRomPath + "/");
+    roms_paths.emplace_back(romPath + "/");
+    roms_paths.emplace_back(homePath + "coleco/");
+    roms_paths.emplace_back(homePath + "gamegear/");
+    roms_paths.emplace_back(homePath + "megadriv/");
+    roms_paths.emplace_back(homePath + "msx/");
+    roms_paths.emplace_back(homePath + "pce/");
+    roms_paths.emplace_back(homePath + "sg1000/");
+    roms_paths.emplace_back(homePath + "sgx/");
+    roms_paths.emplace_back(homePath + "sms/");
+    roms_paths.emplace_back(homePath + "tg16/");
     for (size_t i = roms_paths.size(); i < DIRS_MAX; i++) {
         roms_paths.emplace_back("");
     }

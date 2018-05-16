@@ -201,7 +201,7 @@ file(GLOB SRC_CPU
         #pfba/cpu/c68000_intf.cpp
         )
 list(REMOVE_ITEM SRC_CPU
-        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m68000_intf.cpp
+        #${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/m68000_intf.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/adsp2100/2100ops.c
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/tms34010/tms34010_dasm.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/cpu/tms34010/tms34010_newdasm.cpp

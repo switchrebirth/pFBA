@@ -17,7 +17,8 @@ class Config {
 
 public:
 
-    Config(c2d::Renderer *renderer, const std::string &cfgPath, const std::string &defaultRomPath);
+    Config(c2d::Renderer *renderer, const std::string &cfgPath,
+           const std::string &defaultRomPath, const std::string &homePath);
 
     ~Config() {};
 

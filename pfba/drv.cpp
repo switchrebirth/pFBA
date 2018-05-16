@@ -43,24 +43,21 @@ static int DoLibInit()                    // Do Init of Burn library driver
 // Catch calls to BurnLoadRom() once the emulation has started;
 // Intialise the zip module before forwarding the call, and exit cleanly.
 static int DrvLoadRom(unsigned char *Dest, int *pnWrote, int i) {
+
     int nRet;
 
     BzipOpen(false);
 
-    char *pszFilename;
-    BurnDrvGetRomName(&pszFilename, i, 0);
-    printf("DrvLoadRom: BurnExtLoadRom(%s)\n", pszFilename);
-    nRet = BurnExtLoadRom(Dest, pnWrote, i);
-    printf("DrvLoadRom: BurnExtLoadRom = %i\n", nRet);
+    if ((nRet = BurnExtLoadRom(Dest, pnWrote, i)) != 0) {
+        char* pszFilename;
 
-    if (nRet != 0) {
+        BurnDrvGetRomName(&pszFilename, i, 0);
         char szText[256] = "";
         sprintf(szText,
-                "Error loading %s, requested by %s.\n"
-                        "The emulation will likely suffer problems.",
-                pszFilename, BurnDrvGetTextA(0));
+                "Error loading %s for %s.\nEmulation will likely have problems.",
+                pszFilename, BurnDrvGetTextA(DRV_NAME));
         printf("DrvLoadRom: %s\n", szText);
-        //gui->getUiMessageBox()->show("ERROR", szText, "OK");
+        ui->getUiMessageBox()->show("ERROR", szText, "OK");
     }
 
     BzipClose();

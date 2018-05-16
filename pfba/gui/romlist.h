@@ -46,14 +46,14 @@ public:
 
     class Rom : public c2d::Io::File {
     public:
-        char *zip;
-        char *year;
-        char *manufacturer;
-        char *parent;
+        char zip[64];
+        char *year = NULL;
+        char *manufacturer = NULL;
+        char *parent = NULL;
         int flags;
         int state;
         int hardware;
-        char *system;
+        char *system = NULL;
         int genre;
     };
 

@@ -358,5 +358,5 @@ int GuiEmu::getSekCpuCore() {
 
     return sekCpuCore;
 }
-*/
 #endif
+*/

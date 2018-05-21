@@ -79,7 +79,6 @@ RomList::RomList(Gui *gui) {
         char *zn;
         BurnDrvGetZipName(&zn, 0);
         strncpy(rom->zip, zn, 64);
-        TODO
         rom->parent = BurnDrvGetTextA(DRV_PARENT);
         rom->name = BurnDrvGetTextA(DRV_FULLNAME);
         rom->year = BurnDrvGetTextA(DRV_DATE);

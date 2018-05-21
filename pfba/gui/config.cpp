@@ -193,10 +193,10 @@ Config::Config(c2d::Renderer *renderer, const std::string &cfgPath,
                                     Option::Index::KEY_COIN1, Option::Type::INPUT));  // ESCAPE
     options_gui.emplace_back(Option("KEY_START1", {std::to_string(KEY_KB_START1_DEFAULT)}, KEY_KB_START1_DEFAULT,
                                     Option::Index::KEY_START1, Option::Type::INPUT));// ENTER
-    options_gui.emplace_back(Option("KEY_MENU1", {std::to_string(KEY_KB_MENU1_DEFAULT)}, KEY_KB_MENU1_DEFAULT,
-                                    Option::Index::KEY_MENU1, Option::Type::INPUT));
-    options_gui.emplace_back(Option("KEY_MENU2", {std::to_string(KEY_KB_MENU2_DEFAULT)}, KEY_KB_MENU2_DEFAULT,
-                                    Option::Index::KEY_MENU2, Option::Type::INPUT));
+    //options_gui.emplace_back(Option("KEY_MENU1", {std::to_string(KEY_KB_MENU1_DEFAULT)}, KEY_KB_MENU1_DEFAULT,
+    //                                Option::Index::KEY_MENU1, Option::Type::INPUT));
+    //options_gui.emplace_back(Option("KEY_MENU2", {std::to_string(KEY_KB_MENU2_DEFAULT)}, KEY_KB_MENU2_DEFAULT,
+    //                                Option::Index::KEY_MENU2, Option::Type::INPUT));
 #endif
 
     //
@@ -401,8 +401,8 @@ int *Config::getGuiPlayerInputKeys(int player) {
     keyboard_keys[9] = getValue(Option::Index::KEY_FIRE4);
     keyboard_keys[10] = getValue(Option::Index::KEY_FIRE5);
     keyboard_keys[11] = getValue(Option::Index::KEY_FIRE6);
-    keyboard_keys[12] = getValue(Option::Index::KEY_MENU1);
-    keyboard_keys[13] = getValue(Option::Index::KEY_MENU2);
+    //keyboard_keys[12] = getValue(Option::Index::KEY_MENU1);
+    //keyboard_keys[13] = getValue(Option::Index::KEY_MENU2);
 #endif
 
     return keyboard_keys;
@@ -445,8 +445,8 @@ int *Config::getRomPlayerInputKeys(int player) {
     keyboard_keys[9] = getValue(Option::Index::KEY_FIRE4, true);
     keyboard_keys[10] = getValue(Option::Index::KEY_FIRE5, true);
     keyboard_keys[11] = getValue(Option::Index::KEY_FIRE6, true);
-    keyboard_keys[12] = getValue(Option::Index::KEY_MENU1, true);
-    keyboard_keys[13] = getValue(Option::Index::KEY_MENU2, true);
+    //keyboard_keys[12] = getValue(Option::Index::KEY_MENU1, true);
+    //keyboard_keys[13] = getValue(Option::Index::KEY_MENU2, true);
 #endif
 
     return keyboard_keys;

@@ -70,7 +70,7 @@ public:
         KEY_FIRE5,
         KEY_FIRE6,
         KEY_COIN1,
-        KEY_START1
+        KEY_START1,
 #endif
         END
     };

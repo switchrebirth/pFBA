@@ -49,7 +49,7 @@ static int DrvLoadRom(unsigned char *Dest, int *pnWrote, int i) {
     BzipOpen(false);
 
     if ((nRet = BurnExtLoadRom(Dest, pnWrote, i)) != 0) {
-        char* pszFilename;
+        char *pszFilename;
 
         BurnDrvGetRomName(&pszFilename, i, 0);
         char szText[256] = "";
@@ -88,8 +88,8 @@ int DrvInit(int nDrvNum, bool bRestore) {
     printf("DrvInit: BurnExtLoadRom = DrvLoadRom\n");
     BurnExtLoadRom = DrvLoadRom;
 
-    char path[MAX_PATH];
-    snprintf(path, MAX_PATH, "%s%s.fs", szAppEEPROMPath, BurnDrvGetTextA(DRV_NAME));
+    char path[1024];
+    snprintf(path, 1023, "%s%s.fs", szAppEEPROMPath, BurnDrvGetTextA(DRV_NAME));
     BurnStateLoad(path, 0, NULL);
 
     bDrvOkay = 1;                    // Okay to use all BurnDrv functions
@@ -106,8 +106,8 @@ int DrvInitCallback() {
 int DrvExit() {
     if (bDrvOkay) {
         if (nBurnDrvSelect[0] < nBurnDrvCount) {
-            char path[MAX_PATH];
-            snprintf(path, MAX_PATH, "%s%s.fs", szAppEEPROMPath, BurnDrvGetTextA(DRV_NAME));
+            char path[1024];
+            snprintf(path, 1023, "%s%s.fs", szAppEEPROMPath, BurnDrvGetTextA(DRV_NAME));
             BurnStateSave(path, 0);
             BurnDrvExit();                // Exit the driver
         }

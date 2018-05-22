@@ -51,13 +51,13 @@ public:
             infoText->setVisibility(Hidden);
         } else {
             // load preview image
-            snprintf(texture_path, MAX_PATH, "%s/%s.png", szAppPreviewPath, rom->zip);
+            snprintf(texture_path, 1023, "%s/%s.png", szAppPreviewPath, rom->zip);
             texture = new C2DTexture(texture_path);
             if (!texture->available && rom->parent) {
                 // try parent image
                 delete (texture);
                 memset(texture_path, 0, MAX_PATH);
-                sprintf(texture_path, "%s/%s.png", szAppPreviewPath, rom->parent);
+                snprintf(texture_path, 1023, "%s/%s.png", szAppPreviewPath, rom->parent);
                 texture = new C2DTexture(texture_path);
             }
             // set preview image
@@ -96,7 +96,7 @@ public:
     Texture *texture = NULL;
     Rectangle *infoBox = NULL;
     Text *infoText = NULL;
-    char texture_path[MAX_PATH];
+    char texture_path[1024];
     char info[1024];
     char rotation[64];
     float margin = 0;

@@ -83,7 +83,7 @@ RomList::RomList(Gui *gui) {
         Rom *rom = new Rom();
         char *zn;
         BurnDrvGetZipName(&zn, 0);
-        strncpy(rom->zip, zn, 64);
+        strncpy(rom->zip, zn, 63);
         rom->drv = i;
         rom->drv_name = BurnDrvGetTextA(DRV_NAME);
         rom->parent = BurnDrvGetTextA(DRV_PARENT);

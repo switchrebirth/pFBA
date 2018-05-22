@@ -82,8 +82,8 @@ public:
 
         memset(path, 0, MAX_PATH);
         memset(shot, 0, MAX_PATH);
-        sprintf(path, "%s/%s%i.sav", szAppSavePath, rom->name, id);
-        sprintf(shot, "%s/%s%i.png", szAppSavePath, rom->name, id);
+        snprintf(path, 1023, "%s/%s%i.sav", szAppSavePath, rom->drv_name, id);
+        snprintf(shot, 1023, "%s/%s%i.png", szAppSavePath, rom->drv_name, id);
 
         loadTexture();
     }
@@ -104,8 +104,8 @@ public:
     Texture *texture = NULL;
     Text *middle_text = NULL;
     Text *bottom_text = NULL;
-    char path[MAX_PATH];
-    char shot[MAX_PATH];
+    char path[1024];
+    char shot[1024];
     char bottom_text_char[32];
     bool exist = false;
     int id = 0;

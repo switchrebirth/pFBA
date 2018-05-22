@@ -13,6 +13,11 @@
 
 using namespace c2d;
 
+static inline bool endsWith(std::string const &value, std::string const &ending) {
+    if (ending.size() > value.size()) return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
 RomList::RomList(Gui *gui) {
 
     printf("RomList\n");
@@ -64,7 +69,7 @@ RomList::RomList(Gui *gui) {
     for (unsigned int i = 0; i < paths.size(); i++) {
         if (!paths[i].empty()) {
             files[i] = gui->getIo()->getDirList(paths[i].c_str());
-            printf("RomList: found %i files in `%s`\n", (int) files[i].size(), paths[i].c_str());
+            //printf("RomList: found %i files in `%s`\n", (int) files[i].size(), paths[i].c_str());
         }
     }
 
@@ -79,6 +84,8 @@ RomList::RomList(Gui *gui) {
         char *zn;
         BurnDrvGetZipName(&zn, 0);
         strncpy(rom->zip, zn, 64);
+        rom->drv = i;
+        rom->drv_name = BurnDrvGetTextA(DRV_NAME);
         rom->parent = BurnDrvGetTextA(DRV_PARENT);
         rom->name = BurnDrvGetTextA(DRV_FULLNAME);
         rom->year = BurnDrvGetTextA(DRV_DATE);
@@ -115,13 +122,90 @@ RomList::RomList(Gui *gui) {
                 continue;
             }
 
-            if (std::find(files[j].begin(), files[j].end(), path) != files[j].end() ||
-                std::find(files[j].begin(), files[j].end(), pathUppercase) != files[j].end()) {
+            auto file = std::find(files[j].begin(), files[j].end(), path);
+            if (file == files[j].end()) {
+                file = std::find(files[j].begin(), files[j].end(), pathUppercase);
+            }
+
+            if (file != files[j].end()) {
+
+                int prefix = (((rom->hardware | HARDWARE_PREFIX_CARTRIDGE) ^ HARDWARE_PREFIX_CARTRIDGE) & 0xff000000);
+
+                switch (prefix) {
+                    case HARDWARE_PREFIX_COLECO:
+                        if (!endsWith(paths[j], "coleco/")) {
+                            continue;
+                        }
+                        break;
+                    case HARDWARE_PREFIX_SEGA_GAME_GEAR:
+                        if (!endsWith(paths[j], "gamegear/")) {
+                            continue;
+                        }
+                        break;
+                    case HARDWARE_PREFIX_SEGA_MEGADRIVE:
+                        if (!endsWith(paths[j], "megadriv/")) {
+                            continue;
+                        }
+                        break;
+                    case HARDWARE_PREFIX_MSX:
+                        if (!endsWith(paths[j], "msx/")) {
+                            continue;
+                        }
+                        break;
+                    case HARDWARE_PREFIX_SEGA_SG1000:
+                        if (!endsWith(paths[j], "sg1000/")) {
+                            continue;
+                        }
+                        break;
+                    case HARDWARE_PREFIX_SEGA_MASTER_SYSTEM:
+                        if (!endsWith(paths[j], "sms/")) {
+                            continue;
+                        }
+                        break;
+                    case HARDWARE_PREFIX_PCENGINE:
+                        switch (rom->hardware) {
+                            case HARDWARE_PCENGINE_PCENGINE:
+                                if (!endsWith(paths[j], "pce/")) {
+                                    continue;
+                                }
+                                break;
+                            case HARDWARE_PCENGINE_TG16:
+                                if (!endsWith(paths[j], "tg16/")) {
+                                    continue;
+                                }
+                                break;
+                            case HARDWARE_PCENGINE_SGX:
+                                if (!endsWith(paths[j], "sgx/")) {
+                                    continue;
+                                }
+                                break;
+                            default:
+                                continue;
+                        }
+                        break;
+                    default:
+                        if (endsWith(paths[j], "coleco/")
+                            || endsWith(paths[j], "gamegear/")
+                            || endsWith(paths[j], "megadriv/")
+                            || endsWith(paths[j], "msx/")
+                            || endsWith(paths[j], "sg1000/")
+                            || endsWith(paths[j], "sms/")
+                            || endsWith(paths[j], "pce/")
+                            || endsWith(paths[j], "sgx/")
+                            || endsWith(paths[j], "tg16/")) {
+                            continue;
+                        }
+                        break;
+                }
+
+                //snprintf(rom->zip_path, 256, "%s%s", paths[j].c_str(), file->c_str());
                 rom->state = BurnDrvIsWorking() ? RomState::WORKING : RomState::NOT_WORKING;
                 hardwareList->at(0).available_count++;
+
                 if (rom->parent) {
                     hardwareList->at(0).available_clone_count++;
                 }
+
                 if (hardware) {
                     hardware->available_count++;
                     if (rom->parent) {

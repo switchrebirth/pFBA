@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "burner.h"
+
 class Gui;
 
 #define HARDWARE_PREFIX_ALL 0xffffffff
@@ -47,6 +48,7 @@ public:
     class Rom : public c2d::Io::File {
     public:
         char zip[64];
+        char *drv_name;
         char *year = NULL;
         char *manufacturer = NULL;
         char *parent = NULL;
@@ -54,6 +56,7 @@ public:
         int state;
         int hardware;
         char *system = NULL;
+        unsigned int drv;
         int genre;
     };
 

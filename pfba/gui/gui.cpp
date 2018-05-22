@@ -136,42 +136,21 @@ float Gui::getScaling() {
 
 void Gui::runRom(RomList::Rom *rom) {
 
-    if (rom == NULL) {
+    if (!rom) {
         return;
     }
 
-    char path[MAX_PATH];
-    for (int i = 0; i < DIRS_MAX; i++) {
-        if (strlen(config->getRomPath(i)) > 0) {
-            sprintf(path, "%s%s.zip", config->getRomPath(i), rom->zip);
-            printf("%s\n", path);
-            if (io->exist(path))
-                break;
-        }
-    }
-
-    if (!io->exist(path)) {
-        printf("RunRom: rom not found: `%s`\n", rom->zip);
-        return;
-    }
-
-    printf("RunRom: %s\n", path);
-    for (nBurnDrvSelect[0] = 0; nBurnDrvSelect[0] < nBurnDrvCount; nBurnDrvSelect[0]++) {
-        nBurnDrvActive = nBurnDrvSelect[0];
-        if (strcasecmp(rom->zip, BurnDrvGetTextA(DRV_NAME)) == 0)
-            break;
-    }
-
+    nBurnDrvActive = rom->drv;
     if (nBurnDrvActive >= nBurnDrvCount) {
         printf("RunRom: driver not found\n");
         return;
     }
 
     // load rom settings
-    printf("RunRom: config->LoadRom(%s)\n", rom->zip);
+    printf("RunRom: config->load(%s)\n", rom->drv_name);
     config->load(rom);
 
-    printf("RunRom: uiEmu->load(%i)\n", nBurnDrvActive);
+    printf("RunRom: uiEmu->run(%i)\n", nBurnDrvActive);
     uiEmu->run(nBurnDrvActive);
 }
 

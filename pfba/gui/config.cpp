@@ -222,7 +222,7 @@ void Config::load(RomList::Rom *rom) {
     if (isRomCfg) {
         path = szAppConfigPath;
         path += "/";
-        path += rom->zip;
+        path += rom->drv_name;
         path += ".cfg";
     }
 
@@ -298,7 +298,7 @@ void Config::save(RomList::Rom *rom) {
     if (isRomCfg) {
         path = szAppConfigPath;
         path += "/";
-        path += rom->zip;
+        path += rom->drv_name;
         path += ".cfg";
     }
 

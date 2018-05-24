@@ -40,7 +40,7 @@ int GuiEmu::run(int driver) {
     //////////
     int audio = ui->getConfig()->getValue(Option::Index::ROM_AUDIO, true);
     if (audio && ui->getAudio()->available) {
-        printf("Creating audio device\n");
+        printf("Creating audio device...\n");
         // disable interpolation as it produce "cracking" sound
         // on some games (cps1 (SF2), cave ...)
         nInterpolation = 1;
@@ -49,17 +49,22 @@ int GuiEmu::run(int driver) {
         nBurnSoundLen = ui->getAudio()->buffer_len;
         pBurnSoundOut = ui->getAudio()->buffer;
         ui->getAudio()->reset();
+        printf("done\n");
     }
 
     ///////////
     // DRIVER
     //////////
+    printf("InpInit...\n");
     InpInit();
+    printf("done\n");
+    printf("InpDIP...\n");
     InpDIP();
+    printf("done\n");
 
-    printf("Initialize driver\n");
+    printf("Initialize driver...\n");
     if (DrvInit(driver, false) != 0) {
-        printf("Driver initialisation failed! Likely causes are:\n"
+        printf("\nDriver initialisation failed! Likely causes are:\n"
                        "- Corrupt/Missing ROM(s)\n"
                        "- I/O Error\n"
                        "- Memory error\n\n");
@@ -69,16 +74,19 @@ int GuiEmu::run(int driver) {
         ui->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
         return -1;
     }
+    printf("done\n");
 
     ///////////
     // VIDEO
     //////////
-    printf("Creating video device\n");
+    printf("Creating video device...\n");
     ui->getRenderer()->clear();
     int w, h;
     BurnDrvGetFullSize(&w, &h);
     video = new Video(ui, Vector2f(w, h));
     add(video);
+    printf("done\n");
+
     // set fps text on top
     fpsText->setLayer(1);
 
@@ -101,16 +109,22 @@ int GuiEmu::run(int driver) {
 
 void GuiEmu::stop() {
 
+    printf("DrvExit...\n");
     DrvExit();
+    printf("Done\n");
+    printf("InpExit...\n");
     InpExit();
+    printf("Done\n");
 
     if (ui->getAudio()) {
         ui->getAudio()->pause(1);
     }
 
     if (video) {
+        printf("Closing video...\n");
         delete (video);
         video = NULL;
+        printf("Done\n");
     }
 
     ui->updateInputMapping(false);
@@ -218,12 +232,14 @@ void GuiEmu::updateFrame() {
 #else
         ui->getRenderer()->flip();
 #endif
+        /*
         timer += ui->getRenderer()->getDeltaTime().asSeconds();
         if (timer >= 1) {
             timer = 0;
             printf("fps: %.2g/%2d, delta: %f\n", ui->getRenderer()->getFps(), (nBurnFPS / 100),
                    ui->getRenderer()->getDeltaTime().asSeconds());
         }
+        */
     }
 }
 

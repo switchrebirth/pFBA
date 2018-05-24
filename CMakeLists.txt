@@ -73,7 +73,6 @@ list(REMOVE_ITEM SRC_BURNER
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/misc.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/sshot.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/state.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/fba/src/burner/statec.cpp
         )
 ##############
 # drivers

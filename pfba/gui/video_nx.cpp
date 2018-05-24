@@ -250,9 +250,11 @@ void NXVideo::updateScaling() {
 
 NXVideo::~NXVideo() {
 
+    printf("NXVideo::~NXVideo...\n");
     if (pixels) {
         free(pixels);
     }
+    printf("Done\n");
 }
 
 #endif

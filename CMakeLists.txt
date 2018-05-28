@@ -22,14 +22,14 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 
 # setup toolchain
-include(pfba/deps/libcross2d/Toolchain.cmake)
+include(libcross2d/Toolchain.cmake)
 enable_language(ASM)
 
 execute_process(COMMAND "date" "+%Y.%m.%d" OUTPUT_VARIABLE BUILD_DATE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # add cross2d library. If you want to port pfba to another platform,
 # you should (may) only need to port this library.
-add_subdirectory(pfba/deps/libcross2d)
+add_subdirectory(libcross2d)
 
 project(pfba)
 

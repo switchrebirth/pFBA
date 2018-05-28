@@ -9,27 +9,30 @@ set(PFBA_VERSION_MINOR 55)
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
 set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) support")
 set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
-set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 (software) support")
-set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
+set(BUILD_SDL2 ON CACHE BOOL "Build with SDL2 (software) support")
+set(BUILD_SDL2_GL ON CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
 set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
 set(BUILD_NX_GL OFF CACHE BOOL "Build with NX (SWITCH) support (software, osmesa)")
 
+set(BUILD_PFBA ON CACHE BOOL "Build with PFBA support")
+set(BUILD_SNES9X OFF CACHE BOOL "Build with SNES9X support")
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")
 endif ()
 
 # setup toolchain
-include(libcross2d/Toolchain.cmake)
+#include(libcross2d/Toolchain.cmake)
+
+# add libcross2d/libcross2dui library. If you want to port pfba to another platform,
+# you should (may) only need to port libcross2d library.
+add_subdirectory(libcross2dui)
 enable_language(ASM)
 
 execute_process(COMMAND "date" "+%Y.%m.%d" OUTPUT_VARIABLE BUILD_DATE OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-# add cross2d library. If you want to port pfba to another platform,
-# you should (may) only need to port this library.
-add_subdirectory(libcross2d)
 
 project(pfba)
 
@@ -281,33 +284,12 @@ file(GLOB SRC_7Z
 ##############
 # pfba
 ##############
-set(PFBA_DIRS
-        pfba
-        pfba/gui
-        )
-file(GLOB SRC_PFBA
-        pfba/*.c*
-        pfba/gui/*.c*
-        )
-
-##############
-# libconfig
-##############
-set(LIBCONFIG_DIRS
-        pfba/deps/libconfig-1.5/lib
-        )
-file(GLOB SRC_LIBCONFIG
-        pfba/deps/libconfig-1.5/lib/grammar.c
-        pfba/deps/libconfig-1.5/lib/libconfig.c
-        pfba/deps/libconfig-1.5/lib/scanctx.c
-        pfba/deps/libconfig-1.5/lib/scanner.c
-        pfba/deps/libconfig-1.5/lib/strbuf.c
-        )
+set(PFBA_DIRS pfba)
+file(GLOB SRC_PFBA pfba/*.c*)
 
 # includes
 set(INC ${PFBA_DIRS}
         ${7Z_DIRS}
-        ${LIBCONFIG_DIRS}
         ${BURN_DIRS}
         ${BURNER_DIRS}
         ${DRV_DIRS}
@@ -322,11 +304,8 @@ set(FLAGS
         -D__PFBA_VERSION_MAJOR__=${PFBA_VERSION_MAJOR}
         -D__PFBA_VERSION_MINOR__=${PFBA_VERSION_MINOR}
         -DINCLUDE_7Z_SUPPORT
-        -DUSE_SPEEDHACKS
-        -DBUILD_SDL -DBUILD_M68K
-        -Wno-write-strings -Wno-narrowing
-        -fforce-addr -finline-limit=1200
-        -Wno-sign-compare
+        -DUSE_SPEEDHACKS -DBUILD_SDL -DBUILD_M68K
+        -Wno-write-strings -Wno-narrowing -fforce-addr -finline-limit=1200 -Wno-sign-compare
         -DFASTCALL -U__fastcall -D_fastcall= -D__fastcall= -D__fastcall__=
         #"-DINLINE=static inline" "-DSH2_INLINE=static inline"
         -Wno-unused-variable -Wno-unused-but-set-variable -Wno-sequence-point
@@ -365,7 +344,6 @@ elseif (BUILD_PS3)
             -DNO_KEYBOARD -D__CELLOS_LV2__ -DUSE_FILE32API
             -mhard-float -ffunction-sections -fdata-sections)
     set(LDFLAGS
-            cross2d
             ${PSL1GHT}/ppu/lib/libpngdec.a
             ${PSL1GHT}/portlibs/ppu/lib/libfreetype.a
             ${PSL1GHT}/portlibs/ppu/lib/libpng.a
@@ -389,7 +367,6 @@ elseif (BUILD_3DS)
             -DNO_KEYBOARD -D__PFBA_ARM__ -DUSE_FILE32API -DLSB_FIRST
             -ffunction-sections -fomit-frame-pointer)
     set(LDFLAGS
-            cross2d
             ${DEVKITPRO}/portlibs/armv6k/lib/libpng.a
             ${DEVKITPRO}/portlibs/armv6k/lib/libz.a
             ${DEVKITPRO}/libctru/lib/libcitro3d.a
@@ -420,7 +397,7 @@ elseif (BUILD_SFML)
 endif (BUILD_PSP2)
 
 # source files
-set(SRC ${SRC_PFBA} ${SRC_CPU} ${SRC_DRV} ${SRC_BURN} ${SRC_BURNER} ${SRC_INTF} ${SRC_7Z} ${SRC_LIBCONFIG})
+set(SRC ${SRC_PFBA} ${SRC_CPU} ${SRC_DRV} ${SRC_BURN} ${SRC_BURNER} ${SRC_INTF} ${SRC_7Z})
 
 ############
 # FBA deps
@@ -452,7 +429,7 @@ add_executable(${PROJECT_NAME}.elf ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
 target_compile_options(${PROJECT_NAME}.elf PRIVATE ${FLAGS})
 target_compile_options(${PROJECT_NAME}.elf PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++11 -fpermissive>)
 target_include_directories(${PROJECT_NAME}.elf PRIVATE ${INC})
-target_link_libraries(${PROJECT_NAME}.elf cross2d ${LDFLAGS})
+target_link_libraries(${PROJECT_NAME}.elf cross2dui ${LDFLAGS})
 add_dependencies(${PROJECT_NAME}.elf ${PROJECT_NAME}.data)
 
 #####################

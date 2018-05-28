@@ -4,3 +4,6 @@
 [submodule "libcross2d"]
 	path = libcross2d
 	url = git@github.com:Cpasjuste/libcross2d.git
+[submodule "libcross2dui"]
+	path = libcross2dui
+	url = git@github.com:Cpasjuste/libcross2dui.git

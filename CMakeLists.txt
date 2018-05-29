@@ -284,8 +284,8 @@ file(GLOB SRC_7Z
 ##############
 # pfba
 ##############
-set(PFBA_DIRS pfba)
-file(GLOB SRC_PFBA pfba/*.c*)
+set(PFBA_DIRS pfba pfba/fba)
+file(GLOB SRC_PFBA pfba/*.c* pfba/fba/*.c*)
 
 # includes
 set(INC ${PFBA_DIRS}

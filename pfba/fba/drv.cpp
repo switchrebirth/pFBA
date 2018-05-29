@@ -1,5 +1,5 @@
 // Driver Init module
-#include "gui.h"
+#include "c2dui_gui_main.h"
 #include "gui_progressbox.h"
 
 extern Gui *ui;

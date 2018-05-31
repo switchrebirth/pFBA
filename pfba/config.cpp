@@ -7,7 +7,7 @@
 
 #include "c2dui.h"
 #include "config.h"
-#include "c2dui_romlist.h"
+#include "romlist.h"
 
 using namespace c2d;
 using namespace c2dui;

@@ -2,6 +2,7 @@
 // Created by cpasjuste on 29/05/18.
 //
 
+#include "c2dui.h"
 #include "romlist.h"
 
 using namespace c2d;
@@ -48,7 +49,7 @@ void RomList::build() {
         }
 
         // add rom to specific hardware
-        Hardware *hardware = GetHardware(rom->hardware);
+        Hardware *hardware = getHardware(rom->hardware);
         if (hardware) {
             hardware->supported_count++;
             if (rom->parent) {

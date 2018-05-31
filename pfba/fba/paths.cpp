@@ -4,6 +4,26 @@
 #include <sys/stat.h>
 #include "burner.h"
 
+/////////
+// FBA
+/////////
+char szAppBurnVer[16] = VERSION;
+// replaces ips_manager.cpp
+bool bDoIpsPatch = 0;
+
+void IpsApplyPatches(UINT8 *base, char *rom_name) {}
+
+// needed by cps3run.cpp and dataeast/d_backfire.cpp
+void Reinitialise() {}
+
+// needed by neo_run.cpp
+void wav_exit() {}
+
+int bRunPause;
+/////////
+// FBA
+/////////
+
 #ifdef __PSP2__
 #include <psp2/io/stat.h>
 #define mkdir sceIoMkdir

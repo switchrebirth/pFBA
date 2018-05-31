@@ -1,9 +1,7 @@
 #include "burner.h"
 #include <png.h>
 #include <malloc.h>
-
-#include "gui/gui.h"
-#include "gui/gui_emu.h"
+#include "ui.h"
 
 #define SSHOT_NOERROR 0
 #define SSHOT_ERROR_BPP_NOTSUPPORTED 1
@@ -17,7 +15,7 @@ static UINT8 *pConvertedImage = NULL;
 static png_bytep *pSShotImageRows = NULL;
 static FILE *ff;
 
-extern Gui *ui;
+extern PFBAGui *ui;
 
 INT32 MakeScreenShot(const char *dest) {
     char szAuthor[256];

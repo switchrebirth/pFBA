@@ -17,10 +17,12 @@
  *
  */
 
-#include <fba/burner_sdl.h>
-#include <burn.h>
+#include "burn.h"
+#include "burner_sdl.h"
 
 #include "c2dui.h"
+
+#include "ui.h"
 #include "config.h"
 
 using namespace c2d;
@@ -52,27 +54,8 @@ Input *inp;
 Io *io;
 
 PFBAConfig *config;
+PFBAGui *ui;
 C2DUISkin *skin;
-
-/////////
-// FBA
-/////////
-char szAppBurnVer[16] = VERSION;
-// replaces ips_manager.cpp
-bool bDoIpsPatch = 0;
-
-void IpsApplyPatches(UINT8 *base, char *rom_name) {}
-
-// needed by cps3run.cpp and dataeast/d_backfire.cpp
-void Reinitialise() {}
-
-// needed by neo_run.cpp
-void wav_exit() {}
-
-int bRunPause;
-/////////
-// FBA
-/////////
 
 int main(int argc, char **argv) {
 
@@ -125,7 +108,7 @@ int main(int argc, char **argv) {
     io = new C2DIo();
 
     // load configuration
-    int version = (__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__;
+    int version = 100; //(__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__;
     config = new PFBAConfig(renderer, C2DUI_HOME_PATH, version);
 
     // skin
@@ -136,7 +119,7 @@ int main(int argc, char **argv) {
     audio->pause(1);
 
     // run gui
-    ui = new Gui(io, renderer, skin, config, inp, audio);
+    ui = new PFBAGui(renderer, io, inp, audio, config, skin);
     ui->run();
 
     // quit

@@ -5,9 +5,7 @@
 #ifndef PFBA_ROMLIST_H
 #define PFBA_ROMLIST_H
 
-#include "c2dui_gui_main.h"
-#include "c2dui_romlist.h"
-#include "burner.h"
+#include <string>
 
 #define HARDWARE_PREFIX_ALL 0xffffffff
 
@@ -19,7 +17,7 @@ public:
 
     void build() override;
 
-    static bool IsHardware(int hardware, int type) {
+    bool isHardware(int hardware, int type) override {
         return (((hardware | HARDWARE_PREFIX_CARTRIDGE) ^ HARDWARE_PREFIX_CARTRIDGE)
                 & 0xff000000) == (unsigned int) type;
     }

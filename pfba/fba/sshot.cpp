@@ -3,7 +3,6 @@
 #include <malloc.h>
 
 #include "c2dui.h"
-#include "ui.h"
 
 #define SSHOT_NOERROR 0
 #define SSHOT_ERROR_BPP_NOTSUPPORTED 1
@@ -17,7 +16,7 @@ static UINT8 *pConvertedImage = NULL;
 static png_bytep *pSShotImageRows = NULL;
 static FILE *ff;
 
-extern PFBAGui *ui;
+extern c2dui::C2DUIGuiMain *ui;
 
 int MakeScreenShot(const char *dest) {
     char szAuthor[256];

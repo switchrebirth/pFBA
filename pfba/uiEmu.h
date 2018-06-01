@@ -13,7 +13,7 @@ public:
 
     PFBAGuiEmu(c2dui::C2DUIGuiMain *ui);
 
-    int run(int driver, const std::string &path = "");
+    int run(c2dui::C2DUIRomList::Rom *rom);
 
     void stop();
 

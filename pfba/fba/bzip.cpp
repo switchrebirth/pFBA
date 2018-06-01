@@ -3,7 +3,6 @@
 #include <malloc.h>
 
 #include "c2dui.h"
-#include "ui.h"
 #include "burner.h"
 
 int nBzipError = 0;                                                // non-zero if there is a problem with the opened romset
@@ -26,7 +25,7 @@ static int nZipsFound = 0;
 StringSet BzipText;                                                // Text which describes any problems with loading the zip
 StringSet BzipDetail;                                            // Text which describes in detail any problems with loading the zip
 
-extern PFBAGui *ui;
+extern c2dui::C2DUIGuiMain *ui;
 
 static inline bool endsWith(std::string const &value, std::string const &ending) {
     if (ending.size() > value.size()) return false;

@@ -54,11 +54,11 @@ Renderer *renderer;
 Input *inp;
 Io *io;
 
-PFBAConfig *config;
 PFBAGui *ui;
-PFBARomList *romList;
 PFBAGuiMenu *uiMenu;
 PFBAGuiEmu *uiEmu;
+PFBAConfig *config;
+PFBARomList *romList;
 
 C2DUISkin *skin;
 C2DUIGuiRomList *uiRomList;

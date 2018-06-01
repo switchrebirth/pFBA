@@ -1,13 +1,12 @@
 // Driver Init module
 
 #include "c2dui.h"
-#include "ui.h"
 #include "burner.h"
 
 using namespace c2d;
 using namespace c2dui;
 
-extern PFBAGui *ui;
+extern C2DUIGuiMain *ui;
 extern UINT8 NeoSystem;
 int bDrvOkay = 0;                        // 1 if the Driver has been initted okay, and it's okay to use the BurnDrv functions
 int kNetGame = 0;

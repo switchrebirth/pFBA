@@ -12,10 +12,7 @@ public:
     PFBAGui(c2d::Renderer *renderer, c2d::Io *io, c2d::Input *input, c2d::Audio *audio,
             c2dui::C2DUIConfig *config, c2dui::C2DUISkin *skin);
 
-    ~PFBAGui();
-
     void runRom(c2dui::C2DUIRomList::Rom *rom) override;
 };
-
 
 #endif //PFBA_UI_H

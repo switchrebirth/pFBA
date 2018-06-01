@@ -28,7 +28,7 @@ PFBAGuiEmu::PFBAGuiEmu(C2DUIGuiMain *ui) : C2DUIGuiEmu(ui) {
     printf("PFBAGuiEmu()\n");
 }
 
-int PFBAGuiEmu::run(int driver, const std::string &path) {
+int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
 
     ///////////
     // AUDIO
@@ -56,7 +56,7 @@ int PFBAGuiEmu::run(int driver, const std::string &path) {
     InpInit();
     InpDIP();
     printf("Initialize driver...\n");
-    if (DrvInit(driver, false) != 0) {
+    if (DrvInit(rom->drv, false) != 0) {
         printf("\nDriver initialisation failed! Likely causes are:\n"
                "- Corrupt/Missing ROM(s)\n"
                "- I/O Error\n"
@@ -91,7 +91,7 @@ int PFBAGuiEmu::run(int driver, const std::string &path) {
     // VIDEO
     //////////
 
-    return C2DUIGuiEmu::run(driver, path);
+    return C2DUIGuiEmu::run(rom);
 }
 
 void PFBAGuiEmu::stop() {

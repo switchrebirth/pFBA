@@ -1,0 +1,250 @@
+//
+// Created by cpasjuste on 01/06/18.
+//
+
+#include "burner.h"
+
+#include "c2dui.h"
+#include "uiEmu.h"
+
+using namespace c2d;
+using namespace c2dui;
+
+extern int InpMake(Input::Player *players);
+
+extern unsigned char inputServiceSwitch;
+extern unsigned char inputP1P2Switch;
+
+static unsigned int myHighCol16(int r, int g, int b, int /* i */) {
+    unsigned int t;
+    t = (unsigned int) ((r << 8) & 0xf800); // rrrr r000 0000 0000
+    t |= (g << 3) & 0x07e0; // 0000 0ggg ggg0 0000
+    t |= (b >> 3) & 0x001f; // 0000 0000 000b bbbb
+    return t;
+}
+
+PFBAGuiEmu::PFBAGuiEmu(C2DUIGuiMain *ui) : C2DUIGuiEmu(ui) {
+
+    printf("PFBAGuiEmu()\n");
+}
+
+int PFBAGuiEmu::run(int driver, const std::string &path) {
+
+    ///////////
+    // AUDIO
+    //////////
+    int audio = getUi()->getConfig()->getValue(C2DUIOption::Index::ROM_AUDIO, true);
+    if (audio && getUi()->getAudio()->available) {
+        printf("Init audio device...");
+        // disable interpolation as it produce "cracking" sound
+        // on some games (cps1 (SF2), cave ...)
+        nInterpolation = 1;
+        nFMInterpolation = 0;
+        nBurnSoundRate = getUi()->getAudio()->frequency;
+        nBurnSoundLen = getUi()->getAudio()->buffer_len;
+        pBurnSoundOut = getUi()->getAudio()->buffer;
+        printf("done\n");
+    }
+    ///////////
+    // AUDIO
+    //////////
+
+    ///////////////
+    // FBA DRIVER
+    ///////////////
+    bForce60Hz = true;
+    InpInit();
+    InpDIP();
+    printf("Initialize driver...\n");
+    if (DrvInit(driver, false) != 0) {
+        printf("\nDriver initialisation failed! Likely causes are:\n"
+               "- Corrupt/Missing ROM(s)\n"
+               "- I/O Error\n"
+               "- Memory error\n\n");
+        DrvExit();
+        InpExit();
+        getUi()->getUiProgressBox()->setVisibility(Hidden);
+        getUi()->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
+        return -1;
+    }
+    nFramesEmulated = 0;
+    nFramesRendered = 0;
+    nCurrentFrame = 0;
+    setFrameDuration(1.0f / ((float) nBurnFPS / 100.0f));
+    printf("frame_duration: %f\n", getFrameDuration());
+    printf("done\n");
+    ///////////////
+    // FBA DRIVER
+    ///////////////
+
+    //////////
+    // VIDEO
+    //////////
+    int w, h;
+    BurnDrvGetFullSize(&w, &h);
+    nBurnBpp = 2;
+    BurnHighCol = myHighCol16;
+    BurnRecalcPal();
+    C2DUIVideo *video = new C2DUIVideo(getUi(), (void **) &pBurnDraw, &nBurnPitch, Vector2f(w, h));
+    setVideo(video);
+    //////////
+    // VIDEO
+    //////////
+
+    return C2DUIGuiEmu::run(driver, path);
+}
+
+void PFBAGuiEmu::stop() {
+
+    DrvExit();
+    InpExit();
+
+    C2DUIGuiEmu::stop();
+}
+
+void PFBAGuiEmu::updateFb() {
+
+    if (pBurnDraw == nullptr) {
+        nFramesEmulated++;
+        nCurrentFrame++;
+        nFramesRendered++;
+        getVideo()->lock(nullptr, (void **) &pBurnDraw, &nBurnPitch);
+        BurnDrvFrame();
+        getVideo()->unlock();
+    }
+}
+
+void PFBAGuiEmu::renderFrame(bool draw, int drawFps, float fps) {
+
+    getFpsText()->setVisibility(
+            drawFps ? Visible : Hidden);
+
+    if (!isPaused()) {
+
+        nFramesEmulated++;
+        nCurrentFrame++;
+
+        pBurnDraw = nullptr;
+        if (draw) {
+            nFramesRendered++;
+            getVideo()->lock(nullptr, (void **) &pBurnDraw, &nBurnPitch);
+        }
+        BurnDrvFrame();
+        if (draw) {
+            getVideo()->unlock();
+        }
+
+        if (drawFps) {
+            sprintf(getFpsString(), "FPS: %.2g/%2d", fps, (nBurnFPS / 100));
+            getFpsText()->setString(getFpsString());
+        }
+
+        if (getUi()->getAudio() && getUi()->getAudio()->available) {
+            getUi()->getAudio()->play();
+        }
+    }
+}
+
+void PFBAGuiEmu::updateFrame() {
+
+    int showFps = getUi()->getConfig()->getValue(C2DUIOption::Index::ROM_SHOW_FPS, true);
+    int frameSkip = getUi()->getConfig()->getValue(C2DUIOption::Index::ROM_FRAMESKIP, true);
+
+    if (frameSkip) {
+        bool draw = nFramesEmulated % (frameSkip + 1) == 0;
+        renderFrame(draw, showFps, getUi()->getRenderer()->getFps());
+#ifdef __NX__
+        getUi()->getRenderer()->flip(false);
+#else
+        getUi()->getRenderer()->flip(draw);
+#endif
+        float delta = getUi()->getRenderer()->getDeltaTime().asSeconds();
+        if (delta < getFrameDuration()) { // limit fps
+            //printf("f: %f | d: %f | m: %f | s: %i\n", frame_duration, delta, frame_duration - delta,
+            //       (unsigned int) ((frame_duration - delta) * 1000));
+            getUi()->getRenderer()->delay((unsigned int) ((getFrameDuration() - delta) * 1000));
+        }
+    } else {
+        renderFrame(true, showFps, getUi()->getRenderer()->getFps());
+#ifdef __NX__
+        getUi()->getRenderer()->flip(false);
+#else
+        getUi()->getRenderer()->flip();
+#endif
+        /*
+        timer += getUi()->getRenderer()->getDeltaTime().asSeconds();
+        if (timer >= 1) {
+            timer = 0;
+            printf("fps: %.2g/%2d, delta: %f\n", getUi()->getRenderer()->getFps(), (nBurnFPS / 100),
+                   getUi()->getRenderer()->getDeltaTime().asSeconds());
+        }
+        */
+    }
+}
+
+int PFBAGuiEmu::update() {
+
+    inputServiceSwitch = 0;
+    inputP1P2Switch = 0;
+
+    int rotation_config =
+            getUi()->getConfig()->getValue(C2DUIOption::Index::ROM_ROTATION, true);
+    int rotate_input = 0;
+#ifdef __PSP2__
+    // TODO: find a way to unify platforms,
+    // or allow rotation config from main.cpp
+    if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
+        if (rotation_config == 0) {
+            //rotate controls by 90 degrees
+            rotate_input = 1;
+        } else if (rotation_config == 2) {
+            //rotate controls by 270 degrees
+            rotate_input = 3;
+        }
+    }
+#elif __SWITCH__
+    if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
+        if (rotation_config == 0) {             // OFF
+            //rotate controls by 270 degrees
+            rotate_input = 3;
+        } else if (rotation_config == 1) {      // ON
+            //rotate controls by 270 degrees
+            rotate_input = 0;
+        } else if (rotation_config == 2) {      // FLIP
+            //rotate controls by 270 degrees
+            rotate_input = 1;
+        }
+    }
+#else
+    if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
+        rotate_input = rotation_config ? 0 : 3;
+    }
+#endif
+
+    Input::Player *players = getUi()->getInput()->update(rotate_input);
+
+    // process menu
+    if ((players[0].state & Input::Key::KEY_START)
+        && (players[0].state & Input::Key::KEY_COIN)) {
+        pause();
+        return UI_KEY_SHOW_MEMU_ROM;
+    } else if ((players[0].state & Input::Key::KEY_START)
+               && (players[0].state & Input::Key::KEY_FIRE5)) {
+        pause();
+        return UI_KEY_SHOW_MEMU_STATE;
+    } else if ((players[0].state & Input::Key::KEY_START)
+               && (players[0].state & Input::Key::KEY_FIRE3)) {
+        inputServiceSwitch = 1;
+    } else if ((players[0].state & Input::Key::KEY_START)
+               && (players[0].state & Input::Key::KEY_FIRE4)) {
+        inputP1P2Switch = 1;
+    } else if (players[0].state & EV_RESIZE) {
+        // useful for sdl resize event for example
+        getVideo()->updateScaling();
+    }
+
+    InpMake(players);
+    updateFrame();
+
+    return 0;
+}

@@ -1,6 +1,11 @@
 // Driver Init module
+
 #include "c2dui.h"
 #include "ui.h"
+#include "burner.h"
+
+using namespace c2d;
+using namespace c2dui;
 
 extern PFBAGui *ui;
 extern UINT8 NeoSystem;
@@ -26,7 +31,7 @@ static int DoLibInit()                    // Do Init of Burn library driver
     }
 
     NeoSystem &= ~(UINT8) 0x1f;
-    NeoSystem |= NeoSystemList[ui->getConfig()->getValue(Option::Index::ROM_NEOBIOS, true)];
+    NeoSystem |= NeoSystemList[ui->getConfig()->getValue(C2DUIOption::Index::ROM_NEOBIOS, true)];
 
     nRet = BurnDrvInit();
     printf("DoLibInit: BurnDrvInit = %i\n", nRet);
@@ -147,6 +152,6 @@ int ProgressUpdateBurner(double dProgress, const TCHAR *pszText, bool bAbs) {
 
 int AppError(TCHAR *szText, int bWarning) {
 
-    //gui->getUiMessageBox()->show("ERROR", szText ? szText : "UNKNOW ERROR", "OK");
+    //ui->getUiMessageBox()->show("ERROR", szText ? szText : "UNKNOW ERROR", "OK");
     return 1;
 }

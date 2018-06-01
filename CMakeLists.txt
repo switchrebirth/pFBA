@@ -24,9 +24,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")
 endif ()
 
-# setup toolchain
-#include(libcross2d/Toolchain.cmake)
-
 # add libcross2d/libcross2dui library. If you want to port pfba to another platform,
 # you should (may) only need to port libcross2d library.
 add_subdirectory(libcross2dui)

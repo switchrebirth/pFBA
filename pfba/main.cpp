@@ -17,13 +17,14 @@
  *
  */
 
-#include "burn.h"
-#include "burner_sdl.h"
+#include "burner.h"
 
 #include "c2dui.h"
-
 #include "ui.h"
+#include "uiEmu.h"
+#include "uiMenu.h"
 #include "config.h"
+#include "romlist.h"
 
 using namespace c2d;
 using namespace c2dui;
@@ -55,7 +56,13 @@ Io *io;
 
 PFBAConfig *config;
 PFBAGui *ui;
+PFBARomList *romList;
+PFBAGuiMenu *uiMenu;
+PFBAGuiEmu *uiEmu;
+
 C2DUISkin *skin;
+C2DUIGuiRomList *uiRomList;
+C2DUIGuiState *uiState;
 
 int main(int argc, char **argv) {
 
@@ -104,11 +111,11 @@ int main(int argc, char **argv) {
 #endif
 
     renderer = (Renderer *) new C2DRenderer(Vector2f(SCR_W, SCR_H));
-    inp = new C2DInput(renderer);
+    inp = new C2DInput();
     io = new C2DIo();
 
     // load configuration
-    int version = 100; //(__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__;
+    int version = (__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__;
     config = new PFBAConfig(renderer, C2DUI_HOME_PATH, version);
 
     // skin
@@ -118,8 +125,15 @@ int main(int argc, char **argv) {
     Audio *audio = new C2DAudio(48000);
     audio->pause(1);
 
-    // run gui
+    // gui
     ui = new PFBAGui(renderer, io, inp, audio, config, skin);
+    romList = new PFBARomList(ui, "fba: " + version);
+    romList->build();
+    uiRomList = new C2DUIGuiRomList(ui, romList, renderer->getSize());
+    uiMenu = new PFBAGuiMenu(ui);
+    uiEmu = new PFBAGuiEmu(ui);
+    uiState = new C2DUIGuiState(ui);
+    ui->init(uiRomList, uiMenu, uiEmu, uiState);
     ui->run();
 
     // quit

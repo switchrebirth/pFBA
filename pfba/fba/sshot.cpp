@@ -1,6 +1,8 @@
 #include "burner.h"
 #include <png.h>
 #include <malloc.h>
+
+#include "c2dui.h"
 #include "ui.h"
 
 #define SSHOT_NOERROR 0
@@ -17,7 +19,7 @@ static FILE *ff;
 
 extern PFBAGui *ui;
 
-INT32 MakeScreenShot(const char *dest) {
+int MakeScreenShot(const char *dest) {
     char szAuthor[256];
     char szDescription[256];
     char szCopyright[256];
@@ -67,7 +69,7 @@ INT32 MakeScreenShot(const char *dest) {
     }
 
     // force a frame to be drawn to fba buffer
-    ui->getUiEmu()->updateFramebuffer();
+    ui->getUiEmu()->updateFb();
     if (pBurnDraw == NULL) {
         printf("MakeScreenshot: pBurnDraw == NULL\n");
         return SSHOT_OTHER_ERROR;

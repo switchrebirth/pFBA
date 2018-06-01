@@ -5,7 +5,7 @@
 #include "c2dui.h"
 #include "ui.h"
 
-#include "burn.h"
+#include "burner.h"
 
 using namespace c2d;
 using namespace c2dui;

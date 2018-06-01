@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "burner.h"
+
 #include "c2dui.h"
 #include "config.h"
 #include "romlist.h"

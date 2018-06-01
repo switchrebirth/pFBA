@@ -1,6 +1,8 @@
 // Burner Zip module
 
 #include <malloc.h>
+
+#include "c2dui.h"
 #include "ui.h"
 #include "burner.h"
 

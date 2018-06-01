@@ -2,6 +2,8 @@
 // Created by cpasjuste on 29/05/18.
 //
 
+#include "burner.h"
+
 #include "c2dui.h"
 #include "romlist.h"
 
@@ -13,11 +15,14 @@ static inline bool endsWith(std::string const &value, std::string const &ending)
     return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
-RomList::RomList(C2DUIGuiMain *ui, const std::string &emuVersion) : C2DUIRomList(ui, emuVersion) {
+PFBARomList::PFBARomList(C2DUIGuiMain *ui, const std::string &emuVersion) : C2DUIRomList(ui, emuVersion) {
 
+    printf("PFBARomList::PFBARomList()\n");
 }
 
-void RomList::build() {
+void PFBARomList::build() {
+
+    printf("PFBARomList::build()\n");
 
     char path[MAX_PATH];
     char pathUppercase[MAX_PATH]; // sometimes on FAT32 short files appear as all uppercase
@@ -195,5 +200,6 @@ void RomList::build() {
         // UI
     }
 
-    clean();
+    // cleanup
+    C2DUIRomList::build();
 }

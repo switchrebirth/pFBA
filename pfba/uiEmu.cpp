@@ -58,9 +58,9 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
     printf("Initialize driver...\n");
     if (DrvInit(rom->drv, false) != 0) {
         printf("\nDriver initialisation failed! Likely causes are:\n"
-               "- Corrupt/Missing ROM(s)\n"
-               "- I/O Error\n"
-               "- Memory error\n\n");
+                       "- Corrupt/Missing ROM(s)\n"
+                       "- I/O Error\n"
+                       "- Memory error\n\n");
         DrvExit();
         InpExit();
         getUi()->getUiProgressBox()->setVisibility(Hidden);
@@ -223,7 +223,16 @@ int PFBAGuiEmu::update() {
 
     Input::Player *players = getUi()->getInput()->update(rotate_input);
 
-    // process menu
+    // process menus
+#ifdef __SWITCH__
+    // switch hack to allow single joycons, + or - act send start + coin in the same time
+    int single_joy = getUi()->getConfig()->getValue(C2DUIOption::Index::JOY_SINGLEJOYCON);
+    if (((players[0].state & Input::Key::KEY_START) || (players[0].state & Input::Key::KEY_COIN))
+        && players[0].state & Input::Key::KEY_FIRE6) {
+        pause();
+        return UI_KEY_SHOW_MEMU_ROM;
+    } else
+#endif
     if ((players[0].state & Input::Key::KEY_START)
         && (players[0].state & Input::Key::KEY_COIN)) {
         pause();
@@ -242,6 +251,19 @@ int PFBAGuiEmu::update() {
         // useful for sdl resize event for example
         getVideo()->updateScaling();
     }
+
+#ifdef __SWITCH__
+    // switch hack to allow single joycons, (+) or (-) send "start + coin"
+    if (single_joy) {
+        for (int i = 0; i < PLAYER_COUNT; i++) {
+            if (players[i].state & Input::Key::KEY_START) {
+                players[i].state |= Input::Key::KEY_COIN;
+            } else if (players[i].state & Input::Key::KEY_COIN) {
+                players[i].state |= Input::Key::KEY_START;
+            }
+        }
+    }
+#endif
 
     InpMake(players);
     updateFrame();

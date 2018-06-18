@@ -127,7 +127,9 @@ int main(int argc, char **argv) {
 
     // gui
     ui = new PFBAGui(renderer, io, inp, audio, config, skin);
-    romList = new PFBARomList(ui, "fba: " + version);
+    std::string fba_version = "fba: ";
+    fba_version += szAppBurnVer;
+    romList = new PFBARomList(ui, fba_version);
     romList->build();
     uiRomList = new C2DUIGuiRomList(ui, romList, renderer->getSize());
     uiMenu = new PFBAGuiMenu(ui);

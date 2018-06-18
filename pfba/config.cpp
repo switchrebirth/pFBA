@@ -80,6 +80,9 @@ PFBAConfig::PFBAConfig(Renderer *renderer, const std::string &home, int version)
     getOptions()->emplace_back(C2DUIOption("SHOW_HARDWARE", hardware_names, 0, C2DUIOption::Index::GUI_SHOW_HARDWARE));
     getOptions()->emplace_back(
             C2DUIOption("FULLSCREEN", {"OFF", "ON"}, 1, C2DUIOption::Index::GUI_FULLSCREEN, C2DUIOption::Type::HIDDEN));
+#ifdef __SWITCH__
+    getOptions()->emplace_back(C2DUIOption("SINGLE_JOYCONS", {"OFF", "ON"}, 0, C2DUIOption::Index::JOY_SINGLEJOYCON));
+#endif
 
     // skin config, hidden in gui for now
     getOptions()->emplace_back(

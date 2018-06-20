@@ -103,8 +103,8 @@ int main(int argc, char **argv) {
     buttons.emplace_back(KEY_JOY_FIRE4_DEFAULT, "Y");
     buttons.emplace_back(KEY_JOY_FIRE5_DEFAULT, "L");
     buttons.emplace_back(KEY_JOY_FIRE6_DEFAULT, "R");
-    buttons.emplace_back(KEY_JOY_COIN1_DEFAULT, "+");
-    buttons.emplace_back(KEY_JOY_START1_DEFAULT, "-");
+    buttons.emplace_back(KEY_JOY_COIN1_DEFAULT, "-");
+    buttons.emplace_back(KEY_JOY_START1_DEFAULT, "+");
     // switch special keys
     buttons.emplace_back(KEY_JOY_ZL_DEFAULT, "ZL");
     buttons.emplace_back(KEY_JOY_ZR_DEFAULT, "ZR");

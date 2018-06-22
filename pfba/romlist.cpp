@@ -32,18 +32,15 @@ void PFBARomList::build() {
         nBurnDrvActive = i;
 
         auto *rom = new Rom();
-        char *zn;
-        BurnDrvGetZipName(&zn, 0);
-        strncpy(rom->zip, zn, 63);
         rom->drv = i;
-        rom->drv_name = BurnDrvGetTextA(DRV_NAME);
+        rom->drv_name = rom->path = BurnDrvGetTextA(DRV_NAME);
         rom->parent = BurnDrvGetTextA(DRV_PARENT);
         rom->name = BurnDrvGetTextA(DRV_FULLNAME);
         rom->year = BurnDrvGetTextA(DRV_DATE);
         rom->manufacturer = BurnDrvGetTextA(DRV_MANUFACTURER);
         rom->system = BurnDrvGetTextA(DRV_SYSTEM);
         rom->genre = BurnDrvGetGenreFlags();
-        rom->flags = BurnDrvGetFlags();
+        rom->flags = (unsigned int) BurnDrvGetFlags();
         rom->state = RomState::MISSING;
         rom->hardware = BurnDrvGetHardwareCode();
 
@@ -62,7 +59,9 @@ void PFBARomList::build() {
             }
         }
 
-        snprintf(path, MAX_PATH, "%s.zip", rom->zip);
+        char *z_name;
+        BurnDrvGetZipName(&z_name, 0);
+        snprintf(path, MAX_PATH, "%s.zip", z_name);
         for (int k = 0; k < MAX_PATH; k++) {
             pathUppercase[k] = (char) toupper(path[k]);
         }
@@ -149,7 +148,7 @@ void PFBARomList::build() {
                         break;
                 }
 
-                //snprintf(rom->zip_path, 256, "%s%s", paths[j].c_str(), file->c_str());
+                rom->path = file->c_str();
                 rom->state = BurnDrvIsWorking() ? RomState::WORKING : RomState::NOT_WORKING;
                 hardwareList->at(0).available_count++;
 

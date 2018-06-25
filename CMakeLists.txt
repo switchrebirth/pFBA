@@ -3,21 +3,22 @@ cmake_minimum_required(VERSION 3.0)
 
 # pfba version
 set(PFBA_VERSION_MAJOR 1)
-set(PFBA_VERSION_MINOR 56)
+set(PFBA_VERSION_MINOR 57)
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
 set(BUILD_SDL1 OFF CACHE BOOL "Build with SDL1 support (software, osmesa) support")
 set(BUILD_SDL1_GL OFF CACHE BOOL "Build with SDL1 support (hardware rendering, fast, needs BUILD_SDL1=ON)")
-set(BUILD_SDL2 ON CACHE BOOL "Build with SDL2 (software) support")
-set(BUILD_SDL2_GL ON CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
+set(BUILD_SDL2 OFF CACHE BOOL "Build with SDL2 (software) support")
+set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, fast, needs BUILD_SDL2=ON)")
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
+set(BUILD_NX ON CACHE BOOL "Build with NX (SWITCH) support")
 set(BUILD_NX_GL OFF CACHE BOOL "Build with NX (SWITCH) support (software, osmesa)")
 
 set(BUILD_PFBA ON CACHE BOOL "Build with PFBA support")
+set(UPDATE_CONFIG ON "Force config file updating")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")
@@ -474,5 +475,14 @@ if (BUILD_NX)
             DEPENDS ${PROJECT_NAME}.elf
             COMMAND nacptool --create "pFBA" "Cpasjuste" "${PFBA_VERSION_MAJOR}.${PFBA_VERSION_MINOR}" pfba.nacp
             COMMAND elf2nro ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro --icon=${CMAKE_SOURCE_DIR}/pfba/data/nx/icon.jpg --nacp=pfba.nacp
+            )
+    add_custom_target(${PROJECT_NAME}_switch.zip
+            DEPENDS ${PROJECT_NAME}.nro
+            COMMAND rm -rf ${CMAKE_BINARY_DIR}/release/pfba
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/release/pfba && mkdir -p ${CMAKE_BINARY_DIR}/release/pfba/roms
+            COMMAND cp -f ${CMAKE_BINARY_DIR}/pfba.nro ${CMAKE_BINARY_DIR}/release/pfba/pfba.nro
+            COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/skin ${CMAKE_BINARY_DIR}/release/pfba/
+            COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/nx/skin ${CMAKE_BINARY_DIR}/release/pfba/
+            COMMAND cd ${CMAKE_BINARY_DIR}/release/pfba && zip -r ../${PROJECT_NAME}-${PFBA_VERSION_MAJOR}.${PFBA_VERSION_MINOR}_switch.zip . && cd ${CMAKE_BINARY_DIR}
             )
 endif (BUILD_NX)

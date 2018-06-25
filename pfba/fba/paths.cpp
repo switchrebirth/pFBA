@@ -59,49 +59,49 @@ void BurnPathsInit() {
     mkdir(szAppHomePath, 0777);
     //printf("szAppHomePath: %s\n", szAppHomePath);
 
-    snprintf(szAppRomPath, MAX_PATH, "%s%s", szAppHomePath, "roms");
+    snprintf(szAppRomPath, MAX_PATH - 1, "%s%s", szAppHomePath, "roms");
     mkdir(szAppRomPath, 0777);
 
-    snprintf(szAppSavePath, MAX_PATH, "%s%s", szAppHomePath, "saves");
+    snprintf(szAppSavePath, MAX_PATH - 1, "%s%s", szAppHomePath, "saves");
     mkdir(szAppSavePath, 0777);
     //printf("szAppSavePath: %s\n", szAppSavePath);
 
-    snprintf(szAppConfigPath, MAX_PATH, "%s%s", szAppHomePath, "configs");
+    snprintf(szAppConfigPath, MAX_PATH - 1, "%s%s", szAppHomePath, "configs");
     mkdir(szAppConfigPath, 0777);
     //printf("szAppConfigPath: %s\n", szAppConfigPath);
 
-    snprintf(szAppHiscorePath, MAX_PATH, "%s%s", szAppHomePath, "hiscore");
+    snprintf(szAppHiscorePath, MAX_PATH - 1, "%s%s", szAppHomePath, "hiscore");
     mkdir(szAppHiscorePath, 0777);
     //printf("szAppHiscorePath: %s\n", szAppHiscorePath);
 
-    snprintf(szAppSamplesPath, MAX_PATH, "%s%s", szAppHomePath, "samples");
+    snprintf(szAppSamplesPath, MAX_PATH - 1, "%s%s", szAppHomePath, "samples");
     mkdir(szAppSamplesPath, 0777);
     //printf("szAppSamplesPath: %s\n", szAppSamplesPath);
 
-    snprintf(szAppPreviewPath, MAX_PATH, "%s%s", szAppHomePath, "previews");
+    snprintf(szAppPreviewPath, MAX_PATH - 1, "%s%s", szAppHomePath, "previews");
     mkdir(szAppPreviewPath, 0777);
     //printf("szAppPreviewPath: %s\n", szAppPreviewPath);
 
-    snprintf(szAppTitlePath, MAX_PATH, "%s%s", szAppHomePath, "titles");
+    snprintf(szAppTitlePath, MAX_PATH - 1, "%s%s", szAppHomePath, "titles");
     mkdir(szAppTitlePath, 0777);
     //printf("szAppTitlePath: %s\n", szAppTitlePath);
 
-    snprintf(szAppIconPath, MAX_PATH, "%s%s", szAppHomePath, "icons");
+    snprintf(szAppIconPath, MAX_PATH - 1, "%s%s", szAppHomePath, "icons");
     mkdir(szAppIconPath, 0777);
     //printf("szAppIconPath: %s\n", szAppIconPath);
 
-    snprintf(szAppBlendPath, MAX_PATH, "%s%s/", szAppHomePath, "blend");
+    snprintf(szAppBlendPath, MAX_PATH - 1, "%s%s/", szAppHomePath, "blend");
     mkdir(szAppBlendPath, 0777);
     //printf("szAppBlendPath: %s\n", szAppBlendPath);
 
 #ifndef __PSP2__
-    snprintf(szAppSkinPath, MAX_PATH, "%s%s", szAppHomePath, "skin");
+    snprintf(szAppSkinPath, MAX_PATH - 1, "%s%s", szAppHomePath, "skin");
     mkdir(szAppSkinPath, 0777);
     //printf("szAppSkinPath: %s\n", szAppSkinPath);
 #endif
 
-    snprintf(szAppEEPROMPath, MAX_PATH, "%sconfig", szAppHomePath);
+    snprintf(szAppEEPROMPath, MAX_PATH - 1, "%sconfig", szAppHomePath);
     mkdir(szAppEEPROMPath, 0777);
-    strncat(szAppEEPROMPath, "/games/", MAX_PATH);
+    strncat(szAppEEPROMPath, "/games/", MAX_PATH - 1);
     mkdir(szAppEEPROMPath, 0777);
 }

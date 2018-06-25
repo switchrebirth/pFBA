@@ -44,18 +44,15 @@ void PFBARomList::build() {
         rom->state = RomState::MISSING;
         rom->hardware = BurnDrvGetHardwareCode();
 
-        // load icon if needed
-        if (ui->getConfig()->getValue(C2DUIOption::Index::GUI_SHOW_ICONS)) {
+        // load icon if needed, only for parent roms
+        if (!rom->parent && ui->getConfig()->getValue(C2DUIOption::Index::GUI_SHOW_ICONS)) {
             snprintf(icon_path, 1023, "%sicons/%s.png", ui->getConfig()->getHomePath()->c_str(), rom->drv_name);
             rom->icon = new C2DTexture(icon_path);
-            if (!rom->icon->available && rom->parent) {
-                // try parent image
-                delete (rom->icon);
-                memset(icon_path, 0, 1024);
-                snprintf(icon_path, 1023, "%sicons/%s.png", ui->getConfig()->getHomePath()->c_str(), rom->parent);
-                rom->icon = new C2DTexture(icon_path);
-            }
             rom->icon->setDeleteMode(C2DObject::DeleteMode::Manual);
+            if (!rom->icon->available) {
+                delete (rom->icon);
+                rom->icon = nullptr;
+            }
         }
 
         // add rom to "ALL" game list
@@ -211,6 +208,18 @@ void PFBARomList::build() {
             ui->getRenderer()->flip();
         }
         // UI
+    }
+
+    // set childs with no icon to parent icon
+    for (auto rom : list) {
+        if (!rom->icon && rom->parent) {
+            auto it = std::find_if(list.begin(), list.end(), [&](const Rom *r) {
+                return r->drv_name == rom->parent;
+            });
+            if (it != list.end()) {
+                rom->icon = (*it)->icon;
+            }
+        }
     }
 
     // cleanup

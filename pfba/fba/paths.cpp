@@ -51,12 +51,12 @@ void BurnPathsInit() {
 #elif __PS3__
     strncpy(szAppHomePath, "/dev_hdd0/pfba", MAX_PATH);
 #elif __NX__
-    strncpy(szAppHomePath, "/switch/pfba", MAX_PATH);
+    strncpy(szAppHomePath, "./", MAX_PATH);
 #else
     getcwd(szAppHomePath, MAX_PATH);
-#endif
     strcat(szAppHomePath, "/");
     mkdir(szAppHomePath, 0777);
+#endif
     //printf("szAppHomePath: %s\n", szAppHomePath);
 
     snprintf(szAppRomPath, MAX_PATH - 1, "%s%s", szAppHomePath, "roms");

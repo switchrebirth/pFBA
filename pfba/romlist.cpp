@@ -26,6 +26,7 @@ void PFBARomList::build() {
 
     char path[MAX_PATH];
     char pathUppercase[MAX_PATH]; // sometimes on FAT32 short files appear as all uppercase
+    bool use_icons = ui->getConfig()->getValue(C2DUIOption::Index::GUI_SHOW_ICONS) == 1;
 
     for (unsigned int i = 0; i < nBurnDrvCount; i++) {
 
@@ -45,13 +46,15 @@ void PFBARomList::build() {
         rom->hardware = BurnDrvGetHardwareCode();
 
         // load icon if needed, only for parent roms
-        if (!rom->parent && ui->getConfig()->getValue(C2DUIOption::Index::GUI_SHOW_ICONS)) {
+        if (use_icons && !rom->parent) {
             snprintf(icon_path, 1023, "%sicons/%s.png", ui->getConfig()->getHomePath()->c_str(), rom->drv_name);
-            rom->icon = new C2DTexture(icon_path);
-            rom->icon->setDeleteMode(C2DObject::DeleteMode::Manual);
-            if (!rom->icon->available) {
-                delete (rom->icon);
-                rom->icon = nullptr;
+            if (ui->getIo()->exist(icon_path)) {
+                rom->icon = new C2DTexture(icon_path);
+                rom->icon->setDeleteMode(C2DObject::DeleteMode::Manual);
+                if (!rom->icon->available) {
+                    delete (rom->icon);
+                    rom->icon = nullptr;
+                }
             }
         }
 
@@ -70,6 +73,7 @@ void PFBARomList::build() {
             }
         }
 
+        // get real rom name
         char *z_name;
         BurnDrvGetZipName(&z_name, 0);
         snprintf(path, MAX_PATH, "%s.zip", z_name);
@@ -210,14 +214,16 @@ void PFBARomList::build() {
         // UI
     }
 
-    // set childs with no icon to parent icon
-    for (auto rom : list) {
-        if (!rom->icon && rom->parent) {
-            auto it = std::find_if(list.begin(), list.end(), [&](const Rom *r) {
-                return r->drv_name == rom->parent;
-            });
-            if (it != list.end()) {
-                rom->icon = (*it)->icon;
+    if (use_icons) {
+        // set childs with no icon to parent icon
+        for (auto rom : list) {
+            if (!rom->icon && rom->parent) {
+                auto it = std::find_if(list.begin(), list.end(), [&](const Rom *r) {
+                    return r->drv_name == rom->parent;
+                });
+                if (it != list.end()) {
+                    rom->icon = (*it)->icon;
+                }
             }
         }
     }

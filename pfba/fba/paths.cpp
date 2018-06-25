@@ -37,6 +37,7 @@ char szAppHiscorePath[MAX_PATH];
 char szAppSamplesPath[MAX_PATH];
 char szAppPreviewPath[MAX_PATH];
 char szAppTitlePath[MAX_PATH];
+char szAppIconPath[MAX_PATH];
 char szAppBlendPath[MAX_PATH];
 char szAppEEPROMPath[MAX_PATH];
 char szAppSkinPath[MAX_PATH];
@@ -84,6 +85,10 @@ void BurnPathsInit() {
     snprintf(szAppTitlePath, MAX_PATH, "%s%s", szAppHomePath, "titles");
     mkdir(szAppTitlePath, 0777);
     //printf("szAppTitlePath: %s\n", szAppTitlePath);
+
+    snprintf(szAppIconPath, MAX_PATH, "%s%s", szAppHomePath, "icons");
+    mkdir(szAppIconPath, 0777);
+    //printf("szAppIconPath: %s\n", szAppIconPath);
 
     snprintf(szAppBlendPath, MAX_PATH, "%s%s/", szAppHomePath, "blend");
     mkdir(szAppBlendPath, 0777);

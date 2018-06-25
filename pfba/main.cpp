@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
     buttons.emplace_back(KEY_JOY_ZR_DEFAULT, "ZR");
 #endif
 
-    renderer = (Renderer *) new C2DRenderer(Vector2f(SCR_W, SCR_H));
+    renderer = new C2DRenderer(Vector2f(SCR_W, SCR_H));
     inp = new C2DInput();
     io = new C2DIo();
 

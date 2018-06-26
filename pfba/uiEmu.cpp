@@ -58,9 +58,9 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
     printf("Initialize driver...\n");
     if (DrvInit(rom->drv, false) != 0) {
         printf("\nDriver initialisation failed! Likely causes are:\n"
-                       "- Corrupt/Missing ROM(s)\n"
-                       "- I/O Error\n"
-                       "- Memory error\n\n");
+               "- Corrupt/Missing ROM(s)\n"
+               "- I/O Error\n"
+               "- Memory error\n\n");
         DrvExit();
         InpExit();
         getUi()->getUiProgressBox()->setVisibility(Hidden);
@@ -223,47 +223,42 @@ int PFBAGuiEmu::update() {
 
     Input::Player *players = getUi()->getInput()->update(rotate_input);
 
-    // process menus
-#ifdef __SWITCH__
-    // switch hack to allow single joycons, + or - act send start + coin in the same time
-    int single_joy = getUi()->getConfig()->getValue(C2DUIOption::Index::JOY_SINGLEJOYCON);
-    if (((players[0].state & Input::Key::KEY_START) || (players[0].state & Input::Key::KEY_COIN))
-        && players[0].state & Input::Key::KEY_FIRE6) {
+    // look for player 1 menu combo
+    if (((players[0].state & Input::Key::KEY_START) && (players[0].state & Input::Key::KEY_FIRE5))
+        || ((players[0].state & Input::Key::KEY_COIN) && (players[0].state & Input::Key::KEY_FIRE5))
+        || ((players[0].state & Input::Key::KEY_START) && (players[0].state & Input::Key::KEY_FIRE6))
+        || ((players[0].state & Input::Key::KEY_COIN) && (players[0].state & Input::Key::KEY_FIRE6))) {
         pause();
         return UI_KEY_SHOW_MEMU_ROM;
-    } else
-#endif
-    if ((players[0].state & Input::Key::KEY_START)
-        && (players[0].state & Input::Key::KEY_COIN)) {
-        pause();
-        return UI_KEY_SHOW_MEMU_ROM;
-    } else if ((players[0].state & Input::Key::KEY_START)
-               && (players[0].state & Input::Key::KEY_FIRE5)) {
-        pause();
-        return UI_KEY_SHOW_MEMU_STATE;
-    } else if ((players[0].state & Input::Key::KEY_START)
-               && (players[0].state & Input::Key::KEY_FIRE3)) {
-        inputServiceSwitch = 1;
-    } else if ((players[0].state & Input::Key::KEY_START)
-               && (players[0].state & Input::Key::KEY_FIRE4)) {
-        inputP1P2Switch = 1;
-    } else if (players[0].state & EV_RESIZE) {
-        // useful for sdl resize event for example
-        getVideo()->updateScaling();
     }
 
-#ifdef __SWITCH__
-    // switch hack to allow single joycons, (+) or (-) send "start + coin"
-    if (single_joy) {
-        for (int i = 0; i < PLAYER_COUNT; i++) {
-            if (players[i].state & Input::Key::KEY_START) {
-                players[i].state |= Input::Key::KEY_COIN;
-            } else if (players[i].state & Input::Key::KEY_COIN) {
-                players[i].state |= Input::Key::KEY_START;
-            }
+    // look each players for combos keys
+    for (int i = 0; i < PLAYER_COUNT; i++) {
+
+        // allow devices with single select/start button to send start/coins (switch in single joycon mode)
+        if (((players[i].state & Input::Key::KEY_START) && (players[i].state & Input::Key::KEY_FIRE1))
+            || ((players[i].state & Input::Key::KEY_COIN) && (players[i].state & Input::Key::KEY_FIRE1))) {
+            players[i].state = Input::Key::KEY_START;
+        } else if (((players[i].state & Input::Key::KEY_START) && (players[i].state & Input::Key::KEY_FIRE2))
+                   || ((players[i].state & Input::Key::KEY_COIN) && (players[i].state & Input::Key::KEY_FIRE2))) {
+            players[i].state = Input::Key::KEY_COIN;
         }
     }
-#endif
+
+    // look for player 1 combos key
+    if (((players[0].state & Input::Key::KEY_START) && (players[0].state & Input::Key::KEY_FIRE3))
+        || ((players[0].state & Input::Key::KEY_COIN) && (players[0].state & Input::Key::KEY_FIRE3))) {
+        inputServiceSwitch = 1;
+    } else if (((players[0].state & Input::Key::KEY_START) && (players[0].state & Input::Key::KEY_FIRE4))
+               || ((players[0].state & Input::Key::KEY_COIN) && (players[0].state & Input::Key::KEY_FIRE4))) {
+        inputP1P2Switch = 1;
+    }
+
+    // look for window resize event
+    if (players[0].state & EV_RESIZE) {
+        // useful for sdl resize event
+        getVideo()->updateScaling();
+    }
 
     InpMake(players);
     updateFrame();

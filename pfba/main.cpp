@@ -108,6 +108,8 @@ int main(int argc, char **argv) {
     // switch special keys
     buttons.emplace_back(KEY_JOY_ZL_DEFAULT, "ZL");
     buttons.emplace_back(KEY_JOY_ZR_DEFAULT, "ZR");
+    buttons.emplace_back(KEY_JOY_LSTICK_DEFAULT, "LSTICK");
+    buttons.emplace_back(KEY_JOY_RSTICK_DEFAULT, "RSTICK");
 #endif
 
     renderer = new C2DRenderer(Vector2f(SCR_W, SCR_H));

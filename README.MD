@@ -38,10 +38,15 @@ pFBA: Portable Final Burn Alpha
     MSX                 : "msx"
     ```
 - pFBA support title, preview, and icon images in "png" format. Titles goes in the "titles" folder, previews in the "previews" folder, and icons in the "icons" folder. They must have the same filename as the zipped rom, but with a ".png" extension instead ".zip". For consoles images, you need to add the console driver prefix to the image filename ("sonic.zip" image for Sega MegaDrive would be "md_sonic.png").
+- You can enable or disable icon images from the pFBA main menu.
 
 -----
 
 ### NINTENDO SWITCH INFORMATION'S
+
+* ##### GENERAL INFORMATION'S
+    * Using icons on the Nintendo Switch will make the emulator loading time
+    * You can enable or disable single joycon support from the pFBA main menu (+). When enable, all detected joycons (and not docked) will be handled as a single controller/player.
 
 * ##### NINTENDO SWITCH CONTROLS (UI)
 ```

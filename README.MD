@@ -51,7 +51,7 @@ pFBA: Portable Final Burn Alpha
 * ##### NINTENDO SWITCH CONTROLS (UI)
    ```
    (+)             : GENERAL OPTIONS + DEFAULT ROMS OPTIONS
-   (-)             : PER ROM OPTION
+   (-)             : PER ROM OPTIONS
    (A)             : RUN ROM
    ```
 

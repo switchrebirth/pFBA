@@ -28,7 +28,7 @@ PFBAConfig::PFBAConfig(Renderer *renderer, const std::string &home, int version)
     getRomPaths()->emplace_back(home + "sms/");
     getRomPaths()->emplace_back(home + "tg16/");
     for (size_t i = getRomPaths()->size(); i < C2DUI_ROMS_PATHS_MAX; i++) {
-        getRomPaths()->emplace_back("");
+        getRomPaths()->emplace_back(std::string());
     }
 
     // add hardware list

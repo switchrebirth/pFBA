@@ -74,25 +74,30 @@ void PFBARomList::build() {
         }
 
         // get real rom name
-        char *z_name;
+        char *z_name = nullptr;
         BurnDrvGetZipName(&z_name, 0);
-        snprintf(path, MAX_PATH, "%s.zip", z_name);
+        if (z_name) {
+            snprintf(path, MAX_PATH - 1, "%s.zip", z_name);
+        } else {
+            snprintf(path, MAX_PATH - 1, "%s.zip", rom->drv_name);
+        }
+
         for (int k = 0; k < MAX_PATH; k++) {
             pathUppercase[k] = (char) toupper(path[k]);
         }
 
-        for (unsigned int j = 0; j < C2DUI_ROMS_PATHS_MAX; j++) {
+        for (unsigned int j = 0; j < files.size(); j++) {
 
-            if (files[j].empty()) {
+            if (files.at(j).empty()) {
                 continue;
             }
 
-            auto file = std::find(files[j].begin(), files[j].end(), path);
-            if (file == files[j].end()) {
-                file = std::find(files[j].begin(), files[j].end(), pathUppercase);
+            auto file = std::find(files.at(j).begin(), files.at(j).end(), path);
+            if (file == files.at(j).end()) {
+                file = std::find(files.at(j).begin(), files.at(j).end(), pathUppercase);
             }
 
-            if (file != files[j].end()) {
+            if (file != files.at(j).end()) {
 
                 int prefix = (((rom->hardware | HARDWARE_PREFIX_CARTRIDGE) ^ HARDWARE_PREFIX_CARTRIDGE) & 0xff000000);
 

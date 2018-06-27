@@ -45,7 +45,7 @@ pFBA: Portable Final Burn Alpha
 ### NINTENDO SWITCH INFORMATION'S
 
 * ##### GENERAL INFORMATION'S
-    * Using icons on the Nintendo Switch will make the emulator loading time longer if a lot of icons are detected. There's currently no plan to improve this.
+    * Using icons on the Nintendo Switch will make main loading time longer if a lot of icons are detected. There's currently no plan to improve this.
     * You can enable or disable single joycon support from the pFBA main menu (+). When enabled, all detected joycons (not docked) will be handled as a single controller/player.
     * Point scaling is currently limited to 1x, 2x and 3x size. FIT, FIT 4/3 and FULL options will fallback to 3x.
 

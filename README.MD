@@ -51,21 +51,22 @@ pFBA: Portable Final Burn Alpha
 
 * ##### NINTENDO SWITCH CONTROLS (UI)
    ```
-   (+)             : GENERAL OPTIONS + DEFAULT ROMS OPTIONS
-   (-)             : PER ROM OPTIONS
-   (A)             : RUN ROM
+   (L/R)            : SWITCH FROM TITLE TO PREVIEW IMAGE
+   (+)              : GENERAL OPTIONS + DEFAULT ROMS OPTIONS
+   (-)              : PER ROM OPTIONS
+   (A)              : RUN ROM
    ```
 
 * ##### NINTENDO SWITCH CONTROLS (IN-GAME)
    ```
-   (+)             : START
-   (-)             : COINS
-   (+/-) + (A)     : START
-   (+/-) + (B)     : COINS
-   (+/-) + (X)     : SERVICE SWITCH
-   (+/-) + (Y)     : 1P + 2P START
-   (+/-) + (L/R)   : PFBA MENU
-   (+)   + (-)     : UNIBIOS MENU (NEOGEO ONLY)
+   (+)              : START
+   (-)              : COINS
+   (+/-) + (A)      : START
+   (+/-) + (B)      : COINS
+   (+/-) + (X)      : SERVICE SWITCH
+   (+/-) + (Y)      : 1P + 2P START
+   (+/-) + (L/R)    : PFBA MENU
+   (+)   + (-)      : UNIBIOS MENU (NEOGEO ONLY)
    ```
 
 -----

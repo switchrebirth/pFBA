@@ -89,7 +89,7 @@ pFBA: Portable Final Burn Alpha
 
 ### COMPILATION
 
-* ##### Linux (sdl2)
+* ##### LINUX (SDL2)
    ```
    sudo apt-get install libsdl2-dev libfreetype6-dev libpng-dev zlib1g-dev
    git clone --recursive https://github.com/Cpasjuste/pfba.git
@@ -99,6 +99,17 @@ pFBA: Portable Final Burn Alpha
    cmake -DBUILD_SDL2=ON -DBUILD_SDL2_GL=ON -DCMAKE_BUILD_TYPE=Release ..
    make pfba.deps
    make pfba.elf
+   ```
+
+* ##### NINTENDO SWITCH
+   ```
+   git clone --recursive https://github.com/Cpasjuste/pfba.git
+   cd pfba && git submodule update --init --recursive
+   mkdir cmake-build
+   cd cmake-build
+   cmake -DBUILD_NX=ON -DCMAKE_BUILD_TYPE=Release ..
+   make pfba.deps
+   make pfba_release_switch.zip
    ```
 
 * ##### PS VITA

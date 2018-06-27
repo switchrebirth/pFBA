@@ -42,8 +42,8 @@ PFBA: Portable Final Burn Alpha
 ```
 (+)             : START
 (-)             : COINS
-(+/-) + (B)     : START
-(+/-) + (A)     : COINS
+(+/-) + (A)     : START
+(+/-) + (B)     : COINS
 (+/-) + (X)     : SERVICE SWITCH
 (+/-) + (Y)     : 1P + 2P START
 (+/-) + (L/R)   : PFBA MENU

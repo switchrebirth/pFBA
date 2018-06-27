@@ -4,7 +4,7 @@ PFBA: Portable Final Burn Alpha
 ![](http://files.mydedibox.fr/files/Dev/psp2/pfba/screen1-mini.jpg)
 
 
-**The main goals of this [final burn alpha](http://www.fbalpha.com/) port are/were :**
+**The main goals of this [final burn alpha](http://www.fbalpha.com/) port are :**
 
 - have a basic but user friendly user interface on non windows devices
 - use a recent rendering interface for speed and effects support
@@ -37,6 +37,7 @@ PFBA: Portable Final Burn Alpha
 - in game: SELECT+LEFT/RIGHT = change shader
 - in game: SELECT+UP/DOWN = change scaling
 
+-----
 
 **Switch controls (in-game)**
 ```

@@ -1,20 +1,21 @@
-PFBA: Portable Final Burn Alpha
-===========================
+pFBA: Portable Final Burn Alpha
+===============================
 
 ![](https://github.com/Cpasjuste/pfba/raw/master/pfba/data/screenshot.png)
 
+-----
 
-**The main goals of this [final burn alpha](http://www.fbalpha.com/) port are :**
+#### The main goals of this [final burn alpha](http://www.fbalpha.com/) port are :
 
 - have a basic but user friendly user interface on non windows devices
-- use a recent rendering interface for speed and effects support
+- use a recent rendering interface for speed and effect support
 - cross-platform and code portability
 - easy updates of fba core (no modifications to the original sources)
 - use arm asm m68k ([cyclone](https://github.com/notaz/cyclone68000)) core on arm devices
 
 -----
 
-**Currently supported devices**
+#### Supported devices
 
 - Linux (sdl1, sdl2)
 - Sony Ps Vita (vita2d)
@@ -22,7 +23,48 @@ PFBA: Portable Final Burn Alpha
 
 -----
 
-**PS VITA**
+#### GENERAL INFORMATION'S
+
+- pFBA support console roms (Sega MegaDrive, Sega GameGear, Sega Master System, Nec PC-Engine, Nec TurboGraFX-16, Nec SuperGraFX, Coleco, SG-1000 and MSX). Here is the corresponding folders where roms should be located (as stock fba):
+    ```
+    Sega MegaDrive      : "megadriv"
+    Sega GameGear       : "gamegear"
+    Sega Master System  : "sms"
+    Nec PC-Engine       : "pce"
+    Nec TurboGraFX-16   : "tg16"
+    Nec SuperGraFX      : "sgx"
+    Coleco              : "coleco"
+    SG-1000             : "sg1000"
+    MSX                 : "msx"
+    ```
+- pFBA support title, preview, and icon images in "png" format. Titles goes in the "titles" folder, previews in the "previews" folder, and icons in the "icons" folder. They must have the same filename as the zipped rom, but with a ".png" extension instead ".zip". For consoles images, you need to add the console driver prefix to the image filename ("sonic.zip" image for Sega MegaDrive would be "md_sonic.png").
+
+-----
+
+### NINTENDO SWITCH INFORMATION'S
+
+* ##### NINTENDO SWITCH CONTROLS (UI)
+```
+(+)             : GENERAL OPTIONS + DEFAULT ROMS OPTIONS
+(-)             : PER ROM OPTION
+(A)             : RUN ROM
+```
+
+* ##### NINTENDO SWITCH CONTROLS (IN-GAME)
+```
+(+)             : START
+(-)             : COINS
+(+/-) + (A)     : START
+(+/-) + (B)     : COINS
+(+/-) + (X)     : SERVICE SWITCH
+(+/-) + (Y)     : 1P + 2P START
+(+/-) + (L/R)   : PFBA MENU
+(+)   + (-)     : UNIBIOS MENU (NEOGEO ONLY)
+```
+
+-----
+
+### PS VITA INFORMATION'S
 
 - data is located at "ux0:/data/pfba"
 - default rom path is "ux0:/data/pfba/roms/"
@@ -37,19 +79,7 @@ PFBA: Portable Final Burn Alpha
 - in game: SELECT+LEFT/RIGHT = change shader
 - in game: SELECT+UP/DOWN = change scaling
 
------
-
-**Switch controls (in-game)**
-```
-(+)             : START
-(-)             : COINS
-(+/-) + (A)     : START
-(+/-) + (B)     : COINS
-(+/-) + (X)     : SERVICE SWITCH
-(+/-) + (Y)     : 1P + 2P START
-(+/-) + (L/R)   : PFBA MENU
-(+)   + (-)     : UNIBIOS MENU (NEOGEO ONLY)
-```
+----
 
 **Linux (SDL2) compilation**
 - sudo apt-get install libsdl2-dev libfreetype6-dev libpng-dev zlib1g-dev

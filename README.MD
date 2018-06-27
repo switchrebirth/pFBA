@@ -70,7 +70,7 @@ pFBA: Portable Final Burn Alpha
 
 -----
 
-### PS VITA INFORMATION'S
+### PS VITA INFORMATION'S (TO BE UPDATED)
 
 - data is located at "ux0:/data/pfba"
 - default rom path is "ux0:/data/pfba/roms/"
@@ -87,28 +87,34 @@ pFBA: Portable Final Burn Alpha
 
 ----
 
-**Linux (SDL2) compilation**
-- sudo apt-get install libsdl2-dev libfreetype6-dev libpng-dev zlib1g-dev
-- git clone --recursive https://github.com/Cpasjuste/pfba.git
-- cd pfba && git submodule update --init --recursive
-- mkdir cmake-build
-- cd cmake-build
-- cmake -DBUILD_SDL2=ON -DBUILD_SDL2_GL=ON -DCMAKE_BUILD_TYPE=Release ..
-- make pfba.deps
-- make pfba.elf
+### COMPILATION
 
-**Ps Vita compilation**
-- git clone --recursive https://github.com/Cpasjuste/pfba.git
-- cd pfba && git submodule update --init --recursive
-- mkdir cmake-build
-- cd cmake-build
-- cmake -DBUILD_PSP2=ON -DCMAKE_BUILD_TYPE=Release ..
-- make pfba.deps
-- make pfba.vpk
+* ##### Linux (sdl2)
+   ```
+   sudo apt-get install libsdl2-dev libfreetype6-dev libpng-dev zlib1g-dev
+   git clone --recursive https://github.com/Cpasjuste/pfba.git
+   cd pfba && git submodule update --init --recursive
+   mkdir cmake-build
+   cd cmake-build
+   cmake -DBUILD_SDL2=ON -DBUILD_SDL2_GL=ON -DCMAKE_BUILD_TYPE=Release ..
+   make pfba.deps
+   make pfba.elf
+   ```
+
+* ##### PS VITA
+   ```
+   git clone --recursive https://github.com/Cpasjuste/pfba.git
+   cd pfba && git submodule update --init --recursive
+   mkdir cmake-build
+   cd cmake-build
+   cmake -DBUILD_PSP2=ON -DCMAKE_BUILD_TYPE=Release ..
+   make pfba.deps
+   make pfba.vpk
+   ```
 
 -----
 
-**Thanks**
+### Thanks
 - Xavier for the support (http://www.consolex-bordeaux.fr/)
 - ScHlAuChi for all the advices and testing
 - fba/mame authors (http://www.fbalpha.com/, http://mamedev.org/)

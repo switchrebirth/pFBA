@@ -45,27 +45,27 @@ pFBA: Portable Final Burn Alpha
 ### NINTENDO SWITCH INFORMATION'S
 
 * ##### GENERAL INFORMATION'S
-    * Using icons on the Nintendo Switch will make the emulator loading time
-    * You can enable or disable single joycon support from the pFBA main menu (+). When enable, all detected joycons (and not docked) will be handled as a single controller/player.
+    * Using icons on the Nintendo Switch will make the emulator loading time longer if a lot of icons are detected. There's currently no plan to improve this.
+    * You can enable or disable single joycon support from the pFBA main menu (+). When enabled, all detected joycons (not docked) will be handled as a single controller/player.
 
 * ##### NINTENDO SWITCH CONTROLS (UI)
-```
-(+)             : GENERAL OPTIONS + DEFAULT ROMS OPTIONS
-(-)             : PER ROM OPTION
-(A)             : RUN ROM
-```
+   ```
+   (+)             : GENERAL OPTIONS + DEFAULT ROMS OPTIONS
+   (-)             : PER ROM OPTION
+   (A)             : RUN ROM
+   ```
 
 * ##### NINTENDO SWITCH CONTROLS (IN-GAME)
-```
-(+)             : START
-(-)             : COINS
-(+/-) + (A)     : START
-(+/-) + (B)     : COINS
-(+/-) + (X)     : SERVICE SWITCH
-(+/-) + (Y)     : 1P + 2P START
-(+/-) + (L/R)   : PFBA MENU
-(+)   + (-)     : UNIBIOS MENU (NEOGEO ONLY)
-```
+   ```
+   (+)             : START
+   (-)             : COINS
+   (+/-) + (A)     : START
+   (+/-) + (B)     : COINS
+   (+/-) + (X)     : SERVICE SWITCH
+   (+/-) + (Y)     : 1P + 2P START
+   (+/-) + (L/R)   : PFBA MENU
+   (+)   + (-)     : UNIBIOS MENU (NEOGEO ONLY)
+   ```
 
 -----
 

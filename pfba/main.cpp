@@ -30,6 +30,7 @@ using namespace c2d;
 using namespace c2dui;
 
 #ifdef __PSP2__
+
 #include <psp2/power.h>
 #include <psp2/io/dirent.h>
 
@@ -121,7 +122,11 @@ int main(int argc, char **argv) {
     config = new PFBAConfig(renderer, C2DUI_HOME_PATH, version);
 
     // skin
+#ifdef __PSP2__
+    skin = new C2DUISkin("app0:/", buttons);
+#else
     skin = new C2DUISkin(C2DUI_HOME_PATH, buttons);
+#endif
 
     // audio
     Audio *audio = new C2DAudio(48000);

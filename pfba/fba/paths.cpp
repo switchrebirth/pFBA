@@ -44,8 +44,8 @@ char szAppSkinPath[MAX_PATH];
 
 void BurnPathsInit() {
 #ifdef __PSP2__
-    strncpy(szAppHomePath, "ux0:/data/pfba", MAX_PATH);
-    strncpy(szAppSkinPath, "app0:/skin", MAX_PATH);
+    strncpy(szAppHomePath, "ux0:/data/pfba/", MAX_PATH);
+    strncpy(szAppSkinPath, "app0:/skin/", MAX_PATH);
 #elif __3DS__
     strncpy(szAppHomePath, "/pfba", MAX_PATH);
 #elif __PS3__

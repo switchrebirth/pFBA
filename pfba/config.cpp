@@ -77,7 +77,12 @@ PFBAConfig::PFBAConfig(Renderer *renderer, const std::string &home, int version)
     getOptions()->emplace_back(C2DUIOption("SHOW_ALL", {"WORKING", "ALL"}, 1, C2DUIOption::Index::GUI_SHOW_ALL));
     getOptions()->emplace_back(C2DUIOption("SHOW_CLONES", {"OFF", "ON"}, 0, C2DUIOption::Index::GUI_SHOW_CLONES));
     getOptions()->emplace_back(C2DUIOption("SHOW_HARDWARE", hardware_names, 0, C2DUIOption::Index::GUI_SHOW_HARDWARE));
+#ifdef __PSP2__
+    getOptions()->emplace_back(
+            C2DUIOption("SHOW_ICONS", {"OFF", "ON"}, 0, C2DUIOption::Index::GUI_SHOW_ICONS, C2DUIOption::Type::HIDDEN));
+#else
     getOptions()->emplace_back(C2DUIOption("SHOW_ICONS", {"OFF", "ON"}, 0, C2DUIOption::Index::GUI_SHOW_ICONS));
+#endif
     getOptions()->emplace_back(
             C2DUIOption("FULLSCREEN", {"OFF", "ON"}, 1, C2DUIOption::Index::GUI_FULLSCREEN, C2DUIOption::Type::HIDDEN));
 #ifdef __SWITCH__

@@ -373,7 +373,7 @@ int BzipOpen(bool bootApp) {
             free(szBzipName[z]);
             szBzipName[z] = (TCHAR *) malloc(MAX_PATH * sizeof(TCHAR));
 
-            const char *rom_path = ui->getConfig()->getRomPath(d);
+            const char *rom_path = ui->getConfig()->getRomPath(d)->c_str();
             _stprintf(szBzipName[z], _T("%s%s"), rom_path, szName);
 
             int prefix = (((BurnDrvGetHardwareCode() | HARDWARE_PREFIX_CARTRIDGE) ^ HARDWARE_PREFIX_CARTRIDGE) &

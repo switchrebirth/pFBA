@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 
 # pfba version
 set(PFBA_VERSION_MAJOR 1)
-set(PFBA_VERSION_MINOR 57)
+set(PFBA_VERSION_MINOR 58)
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")
@@ -18,7 +18,7 @@ set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
 set(BUILD_NX_GL OFF CACHE BOOL "Build with NX (SWITCH) support (software, osmesa)")
 
 set(BUILD_PFBA ON CACHE BOOL "Build with PFBA support")
-set(UPDATE_CONFIG ON "Force config file updating")
+set(UPDATE_CONFIG OFF "Force config file updating")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_DEBUG true CACHE BOOL "Debug build")

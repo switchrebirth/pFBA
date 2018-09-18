@@ -101,13 +101,8 @@ PFBAConfig::PFBAConfig(Renderer *renderer, const std::string &home, int version)
     getOptions()->emplace_back(
             C2DUIOption("SCALING", {"NONE", "2X", "3X", "FIT", "FIT 4:3", "FULL"},
                         4, C2DUIOption::Index::ROM_SCALING));
-#ifdef __NX__
-    getOptions()->emplace_back(
-            C2DUIOption("FILTER", {"POINT", "LINEAR"}, 1, C2DUIOption::Index::ROM_FILTER));
-#else
     getOptions()->emplace_back(
             C2DUIOption("FILTER", {"POINT", "LINEAR"}, 0, C2DUIOption::Index::ROM_FILTER));
-#endif
     if (renderer->getShaderList() != nullptr) {
         getOptions()->emplace_back(
                 C2DUIOption("EFFECT", renderer->getShaderList()->getNames(), 0, C2DUIOption::Index::ROM_SHADER));

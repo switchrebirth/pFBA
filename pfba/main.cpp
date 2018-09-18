@@ -43,7 +43,7 @@ int _newlib_heap_size_user = 192 * 1024 * 1024;
 #elif __3DS__
 #define SCR_W   400
 #define SCR_H   240
-#elif __NX__
+#elif __SWITCH__
 #define SCR_W   1280
 #define SCR_H   720
 #else
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
     buttons.emplace_back(KEY_JOY_COIN1_DEFAULT, "SELECT");
     buttons.emplace_back(KEY_JOY_START1_DEFAULT, "START");
     skin = new C2DUISkin("app0:/", buttons);
-#elif __NX__
+#elif __SWITCH__
     // see c2d.h for key id
     buttons.emplace_back(KEY_JOY_UP_DEFAULT, "UP");
     buttons.emplace_back(KEY_JOY_DOWN_DEFAULT, "DOWN");

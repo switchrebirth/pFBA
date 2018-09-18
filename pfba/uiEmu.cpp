@@ -58,9 +58,9 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
     printf("Initialize driver...\n");
     if (DrvInit(rom->drv, false) != 0) {
         printf("\nDriver initialisation failed! Likely causes are:\n"
-                       "- Corrupt/Missing ROM(s)\n"
-                       "- I/O Error\n"
-                       "- Memory error\n\n");
+               "- Corrupt/Missing ROM(s)\n"
+               "- I/O Error\n"
+               "- Memory error\n\n");
         DrvExit();
         InpExit();
         getUi()->getUiProgressBox()->setVisibility(Hidden);

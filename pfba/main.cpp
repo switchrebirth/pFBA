@@ -70,6 +70,15 @@ int main(int argc, char **argv) {
     BurnPathsInit();
     BurnLibInit();
 
+    renderer = new C2DRenderer(Vector2f(SCR_W, SCR_H));
+    inp = new C2DInput();
+    io = new C2DIo();
+
+    // load configuration
+    int version = (__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__;
+    config = new PFBAConfig(renderer, C2DUI_HOME_PATH, version);
+
+    // skin
     // buttons used for ui config menu
     std::vector<C2DUISkin::Button> buttons;
 
@@ -92,6 +101,7 @@ int main(int argc, char **argv) {
     buttons.emplace_back(KEY_JOY_FIRE6_DEFAULT, "R");
     buttons.emplace_back(KEY_JOY_COIN1_DEFAULT, "SELECT");
     buttons.emplace_back(KEY_JOY_START1_DEFAULT, "START");
+    skin = new C2DUISkin("app0:/", buttons);
 #elif __NX__
     // see c2d.h for key id
     buttons.emplace_back(KEY_JOY_UP_DEFAULT, "UP");
@@ -111,19 +121,7 @@ int main(int argc, char **argv) {
     buttons.emplace_back(KEY_JOY_ZR_DEFAULT, "ZR");
     buttons.emplace_back(KEY_JOY_LSTICK_DEFAULT, "LSTICK");
     buttons.emplace_back(KEY_JOY_RSTICK_DEFAULT, "RSTICK");
-#endif
-
-    renderer = new C2DRenderer(Vector2f(SCR_W, SCR_H));
-    inp = new C2DInput();
-    io = new C2DIo();
-
-    // load configuration
-    int version = (__PFBA_VERSION_MAJOR__ * 100) + __PFBA_VERSION_MINOR__;
-    config = new PFBAConfig(renderer, C2DUI_HOME_PATH, version);
-
-    // skin
-#ifdef __PSP2__
-    skin = new C2DUISkin("app0:/", buttons);
+    skin = new C2DUISkin(C2DUI_HOME_PATH, buttons);
 #else
     skin = new C2DUISkin(C2DUI_HOME_PATH, buttons);
 #endif

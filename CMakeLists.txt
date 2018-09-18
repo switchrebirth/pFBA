@@ -14,8 +14,7 @@ set(BUILD_SDL2_GL OFF CACHE BOOL "Build with SDL2 support (hardware rendering, f
 set(BUILD_PSP2 OFF CACHE BOOL "Build with PSP2 support")
 set(BUILD_PS3 OFF CACHE BOOL "Build with PS3 support")
 set(BUILD_3DS OFF CACHE BOOL "Build with 3DS support")
-set(BUILD_NX OFF CACHE BOOL "Build with NX (SWITCH) support")
-set(BUILD_NX_GL OFF CACHE BOOL "Build with NX (SWITCH) support (software, osmesa)")
+set(BUILD_NX ON CACHE BOOL "Build with NX (SWITCH) support")
 
 set(BUILD_PFBA ON CACHE BOOL "Build with PFBA support")
 set(UPDATE_CONFIG OFF "Force config file updating")

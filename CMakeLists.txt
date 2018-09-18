@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # pfba version
-set(PFBA_VERSION_MAJOR 1)
-set(PFBA_VERSION_MINOR 58)
+set(PFBA_VERSION_MAJOR 2)
+set(PFBA_VERSION_MINOR 0)
 
 # delete cmake cache folder before changing this option
 set(BUILD_SFML OFF CACHE BOOL "Build with SFML support")

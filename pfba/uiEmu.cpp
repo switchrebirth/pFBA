@@ -58,9 +58,9 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
     printf("Initialize driver...\n");
     if (DrvInit(rom->drv, false) != 0) {
         printf("\nDriver initialisation failed! Likely causes are:\n"
-                       "- Corrupt/Missing ROM(s)\n"
-                       "- I/O Error\n"
-                       "- Memory error\n\n");
+               "- Corrupt/Missing ROM(s)\n"
+               "- I/O Error\n"
+               "- Memory error\n\n");
         DrvExit();
         InpExit();
         getUi()->getUiProgressBox()->setVisibility(Hidden);
@@ -153,11 +153,7 @@ void PFBAGuiEmu::updateFrame() {
     if (frameSkip) {
         bool draw = nFramesEmulated % (frameSkip + 1) == 0;
         renderFrame(draw, showFps, getUi()->getRenderer()->getFps());
-#ifdef __NX__
-        getUi()->getRenderer()->flip(false);
-#else
         getUi()->getRenderer()->flip(draw);
-#endif
         float delta = getUi()->getRenderer()->getDeltaTime().asSeconds();
         if (delta < getFrameDuration()) { // limit fps
             //printf("f: %f | d: %f | m: %f | s: %i\n", frame_duration, delta, frame_duration - delta,
@@ -166,11 +162,7 @@ void PFBAGuiEmu::updateFrame() {
         }
     } else {
         renderFrame(true, showFps, getUi()->getRenderer()->getFps());
-#ifdef __NX__
-        getUi()->getRenderer()->flip(false);
-#else
         getUi()->getRenderer()->flip();
-#endif
         /*
         timer += getUi()->getRenderer()->getDeltaTime().asSeconds();
         if (timer >= 1) {

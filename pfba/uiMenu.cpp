@@ -28,10 +28,8 @@ bool PFBAGuiMenu::isOptionHidden(c2dui::C2DUIOption *option) {
         return true;
     }
 
-#ifdef __NX__
-    // TODO: disabled until gpu ?
-    if (option->index == C2DUIOption::Index::ROM_SHOW_FPS
-        || option->index == C2DUIOption::Index::ROM_FRAMESKIP) {
+#ifdef __SWITCH__
+    if (option->index == C2DUIOption::Index::ROM_FRAMESKIP) {
         return true;
     }
 #endif

@@ -37,7 +37,7 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
     if (use_audio) {
         printf("Init audio device...");
         addAudio(48000);
-        if (getAudio()) {
+        if (getAudio()->isAvailable()) {
             // disable interpolation as it produce "cracking" sound
             // on some games (cps1 (SF2), cave ...)
             nInterpolation = 1;
@@ -64,16 +64,16 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
                "- Corrupt/Missing ROM(s)\n"
                "- I/O Error\n"
                "- Memory error\n\n");
-        C2DUIGuiEmu::stop();
         getUi()->getUiProgressBox()->setVisibility(Hidden);
         getUi()->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
+        stop();
         return -1;
     }
     nFramesEmulated = 0;
     nFramesRendered = 0;
     nCurrentFrame = 0;
     setFrameDuration(1.0f / ((float) nBurnFPS / 100.0f));
-    printf("frame_duration: %f\n", getFrameDuration());
+    //printf("frame_duration: %f\n", getFrameDuration());
     printf("done\n");
     ///////////////
     // FBA DRIVER

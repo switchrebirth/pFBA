@@ -15,6 +15,13 @@ static inline bool endsWith(std::string const &value, std::string const &ending)
     return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
+static std::string str_toupper(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+                   [](unsigned char c) { return std::toupper(c); }
+    );
+    return s;
+}
+
 PFBARomList::PFBARomList(C2DUIGuiMain *ui, const std::string &emuVersion) : C2DUIRomList(ui, emuVersion) {
 
     printf("PFBARomList::PFBARomList()\n");
@@ -25,7 +32,7 @@ void PFBARomList::build() {
     printf("PFBARomList::build()\n");
 
     char path[MAX_PATH];
-    char pathUppercase[MAX_PATH]; // sometimes on FAT32 short files appear as all uppercase
+    const char *pathUppercase; // sometimes on FAT32 short files appear as all uppercase
     bool use_icons = ui->getConfig()->getValue(C2DUIOption::Index::GUI_SHOW_ICONS) == 1;
 
     for (unsigned int i = 0; i < nBurnDrvCount; i++) {
@@ -81,10 +88,7 @@ void PFBARomList::build() {
         } else {
             snprintf(path, MAX_PATH - 1, "%s.zip", rom->drv_name);
         }
-
-        for (int k = 0; k < MAX_PATH; k++) {
-            pathUppercase[k] = (char) toupper(path[k]);
-        }
+        pathUppercase = str_toupper(path).c_str();
 
         for (unsigned int j = 0; j < files.size(); j++) {
 

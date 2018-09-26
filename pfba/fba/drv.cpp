@@ -38,6 +38,7 @@ static int DoLibInit()                    // Do Init of Burn library driver
     BzipClose();
 
     if (nRet) {
+        BurnDrvExit();
         return 1;
     } else {
         return 0;

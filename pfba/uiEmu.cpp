@@ -64,8 +64,7 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
                "- Corrupt/Missing ROM(s)\n"
                "- I/O Error\n"
                "- Memory error\n\n");
-        DrvExit();
-        InpExit();
+        C2DUIGuiEmu::stop();
         getUi()->getUiProgressBox()->setVisibility(Hidden);
         getUi()->getUiMessageBox()->show("ERROR", "DRIVER INIT FAILED", "OK");
         return -1;

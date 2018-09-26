@@ -70,11 +70,11 @@ void BurnPathsInit() {
     mkdir(szAppConfigPath, 0777);
     //printf("szAppConfigPath: %s\n", szAppConfigPath);
 
-    snprintf(szAppHiscorePath, MAX_PATH - 1, "%s%s", szAppHomePath, "hiscore");
+    snprintf(szAppHiscorePath, MAX_PATH - 1, "%s%s/", szAppHomePath, "hiscores");
     mkdir(szAppHiscorePath, 0777);
     //printf("szAppHiscorePath: %s\n", szAppHiscorePath);
 
-    snprintf(szAppSamplesPath, MAX_PATH - 1, "%s%s", szAppHomePath, "samples");
+    snprintf(szAppSamplesPath, MAX_PATH - 1, "%s%s/", szAppHomePath, "samples");
     mkdir(szAppSamplesPath, 0777);
     //printf("szAppSamplesPath: %s\n", szAppSamplesPath);
 

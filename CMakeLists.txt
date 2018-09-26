@@ -421,7 +421,10 @@ add_custom_target(${PROJECT_NAME}.deps
 # main target
 ##########################
 add_custom_target(${PROJECT_NAME}.data
-        COMMAND cp -rf ${CMAKE_SOURCE_DIR}/pfba/data/skin ${CMAKE_BINARY_DIR})
+        COMMAND cp -rf ${CMAKE_SOURCE_DIR}/pfba/data/skin ${CMAKE_BINARY_DIR}
+        COMMAND mkdir -p ${CMAKE_BINARY_DIR}/hiscores
+        COMMAND cp -f ${CMAKE_SOURCE_DIR}/pfba/data/hiscore.dat ${CMAKE_BINARY_DIR}/hiscores
+        )
 add_executable(${PROJECT_NAME}.elf ${SRC} ${CMAKE_BINARY_DIR}/deps/m68kops.c)
 target_compile_options(${PROJECT_NAME}.elf PRIVATE ${FLAGS})
 target_compile_options(${PROJECT_NAME}.elf PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++11 -fpermissive>)
@@ -478,10 +481,16 @@ if (BUILD_NX)
     add_custom_target(${PROJECT_NAME}_release_switch.zip
             DEPENDS ${PROJECT_NAME}.nro
             COMMAND rm -rf ${CMAKE_BINARY_DIR}/release/pfba
-            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/release/pfba && mkdir -p ${CMAKE_BINARY_DIR}/release/pfba/roms
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/release/pfba
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/release/pfba/roms
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/release/pfba/hiscores
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/release/pfba/titles
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/release/pfba/previews
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/release/pfba/icons
             COMMAND cp -f ${CMAKE_BINARY_DIR}/pfba.nro ${CMAKE_BINARY_DIR}/release/pfba/pfba.nro
             COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/skin ${CMAKE_BINARY_DIR}/release/pfba/
             COMMAND cp -r ${CMAKE_SOURCE_DIR}/pfba/data/nx/skin ${CMAKE_BINARY_DIR}/release/pfba/
+            COMMAND cp -f ${CMAKE_SOURCE_DIR}/pfba/data/hiscore.dat ${CMAKE_BINARY_DIR}/release/pfba/hiscores
             COMMAND cd ${CMAKE_BINARY_DIR}/release && zip -r ../${PROJECT_NAME}-${PFBA_VERSION_MAJOR}.${PFBA_VERSION_MINOR}_switch.zip pfba && cd ${CMAKE_BINARY_DIR}
             )
 endif (BUILD_NX)

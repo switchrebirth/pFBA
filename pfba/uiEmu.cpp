@@ -56,6 +56,7 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
     // FBA DRIVER
     ///////////////
     bForce60Hz = true;
+    EnableHiscores = 1;
     InpInit();
     InpDIP();
     printf("Initialize driver...\n");

@@ -126,12 +126,8 @@ int main(int argc, char **argv) {
     skin = new C2DUISkin(C2DUI_HOME_PATH, buttons);
 #endif
 
-    // audio
-    Audio *audio = new C2DAudio(48000);
-    audio->pause(1);
-
     // gui
-    ui = new PFBAGui(renderer, io, inp, audio, config, skin);
+    ui = new PFBAGui(renderer, io, inp, config, skin);
     std::string fba_version = "fba: ";
     fba_version += szAppBurnVer;
     romList = new PFBARomList(ui, fba_version);
@@ -147,7 +143,6 @@ int main(int argc, char **argv) {
     BurnLibExit();
 
     delete (ui);
-    delete (audio);
     delete (skin);
     delete (config);
     delete (io);

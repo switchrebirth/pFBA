@@ -9,7 +9,7 @@ class PFBAGui : public c2dui::C2DUIGuiMain {
 
 public:
 
-    PFBAGui(c2d::Renderer *renderer, c2d::Io *io, c2d::Input *input, c2d::Audio *audio,
+    PFBAGui(c2d::Renderer *renderer, c2d::Io *io, c2d::Input *input,
             c2dui::C2DUIConfig *config, c2dui::C2DUISkin *skin);
 
     void runRom(c2dui::C2DUIRomList::Rom *rom) override;

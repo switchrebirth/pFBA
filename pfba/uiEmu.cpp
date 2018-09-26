@@ -33,16 +33,19 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
     ///////////
     // AUDIO
     //////////
-    int audio = getUi()->getConfig()->getValue(C2DUIOption::Index::ROM_AUDIO, true);
-    if (audio && getUi()->getAudio()->available) {
+    int use_audio = getUi()->getConfig()->getValue(C2DUIOption::Index::ROM_AUDIO, true);
+    if (use_audio) {
         printf("Init audio device...");
-        // disable interpolation as it produce "cracking" sound
-        // on some games (cps1 (SF2), cave ...)
-        nInterpolation = 1;
-        nFMInterpolation = 0;
-        nBurnSoundRate = getUi()->getAudio()->frequency;
-        nBurnSoundLen = getUi()->getAudio()->buffer_len;
-        pBurnSoundOut = getUi()->getAudio()->buffer;
+        addAudio(48000);
+        if (getAudio()) {
+            // disable interpolation as it produce "cracking" sound
+            // on some games (cps1 (SF2), cave ...)
+            nInterpolation = 1;
+            nFMInterpolation = 0;
+            nBurnSoundRate = getAudio()->getSampleRate();
+            nBurnSoundLen = getAudio()->getBufferLen();
+            pBurnSoundOut = getAudio()->getBuffer();
+        }
         printf("done\n");
     }
     ///////////
@@ -85,8 +88,7 @@ int PFBAGuiEmu::run(C2DUIRomList::Rom *rom) {
     nBurnBpp = 2;
     BurnHighCol = myHighCol16;
     BurnRecalcPal();
-    C2DUIVideo *video = new C2DUIVideo(getUi(), (void **) &pBurnDraw, &nBurnPitch, Vector2f(w, h));
-    setVideo(video);
+    addVideo(getUi(), (void **) &pBurnDraw, &nBurnPitch, Vector2f(w, h));
     //////////
     // VIDEO
     //////////
@@ -139,8 +141,8 @@ void PFBAGuiEmu::renderFrame(bool draw, int drawFps, float fps) {
             getFpsText()->setString(getFpsString());
         }
 
-        if (getUi()->getAudio() && getUi()->getAudio()->available) {
-            getUi()->getAudio()->play();
+        if (getAudio() && getAudio()->isAvailable()) {
+            getAudio()->play();
         }
     }
 }
